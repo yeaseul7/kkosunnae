@@ -9,9 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.27.16",
+    "@tiptap/extension-image": "^3.11.0",
+    "@tiptap/extension-text-align": "^3.11.0",
+    "@tiptap/extensions": "^3.11.0",
+    "@tiptap/pm": "^3.11.0",
+    "@tiptap/react": "^3.11.0",
+    "@tiptap/starter-kit": "^3.11.0",
+    "firebase": "^12.6.0",
     "next": "16.0.2",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-hotkeys-hook": "^5.2.1",
     "react-icons": "^5.5.0"
   },
   "devDependencies": {
@@ -22,6 +31,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.2",
     "eslint-config-prettier": "^10.1.8",
+    "sass": "^1.94.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

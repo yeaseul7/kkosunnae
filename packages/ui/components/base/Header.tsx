@@ -3,14 +3,21 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import RoundButton from '../common/RoundButton';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import LoginModal from '../auth/LoginModal';
+import HeaderUserIcon from './HeaderUserIcon';
+import HeaderUserMenu from './HeaderUserMenu';
+import { useAuth } from '@/lib/firebase/auth';
 
 interface HeaderProps {
   visibleHeaderButtons?: boolean;
 }
 export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const router = useRouter();
+  const { user, loading } = useAuth();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const handleNotificationClick = useCallback(() => {
     console.log('Notification clicked');
@@ -24,16 +31,20 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
     router.push('/write');
   }, [router]);
 
+  const openLoginModal = useCallback(() => {
+    setIsLoginModalOpen((prev) => !prev);
+  }, []);
+
   return (
-    <header className="h-16 w-full">
-      <div className="flex items-center justify-between w-full">
+    <header className="w-full h-16">
+      <div className="flex justify-between items-center w-full">
         <Link href="/">
           <h1 className="text-2xl font-bold">Logo</h1>
         </Link>
         {visibleHeaderButtons && (
-          <div className="flex items-center gap-2">
+          <div className="flex gap-2 items-center">
             <button
-              className="p-2 hover:bg-gray-200 rounded-full"
+              className="p-2 rounded-full hover:bg-gray-200"
               onClick={handleNotificationClick}
             >
               <Image
@@ -44,7 +55,7 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
               />
             </button>
             <button
-              className="p-2 hover:bg-gray-200 rounded-full"
+              className="p-2 rounded-full hover:bg-gray-200"
               onClick={handleSearchClick}
             >
               <Image
@@ -54,10 +65,30 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
                 height={25}
               />
             </button>
-            <RoundButton onClick={writeArticle}>새 글 작성</RoundButton>
+            <RoundButton onClick={writeArticle} className="mr-2">
+              새 글 작성
+            </RoundButton>
+            {!loading && (
+              <>
+                {user ? (
+                  <div className="relative group">
+                    <HeaderUserIcon
+                      setIsUserMenuOpen={setIsUserMenuOpen}
+                      isUserMenuOpen={isUserMenuOpen}
+                    />
+                    {isUserMenuOpen && <HeaderUserMenu />}
+                  </div>
+                ) : (
+                  <RoundButton onClick={openLoginModal}>로그인</RoundButton>
+                )}
+              </>
+            )}
           </div>
         )}
       </div>
+      {isLoginModalOpen && (
+        <LoginModal onClose={() => setIsLoginModalOpen(false)} />
+      )}
     </header>
   );
 }

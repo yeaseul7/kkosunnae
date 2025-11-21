@@ -10,6 +10,81 @@
   /* --color-foreground: var(--foreground); */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Theme colors from tailwind.config.js */
+  --color-page1: #F8F9FA;
+  --color-page2: #FFFFFF;
+  --color-element1: #FFFFFF;
+  --color-element2: #F8F9FA;
+  --color-element3: #E9ECEF;
+  --color-element4: #DEE2E6;
+  --color-element5: #212529;
+  --color-element6: #343A40;
+  --color-element7: #FFFFFF;
+  --color-element8: #FBFDFC;
+  --color-invert: #1E1E1E;
+  --color-inline-code: #E9ECEF;
+  --color-tag: #F8F9FA;
+  --color-text1: #212529;
+  --color-text2: #495057;
+  --color-text3: #868E96;
+  --color-text4: #CED4DA;
+  --color-border1: #343A40;
+  --color-border2: #ADB5BD;
+  --color-border3: #DEE2E6;
+  --color-border4: #F1F3F5;
+  --color-primary1: #12B886;
+  --color-primary2: #20C997;
+  --color-destructive1: #FF6B6B;
+  --color-destructive2: #FF8787;
+  --color-button-text: #FFFFFF;
+  --color-slight-layer: rgba(0,0,0,0.05);
+  --color-opaque-layer: rgba(249,249,249,0.85);
+  --color-editor-footer: #FFFFFF;
+  --color-prism-bg: #fbfcfd;
+  --color-prism-default-text: #24292e;
+  --color-prism-selection-bg: rgba(0,0,0,0.15);
+  --color-prism-code-block-bg: #fbfcfd;
+  --color-prism-code-1: #969896;
+  --color-prism-code-2: #24292e;
+  --color-prism-code-3: #a626a4;
+  --color-prism-code-4: #63a35c;
+  --color-prism-code-5: #0184bc;
+  --color-prism-code-6: #50a14f;
+  --color-prism-code-7: #a626a4;
+  --color-prism-code-8: #005cc5;
+  --color-prism-code-9: #a626a4;
+  --color-prism-line-number: #585c63;
+  --color-teal-0: #F3FFFB;
+  --color-teal-1: #C3FAE8;
+  --color-teal-2: #96F2D7;
+  --color-teal-3: #63E6BE;
+  --color-teal-4: #38D9A9;
+  --color-teal-5: #20C997;
+  --color-teal-6: #12B886;
+  --color-teal-7: #0CA678;
+  --color-teal-8: #099268;
+  --color-teal-9: #087F5B;
+  --color-gray-0: #F8F9FA;
+  --color-gray-1: #F1F3F5;
+  --color-gray-2: #E9ECEF;
+  --color-gray-3: #DEE2E6;
+  --color-gray-4: #CED4DA;
+  --color-gray-5: #ADB5BD;
+  --color-gray-6: #868E96;
+  --color-gray-7: #495057;
+  --color-gray-8: #343A40;
+  --color-gray-9: #212529;
+  --color-red-0: #fff5f5;
+  --color-red-1: #ffe3e3;
+  --color-red-2: #ffc9c9;
+  --color-red-3: #ffa8a8;
+  --color-red-4: #ff8787;
+  --color-red-5: #ff6b6b;
+  --color-red-6: #fa5252;
+  --color-red-7: #f03e3e;
+  --color-red-8: #e03131;
+  --color-red-9: #c92a2a;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +98,82 @@ body {
   background: var(--background);
   /* color: var(--foreground); */
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* TipTap Placeholder styles */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #868E96;
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #868E96;
+  pointer-events: none;
+  height: 0;
+}
+
+.tiptap {
+  outline: none;
+  
+  p {
+    @apply first:mt-0 last:mb-0 text-base leading-relaxed;
+  }
+
+  h1 {
+    @apply text-3xl font-bold mt-8 mb-4 first:mt-0 last:mb-0;
+  }
+
+  h2 {
+    @apply text-2xl font-bold mt-6 mb-3 first:mt-0 last:mb-0;
+  }
+
+  h3 {
+    @apply text-xl font-bold mt-4 mb-2 first:mt-0 last:mb-0;
+  }
+
+  ul,
+  ol {
+    @apply my-4 pl-6;
+  }
+
+  ul {
+    @apply list-disc;
+  }
+
+  ol {
+    @apply list-decimal;
+  }
+
+  li {
+    @apply my-1;
+  }
+
+  blockquote {
+    @apply border-l-4 border-element4 pl-4 italic my-4;
+  }
+
+  code {
+    @apply bg-element3 px-1 py-0.5 rounded text-sm;
+  }
+
+  pre {
+    @apply bg-element3 p-4 rounded my-4 overflow-x-auto;
+  }
+
+  pre code {
+    @apply bg-transparent p-0;
+  }
+}
+
+.ProseMirror {
+  outline: none !important;
+}
+
+.ProseMirror-focused {
+  outline: none !important;
 }
