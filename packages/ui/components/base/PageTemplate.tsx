@@ -13,10 +13,12 @@ export default function PageTemplate({
   visibleHeaderButtons = true,
 }: PageTemplateProps) {
   return (
-    <div className="flex flex-col items-center justify-center w-full">
-      <Header visibleHeaderButtons={visibleHeaderButtons} />
+    <div className="flex flex-col items-center w-full">
+      <div className="w-full">
+        <Header visibleHeaderButtons={visibleHeaderButtons} />
+      </div>
       {visibleHomeTab && <HomeTab />}
-      {children}
+      <div className="w-full">{children}</div>
     </div>
   );
 }

@@ -1,10 +1,13 @@
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
+import RecentPosts from '@/packages/ui/components/home/recent/RecentPosts';
 
 export default function Recent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans ">
-      <main className="flex min-h-screen w-full max-w-6xl flex-col items-center justify-between py-4 px-4 bg-whitesm:items-start">
-        <PageTemplate></PageTemplate>
+    <div className="flex justify-center items-center min-h-screen font-sans">
+      <main className="flex flex-col justify-between items-center px-4 py-4 w-full max-w-6xl min-h-screen bg-whitesm:items-start">
+        <PageTemplate>
+          <RecentPosts />
+        </PageTemplate>
       </main>
     </div>
   );

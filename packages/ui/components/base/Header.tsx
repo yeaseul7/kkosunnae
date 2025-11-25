@@ -36,10 +36,10 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
   }, []);
 
   return (
-    <header className="w-full h-16">
-      <div className="flex justify-between items-center w-full">
+    <header className="w-full h-16 bg-white">
+      <div className="flex justify-between items-center px-4 w-full h-full">
         <Link href="/">
-          <h1 className="text-2xl font-bold">Logo</h1>
+          <h1 className="text-2xl font-bold">DogLog</h1>
         </Link>
         {visibleHeaderButtons && (
           <div className="flex gap-2 items-center">
@@ -65,13 +65,13 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
                 height={25}
               />
             </button>
-            <RoundButton onClick={writeArticle} className="mr-2">
-              새 글 작성
-            </RoundButton>
             {!loading && (
               <>
                 {user ? (
-                  <div className="relative group">
+                  <div className="flex relative items-center group">
+                    <RoundButton onClick={writeArticle} className="mr-2">
+                      새 글 작성
+                    </RoundButton>
                     <HeaderUserIcon
                       setIsUserMenuOpen={setIsUserMenuOpen}
                       isUserMenuOpen={isUserMenuOpen}

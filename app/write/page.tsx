@@ -1,15 +1,15 @@
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
-import WriteContainer from './WriteContainer';
+import WriteContainer from '@/packages/ui/components/home/write/WriteContainer';
 
 export default function WritePage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans ">
-      <main className="flex min-h-screen w-full max-w-6xl flex-col items-center py-4 px-4 bg-whitesm:items-start">
+    <div className="flex justify-center items-center h-screen font-sans bg-white">
+      <main className="flex flex-col items-center px-4 py-4 w-full max-w-6xl h-full bg-whitesm:items-start">
         <PageTemplate
           visibleHomeTab={false}
           visibleHeaderButtons={false}
         ></PageTemplate>
-        <WriteContainer className="flex-1 w-full" />
+        <WriteContainer className="flex-1 p-4 w-full" />
       </main>
     </div>
   );

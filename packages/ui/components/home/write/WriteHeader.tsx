@@ -1,17 +1,23 @@
-import { useState } from 'react';
+import { PostData } from '@/packages/ui/components/home/write/WriteContainer';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { PiDogFill } from 'react-icons/pi';
 
-export default function WriteHeader() {
-  const [title, setTitle] = useState('');
+export default function WriteHeader({
+  postData,
+  setPostData,
+}: {
+  postData: PostData;
+  setPostData: Dispatch<SetStateAction<PostData>>;
+}) {
   return (
-    <div className="flex items-center justify-start w-full gap-2">
+    <div className="flex gap-2 justify-start items-center w-full">
       <PiDogFill className="w-6 h-6" />
       <input
         type="text"
         placeholder="제목을 입력하세요"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="w-full py-2 text-2xl font-bold border-none outline-none"
+        value={postData.title}
+        onChange={(e) => setPostData({ ...postData, title: e.target.value })}
+        className="py-2 w-full text-2xl font-bold border-none outline-none"
       />
     </div>
   );

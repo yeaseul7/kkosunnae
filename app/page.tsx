@@ -1,12 +1,22 @@
 'use client';
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
 import { app } from '@/lib/firebase/firebase';
+import { usePathname } from 'next/navigation';
+import TrendingPosts from '@/packages/ui/components/home/trending/TrendingPosts';
+import RecentPosts from '@/packages/ui/components/home/recent/RecentPosts';
 
 export default function Home() {
+  const pathname = usePathname();
   return (
-    <div className="flex justify-center items-center min-h-screen font-sans bg-zinc-50">
+    <div className="flex justify-center items-center min-h-screen font-sans bg-white">
       <main className="flex flex-col justify-between items-center px-4 py-4 w-full max-w-6xl min-h-screen bg-whitesm:items-start">
-        <PageTemplate></PageTemplate>
+        <PageTemplate>
+          {pathname === '/' || pathname.startsWith('/trending') ? (
+            <TrendingPosts />
+          ) : (
+            <RecentPosts />
+          )}
+        </PageTemplate>
       </main>
     </div>
   );

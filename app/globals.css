@@ -87,15 +87,16 @@
   --color-red-9: #c92a2a;
 }
 
-@media (prefers-color-scheme: dark) {
+/* 다크 모드 비활성화 - 항상 라이트 모드 사용 */
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
-  background: var(--background);
+  background: #fafafa; /* 항상 밝은 배경색 사용 */
   /* color: var(--foreground); */
   font-family: Arial, Helvetica, sans-serif;
 }

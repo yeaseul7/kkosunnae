@@ -351,7 +351,7 @@ export function selectionWithinConvertibleTypes(
 }
 
 /**
- * Handles image upload with progress tracking and abort capability
+ * Handles image upload to Cloudinary with progress tracking and abort capability
  * @param file The file to upload
  * @param onProgress Optional callback for tracking upload progress
  * @param abortSignal Optional AbortSignal for cancelling the upload
@@ -378,56 +378,69 @@ export const handleImageUpload = async (
     throw new Error('Upload can only be performed in browser environment');
   }
 
-  // Import Firebase Storage dynamically to avoid SSR issues
-  const { ref, uploadBytesResumable, getDownloadURL } = await import(
-    'firebase/storage'
-  );
-  const { storage } = await import('@/lib/firebase/firebase');
+  // Create FormData for upload
+  const formData = new FormData();
+  formData.append('file', file);
 
-  // Generate unique filename
-  const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(2, 15);
-  const fileExtension = file.name.split('.').pop();
-  const filename = `images/${timestamp}-${randomString}.${fileExtension}`;
-
-  // Create storage reference
-  const storageRef = ref(storage, filename);
-
-  // Upload file with progress tracking
-  const uploadTask = uploadBytesResumable(storageRef, file);
-
+  // Create XMLHttpRequest for progress tracking
   return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+
     // Handle abort signal
     if (abortSignal) {
       abortSignal.addEventListener('abort', () => {
-        uploadTask.cancel();
+        xhr.abort();
         reject(new Error('Upload cancelled'));
       });
     }
 
-    // Monitor upload progress
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        if (abortSignal?.aborted) return;
-
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    // Track upload progress
+    xhr.upload.addEventListener('progress', (event) => {
+      if (event.lengthComputable && !abortSignal?.aborted) {
+        const progress = (event.loaded / event.total) * 100;
         onProgress?.({ progress: Math.round(progress) });
-      },
-      (error) => {
-        reject(error);
-      },
-      async () => {
+      }
+    });
+
+    // Handle completion
+    xhr.addEventListener('load', () => {
+      if (abortSignal?.aborted) {
+        reject(new Error('Upload cancelled'));
+        return;
+      }
+
+      if (xhr.status === 200) {
         try {
-          // Get download URL
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          resolve(downloadURL);
+          const response = JSON.parse(xhr.responseText);
+          resolve(response.url);
         } catch (error) {
-          reject(error);
+          reject(new Error('Failed to parse response'));
         }
-      },
-    );
+      } else {
+        try {
+          const error = JSON.parse(xhr.responseText);
+          reject(new Error(error.error || 'Upload failed'));
+        } catch {
+          reject(new Error(`Upload failed with status ${xhr.status}`));
+        }
+      }
+    });
+
+    // Handle errors
+    xhr.addEventListener('error', () => {
+      if (!abortSignal?.aborted) {
+        reject(new Error('Network error during upload'));
+      }
+    });
+
+    // Handle abort
+    xhr.addEventListener('abort', () => {
+      reject(new Error('Upload cancelled'));
+    });
+
+    // Start upload
+    xhr.open('POST', '/api/upload');
+    xhr.send(formData);
   });
 };
 

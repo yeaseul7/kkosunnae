@@ -1,0 +1,107 @@
+'use client';
+import { useRouter } from 'next/navigation';
+import { PostData } from '../home/trending/TrendingPosts';
+import Image from 'next/image';
+import { Timestamp } from 'firebase/firestore';
+import { HiHeart } from 'react-icons/hi2';
+import { PiDogFill } from 'react-icons/pi';
+
+export default function PostCard({ post }: { post: PostData }) {
+  const router = useRouter();
+
+  // 날짜 포맷팅 함수
+  const formatDate = (timestamp: Timestamp | null): string => {
+    if (!timestamp) return '';
+
+    const date = timestamp.toDate();
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    if (days === 0) {
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      if (hours === 0) {
+        const minutes = Math.floor(diff / (1000 * 60));
+        return minutes <= 0 ? '방금 전' : `${minutes}분 전`;
+      }
+      return `약 ${hours}시간 전`;
+    } else if (days === 1) {
+      return '어제';
+    } else if (days < 7) {
+      return `${days}일 전`;
+    } else {
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    }
+  };
+
+  // 콘텐츠에서 텍스트만 추출 (HTML 태그 제거)
+  const extractText = (html: string): string => {
+    if (!html) return '';
+    const text = html
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return text.length > 150 ? text.substring(0, 150) + '...' : text;
+  };
+
+  return (
+    <article
+      key={post.id}
+      onClick={() => router.push(`/read/${post.id}`)}
+      className="flex overflow-hidden flex-col bg-white rounded-md shadow-sm transition-all duration-200 cursor-pointer hover:shadow-lg hover:translate-y-1 active:translate-y-0 active:shadow-sm"
+    >
+      <div className="relative w-full bg-gray-200 aspect-video">
+        <Image
+          src="/static/images/DefaultImage.jpeg"
+          alt={post.title}
+          fill
+          className="object-cover"
+        />
+      </div>
+      <div className="flex flex-col flex-1 p-4">
+        <h2 className="mb-2 text-lg font-semibold text-gray-900 line-clamp-2">
+          {post.title}
+        </h2>
+
+        <p className="mb-4 text-sm text-gray-600 line-clamp-3">
+          {extractText(post.content)}
+        </p>
+
+        {/* 하단 메타 정보 */}
+        <div className="flex justify-between items-center mt-auto">
+          <div className="flex gap-2 items-center text-xs text-gray-500">
+            <span>{formatDate(post.createdAt)}</span>
+            <span>·</span>
+            <span>0개의 댓글</span>
+          </div>
+        </div>
+        <div className="flex justify-between items-center pt-3 mt-3 border-t border-gray-100">
+          <div className="flex gap-2 items-center">
+            {post.authorPhotoURL ? (
+              <Image
+                src={post.authorPhotoURL}
+                alt={post.authorName}
+                width={24}
+                height={24}
+                className="object-cover w-6 h-6 rounded-full"
+              />
+            ) : (
+              <div className="flex justify-center items-center w-6 h-6 bg-gray-200 rounded-full">
+                <PiDogFill className="text-xs text-gray-500" />
+              </div>
+            )}
+            <span className="text-sm text-gray-700">by {post.authorName}</span>
+          </div>
+          <div className="flex gap-1 items-center text-gray-500">
+            <HiHeart className="w-4 h-4" />
+            <span className="text-sm">0</span>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}

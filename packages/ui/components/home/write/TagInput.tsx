@@ -1,21 +1,45 @@
 'use client';
+import { PostData } from '@/packages/ui/components/home/write/WriteContainer';
 import { isEmptyOrWhitespace } from '@/lib/utils';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
-export default function TagInput() {
+export default function TagInput({
+  postData,
+  setPostData,
+}: {
+  postData: PostData;
+  setPostData: Dispatch<SetStateAction<PostData>>;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const valueRef = useRef<string>('');
 
   const [value, setValue] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
+
+  // valueRef를 항상 최신 값으로 동기화
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
 
   const insertTag = useCallback(
     (tag: string) => {
-      if (isEmptyOrWhitespace(tag)) return;
-      if (tags.includes(tag)) return;
-      setTags([...tags, tag]);
+      const trimmedTag = tag.trim();
+      if (!trimmedTag || isEmptyOrWhitespace(trimmedTag)) return;
+
+      setPostData((prev) => {
+        if (prev.tags.includes(trimmedTag)) return prev;
+        return { ...prev, tags: [...prev.tags, trimmedTag] };
+      });
       setValue('');
+      valueRef.current = '';
     },
-    [tags],
+    [setPostData],
   );
 
   useEffect(() => {
@@ -24,9 +48,10 @@ export default function TagInput() {
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
-        console.log('Outside clicked');
-        console.log(value);
-        insertTag(value);
+        const currentValue = valueRef.current.trim();
+        if (currentValue) {
+          insertTag(currentValue);
+        }
       }
     };
 
@@ -37,20 +62,25 @@ export default function TagInput() {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
     };
-  }, [insertTag, value]);
+  }, [insertTag]);
+
   const removeTag = useCallback(
     (tag: string) => {
-      setTags(tags.filter((t) => t !== tag));
+      setPostData((prev) => ({
+        ...prev,
+        tags: prev.tags.filter((t) => t !== tag),
+      }));
     },
-    [tags],
+    [setPostData],
   );
+
   return (
-    <div ref={containerRef} className="w-full flex flex-col gap-2 my-4">
-      <div className="flex items-center gap-2 flex-wrap">
-        {tags.map((tag) => (
+    <div ref={containerRef} className="flex flex-col gap-2 my-4 w-full">
+      <div className="flex flex-wrap gap-2 items-center">
+        {postData.tags.map((tag) => (
           <div
             key={tag}
-            className="bg-element3 rounded-full px-2 py-1 text-sm cursor-pointer text-primary1 whitespace-nowrap shrink-0"
+            className="px-2 py-1 text-sm whitespace-nowrap rounded-full cursor-pointer bg-element2 text-primary1 shrink-0"
             onClick={() => {
               removeTag(tag);
             }}
@@ -63,13 +93,22 @@ export default function TagInput() {
         type="text"
         placeholder="태그를 입력하세요 (쉼표로 구분)"
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          const newValue = e.target.value;
+          setValue(newValue);
+          valueRef.current = newValue;
+        }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
-            insertTag(value);
+            e.preventDefault();
+            e.stopPropagation();
+            const currentValue = e.currentTarget.value.trim();
+            if (currentValue) {
+              insertTag(currentValue);
+            }
           }
         }}
-        className="w-full py-1 text-sm border-none outline-none pt-2"
+        className="py-1 pt-2 w-full text-sm border-none outline-none"
       />
     </div>
   );
