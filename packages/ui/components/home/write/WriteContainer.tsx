@@ -77,13 +77,15 @@ export default function WriteContainer({ className }: WriteContainerProps) {
     }
   }, [postData, user, router]);
   return (
-    <div className={`flex flex-col  w-full h-full ${className || ''}`}>
-      <div className="flex flex-col justify-start items-center w-full h-full">
+    <div className={`flex flex-col w-full h-full ${className || ''}`}>
+      <div className="flex flex-col w-full h-full">
         <WriteHeader postData={postData} setPostData={setPostData} />
         <TagInput postData={postData} setPostData={setPostData} />
         <DecorateHr />
-        <WriteBody postData={postData} setPostData={setPostData} />
-        <div className="flex justify-end items-center w-full">
+        <div className="flex-1 min-h-0">
+          <WriteBody postData={postData} setPostData={setPostData} />
+        </div>
+        <div className="flex justify-end items-center w-full shrink-0">
           <WriteFooter posting={posting} />
         </div>
       </div>

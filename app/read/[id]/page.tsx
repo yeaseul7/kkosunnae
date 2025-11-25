@@ -10,17 +10,9 @@ import NextImage from 'next/image';
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
 import { IoIosArrowBack } from 'react-icons/io';
 import Loading from '@/packages/ui/components/base/Loading';
-
-interface PostData {
-  title: string;
-  content: string;
-  tags: string[];
-  authorId: string;
-  authorName: string;
-  authorPhotoURL: string | null;
-  createdAt: Timestamp | null;
-  updatedAt: Timestamp | null;
-}
+import NotFound from '@/packages/ui/components/base/NotFound';
+import { PostData } from '@/packages/type/postType';
+import ReadHeader from '@/packages/ui/components/home/read/ReadHeader';
 
 export default function ReadPostPage() {
   const params = useParams();
@@ -76,20 +68,7 @@ export default function ReadPostPage() {
       <main className="flex flex-col items-center px-4 py-4 w-full max-w-6xl min-h-screen">
         <PageTemplate visibleHeaderButtons={true} visibleHomeTab={false}>
           {loading && <Loading />}
-
-          {error && !loading && (
-            <div className="flex flex-col justify-center items-center py-12">
-              <div className="text-red-500">
-                {error || '게시물을 찾을 수 없습니다.'}
-              </div>
-              <button
-                onClick={() => router.back()}
-                className="flex gap-2 items-center px-4 py-2 mt-4 text-white bg-blue-500 rounded"
-              >
-                뒤로가기
-              </button>
-            </div>
-          )}
+          {error && !loading && <NotFound error={error} />}
 
           {!loading && !error && post && (
             <>
@@ -102,46 +81,7 @@ export default function ReadPostPage() {
               </button>
 
               <article className="p-8 bg-white">
-                <header className="mb-6">
-                  <h1 className="mb-4 text-3xl font-bold">{post.title}</h1>
-
-                  <div className="flex gap-4 items-center mb-4">
-                    {post.authorPhotoURL ? (
-                      <NextImage
-                        src={post.authorPhotoURL}
-                        alt={post.authorName}
-                        width={28}
-                        height={28}
-                        className="object-cover w-7 h-7 rounded-full"
-                      />
-                    ) : (
-                      <div className="w-7 h-7 bg-gray-300 rounded-full"></div>
-                    )}
-                    <div className="flex gap-2 items-center">
-                      <div className="pr-2 text-base font-semibold">
-                        {post.authorName}
-                      </div>
-                      {post.createdAt && (
-                        <div className="text-sm text-gray-500">
-                          {post.createdAt.toDate().toLocaleDateString()}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {post.tags && post.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {post.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 text-sm whitespace-nowrap rounded-full cursor-pointer bg-element2 text-primary1 shrink-0"
-                        >
-                          # {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </header>
+                <ReadHeader post={post} />
 
                 <div className="max-w-none prose">
                   {editor && (
