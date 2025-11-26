@@ -17,7 +17,7 @@ export default function CommentContainer({
       </div>
       <p className="text-sm text-gray-700 whitespace-pre-wrap">{content}</p>
       <div>
-        <CommentFooter />
+        <CommentFooter commentData={commentData} />
       </div>
     </div>
   );
