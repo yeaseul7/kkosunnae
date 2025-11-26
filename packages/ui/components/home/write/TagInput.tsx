@@ -1,6 +1,6 @@
 'use client';
-import { PostData } from '@/packages/ui/components/home/write/WriteContainer';
 import { isEmptyOrWhitespace } from '@/lib/utils';
+import { PostData } from '@/packages/type/postType';
 import {
   Dispatch,
   SetStateAction,
@@ -33,8 +33,9 @@ export default function TagInput({
       if (!trimmedTag || isEmptyOrWhitespace(trimmedTag)) return;
 
       setPostData((prev) => {
-        if (prev.tags.includes(trimmedTag)) return prev;
-        return { ...prev, tags: [...prev.tags, trimmedTag] };
+        const currentTags = prev.tags || [];
+        if (currentTags.includes(trimmedTag)) return prev;
+        return { ...prev, tags: [...currentTags, trimmedTag] };
       });
       setValue('');
       valueRef.current = '';
@@ -68,7 +69,7 @@ export default function TagInput({
     (tag: string) => {
       setPostData((prev) => ({
         ...prev,
-        tags: prev.tags.filter((t) => t !== tag),
+        tags: (prev.tags || []).filter((t) => t !== tag),
       }));
     },
     [setPostData],
@@ -77,17 +78,18 @@ export default function TagInput({
   return (
     <div ref={containerRef} className="flex flex-col gap-2 my-4 w-full">
       <div className="flex flex-wrap gap-2 items-center">
-        {postData.tags.map((tag) => (
-          <div
-            key={tag}
-            className="px-2 py-1 text-sm whitespace-nowrap rounded-full cursor-pointer bg-element2 text-primary1 shrink-0"
-            onClick={() => {
-              removeTag(tag);
-            }}
-          >
-            # {tag}
-          </div>
-        ))}
+        {postData?.tags?.length > 0 &&
+          postData?.tags?.map((tag) => (
+            <div
+              key={tag}
+              className="px-2 py-1 text-sm whitespace-nowrap rounded-full cursor-pointer bg-element2 text-primary1 shrink-0"
+              onClick={() => {
+                removeTag(tag);
+              }}
+            >
+              # {tag}
+            </div>
+          ))}
       </div>
       <input
         type="text"

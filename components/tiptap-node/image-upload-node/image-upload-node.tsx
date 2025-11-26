@@ -461,9 +461,8 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
           const filename =
             files[index]?.name.replace(/\.[^/.]+$/, "") || "unknown"
           return {
-            type: extension.options.type,
+            type: extension.options.type || "resizableImage",
             attrs: {
-              ...extension.options,
               src: url,
               alt: filename,
               title: filename,

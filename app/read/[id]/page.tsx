@@ -1,18 +1,18 @@
 'use client';
 import { firestore } from '@/lib/firebase/firebase';
-import { doc, getDoc, Timestamp } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
-import NextImage from 'next/image';
+import { Image } from '@tiptap/extension-image';
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
 import { IoIosArrowBack } from 'react-icons/io';
 import Loading from '@/packages/ui/components/base/Loading';
 import NotFound from '@/packages/ui/components/base/NotFound';
 import { PostData } from '@/packages/type/postType';
 import ReadHeader from '@/packages/ui/components/home/read/ReadHeader';
+import ReadFooter from '@/packages/ui/components/home/read/ReadFooter';
 
 export default function ReadPostPage() {
   const params = useParams();
@@ -81,7 +81,7 @@ export default function ReadPostPage() {
               </button>
 
               <article className="p-8 bg-white">
-                <ReadHeader post={post} />
+                <ReadHeader post={post} isEditing={false} />
 
                 <div className="max-w-none prose">
                   {editor && (
@@ -89,6 +89,7 @@ export default function ReadPostPage() {
                   )}
                 </div>
               </article>
+              <ReadFooter post={post} postId={postId} />
             </>
           )}
         </PageTemplate>

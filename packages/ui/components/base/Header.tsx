@@ -39,7 +39,12 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
     <header className="w-full h-16 bg-white">
       <div className="flex justify-between items-center px-4 w-full h-full">
         <Link href="/">
-          <h1 className="text-2xl font-bold">DogLog</h1>
+          <Image
+            src="/static/images/unleashedLogo.png"
+            alt="Logo"
+            width={100}
+            height={100}
+          />
         </Link>
         {visibleHeaderButtons && (
           <div className="flex gap-2 items-center">

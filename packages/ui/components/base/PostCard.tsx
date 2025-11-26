@@ -48,6 +48,25 @@ export default function PostCard({ post }: { post: PostData }) {
     return text.length > 150 ? text.substring(0, 150) + '...' : text;
   };
 
+  // 콘텐츠에서 첫 번째 이미지 URL 추출
+  const extractFirstImage = (html: string | undefined): string | null => {
+    if (!html || typeof html !== 'string') {
+      return null;
+    }
+
+    // <img> 태그에서 src 속성 추출
+    const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/i;
+    const match = html.match(imgRegex);
+
+    if (match && match[1]) {
+      return match[1];
+    }
+
+    return null;
+  };
+
+  const thumbnailImage = extractFirstImage(post.content);
+
   return (
     <article
       key={post.id}
@@ -56,7 +75,7 @@ export default function PostCard({ post }: { post: PostData }) {
     >
       <div className="relative w-full bg-gray-200 aspect-video">
         <Image
-          src="/static/images/DefaultImage.jpeg"
+          src={thumbnailImage || '/static/images/DefaultImage.png'}
           alt={post.title}
           fill
           className="object-cover"

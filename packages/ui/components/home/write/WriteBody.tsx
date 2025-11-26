@@ -5,17 +5,17 @@ import { useRef, useEffect, Dispatch, SetStateAction } from 'react';
 import WriteTag from './WriteTag';
 import { Placeholder } from '@tiptap/extensions';
 import TextAlign from '@tiptap/extension-text-align';
-import { Image } from '@tiptap/extension-image';
+import { ResizableImage } from '@/components/tiptap-node/resizable-image/resizable-image-extension';
 import { ImageUploadNode } from '@/components/tiptap-node/image-upload-node';
 import { handleImageUpload } from '@/lib/tiptap-utils';
-import { PostData } from '@/packages/ui/components/home/write/WriteContainer';
+import { PostData } from '@/packages/type/postType';
 
 export default function WriteBody({
   postData,
   setPostData,
 }: {
-  postData: PostData;
-  setPostData: Dispatch<SetStateAction<PostData>>;
+  postData: PostData | null;
+  setPostData: Dispatch<SetStateAction<PostData | null>>;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -41,7 +41,10 @@ export default function WriteBody({
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
-      Image,
+      ResizableImage.configure({
+        inline: false,
+        allowBase64: false,
+      }),
       ImageUploadNode.configure({
         accept: 'image/*',
         maxSize: 5 * 1024 * 1024,
@@ -50,13 +53,24 @@ export default function WriteBody({
         onError: (error) => console.error('Upload failed:', error),
       }),
     ],
-    content: postData.content,
+    content: postData?.content || '',
     onUpdate: ({ editor }) => {
-      setPostData({ ...postData, content: editor.getHTML() });
+      setPostData({ ...(postData as PostData), content: editor.getHTML() });
     },
     // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
   });
+
+  // postData.content가 변경될 때 에디터 콘텐츠 업데이트
+  useEffect(() => {
+    if (editor && postData?.content) {
+      const currentContent = editor.getHTML();
+      // 현재 콘텐츠와 다를 때만 업데이트 (무한 루프 방지)
+      if (currentContent !== postData.content) {
+        editor.commands.setContent(postData.content);
+      }
+    }
+  }, [editor, postData?.content]);
 
   return (
     <div className="flex flex-col w-full h-full">

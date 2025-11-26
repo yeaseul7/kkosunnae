@@ -1,5 +1,5 @@
 'use client';
-import { getBoardsData } from '@/lib/api/post';
+import { getBoardsData, getRecentBoardsData } from '@/lib/api/post';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -29,7 +29,8 @@ export default function RecentPosts() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const postsData = await getBoardsData();
+        const postsData = await getRecentBoardsData();
+
         setPosts(postsData as PostData[]);
       } catch (e) {
         console.error('게시물 조회 중 오류 발생:', e);

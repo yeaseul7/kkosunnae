@@ -7,26 +7,17 @@ import WriteBody from '@/packages/ui/components/home/write/WriteBody';
 import WriteFooter from '@/packages/ui/components/home/write/WriteFooter';
 import WriteHeader from '@/packages/ui/components/home/write/WriteHeader';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { useCallback, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { PostData } from '@/packages/type/postType';
 
 interface WriteContainerProps {
   className?: string;
 }
-export interface PostData {
-  title: string;
-  content: string;
-  tags: string[];
-}
-
 export default function WriteContainer({ className }: WriteContainerProps) {
   const { user } = useAuth();
   const router = useRouter();
-  const [postData, setPostData] = useState<PostData>({
-    title: '',
-    content: '',
-    tags: [],
-  });
+  const [postData, setPostData] = useState<PostData | null>(null);
 
   const posting = useCallback(async () => {
     if (!user) {
@@ -79,8 +70,14 @@ export default function WriteContainer({ className }: WriteContainerProps) {
   return (
     <div className={`flex flex-col w-full h-full ${className || ''}`}>
       <div className="flex flex-col w-full h-full">
-        <WriteHeader postData={postData} setPostData={setPostData} />
-        <TagInput postData={postData} setPostData={setPostData} />
+        <WriteHeader
+          postData={postData as PostData}
+          setPostData={setPostData as Dispatch<SetStateAction<PostData>>}
+        />
+        <TagInput
+          postData={postData as PostData}
+          setPostData={setPostData as Dispatch<SetStateAction<PostData>>}
+        />
         <DecorateHr />
         <div className="flex-1 min-h-0">
           <WriteBody postData={postData} setPostData={setPostData} />
