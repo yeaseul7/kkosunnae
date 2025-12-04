@@ -53,8 +53,8 @@ export default function CommentHeader({
       <div className="flex gap-2 items-center">
         {isMine && (
           <>
-            <button className="text-xs text-gray-500">수정</button>
-            <button className="text-xs text-gray-500">삭제</button>
+        <button className="text-xs text-gray-500">수정</button>
+        <button className="text-xs text-gray-500">삭제</button>
           </>
         )}
       </div>

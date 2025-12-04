@@ -1,9 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import {
-  sendSignInLinkToEmail,
-  fetchSignInMethodsForEmail,
-} from 'firebase/auth';
+import { sendSignInLinkToEmail } from 'firebase/auth';
 import { auth } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
 import { FcGoogle } from 'react-icons/fc';
@@ -114,25 +111,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
     }
 
     try {
-      // 먼저 계정 존재 여부 확인
-      const signInMethods = await fetchSignInMethodsForEmail(auth, email);
-      const accountExists = signInMethods.length > 0;
-
-      // 로그인 모드: 계정이 없으면 안내
-      if (authMode === 'login' && !accountExists) {
-        setMessage('등록된 계정이 없습니다. 회원가입을 진행해주세요.');
-        setIsLoading(false);
-        return;
-      }
-
-      // 회원가입 모드: 계정이 이미 있으면 안내
-      if (authMode === 'register' && accountExists) {
-        setMessage('이미 등록된 이메일입니다. 로그인을 진행해주세요.');
-        setIsLoading(false);
-        return;
-      }
-
-      // 계정 상태가 올바르면 링크 전송
+      // 이메일 링크 인증: 로그인/회원가입 모두 링크를 통해 진행
       const actionCodeSettings = {
         url: `${window.location.origin}/register`,
         handleCodeInApp: true,
@@ -144,12 +123,27 @@ export default function LoginModal({ onClose }: LoginModalProps) {
       window.localStorage.setItem('authMode', authMode);
       setEmailSent(true);
       setMessage(
-        '이메일로 회원가입 링크를 전송했습니다. 이메일을 확인해주세요.',
+        authMode === 'login'
+          ? '이메일로 로그인 링크를 전송했습니다. 이메일을 확인해주세요.'
+          : '이메일로 회원가입 링크를 전송했습니다. 이메일을 확인해주세요.',
       );
     } catch (error) {
-      setMessage(
-        `에러: ${error instanceof Error ? error.message : '알 수 없는 오류'}`,
-      );
+      console.error('이메일 링크 전송 오류:', error);
+      // 에러 메시지 처리
+      const errorMessage =
+        error instanceof Error ? error.message : '알 수 없는 오류';
+
+      // 특정 에러에 대한 사용자 친화적 메시지
+      if (
+        errorMessage.includes('already-in-use') ||
+        errorMessage.includes('already exists')
+      ) {
+        setMessage('이미 등록된 이메일입니다. 로그인을 진행해주세요.');
+      } else if (errorMessage.includes('invalid-email')) {
+        setEmailError('올바른 이메일 형식을 입력해주세요.');
+      } else {
+        setMessage(`에러: ${errorMessage}`);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -208,7 +202,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
           <div className="space-y-4">
             <form onSubmit={emailAuth} className="space-y-4">
               <div className="flex flex-col gap-2">
-                <label className="text-text3 font-bold">
+                <label className="font-bold text-text3">
                   이메일로 {authMode === 'login' ? '로그인' : '회원가입'}
                 </label>
                 <input
@@ -249,29 +243,29 @@ export default function LoginModal({ onClose }: LoginModalProps) {
             </form>
             <div className="my-8">
               <div className="flex relative items-center mb-4">
-                <label className="text-text3 font-bold">
+                <label className="font-bold text-text3">
                   소셜계정으로 {authMode === 'login' ? '로그인' : '회원가입'}
                 </label>
               </div>
               <button
                 onClick={handleGoogleLogin}
                 disabled={isGoogleLoading || isLoading}
-                className="w-full flex justify-center items-center"
+                className="flex justify-center items-center w-full"
               >
                 {isGoogleLoading ? (
                   `${authMode === 'login' ? '로그인' : '회원가입'} 중...`
                 ) : (
-                  <div className="p-2 border border-border3 rounded-full hover:bg-gray-50">
+                  <div className="p-2 rounded-full border border-border3 hover:bg-gray-50">
                     <FcGoogle className="text-2xl" />
                   </div>
                 )}
               </button>
             </div>
             {authMode === 'login' ? (
-              <div className="flex justify-end text-text3 mt-16">
+              <div className="flex justify-end mt-16 text-text3">
                 아직 회원이 아니신가요?
                 <button
-                  className="text-primary1 hover:text-primary2 pl-2"
+                  className="pl-2 text-primary1 hover:text-primary2"
                   onClick={() => {
                     setAuthMode('register');
                     setEmailError('');
@@ -283,10 +277,10 @@ export default function LoginModal({ onClose }: LoginModalProps) {
                 </button>
               </div>
             ) : (
-              <div className="flex justify-end text-text3 mt-16">
+              <div className="flex justify-end mt-16 text-text3">
                 이미 회원이신가요?
                 <button
-                  className="text-primary1 hover:text-primary2 pl-2"
+                  className="pl-2 text-primary1 hover:text-primary2"
                   onClick={() => {
                     setAuthMode('login');
                     setEmailError('');

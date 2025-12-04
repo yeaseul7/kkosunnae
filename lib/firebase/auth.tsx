@@ -89,22 +89,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 );
                 const isExistingUser = userDoc.exists();
 
-                // 로그인 모드: 기존 사용자만 메인으로, 신규 사용자는 /register로
+                // 로그인 모드: 기존 사용자만 메인으로, 신규 사용자(Firestore 문서 없음)는 /register로
                 // 회원가입 모드: 신규 사용자는 /register로, 기존 사용자는 메인으로
                 if (authMode === 'login') {
                   if (isExistingUser) {
                     // 기존 사용자: 메인 페이지로
                     window.location.href = '/';
                   } else {
-                    alert(
-                      '등록된 계정이 없습니다. 회원가입 페이지로 이동합니다.',
-                    );
-                    window.location.href = '/register';
+                    // Firebase Auth에는 계정이 있지만 Firestore 문서가 없는 경우
+                    // 프로필 정보가 없으므로 회원가입 페이지로 이동
+                    if (window.location.pathname !== '/register') {
+                      window.location.href = '/register';
+                    } else {
+                      window.history.replaceState(
+                        {},
+                        document.title,
+                        '/register',
+                      );
+                    }
                   }
                 } else {
+                  // 회원가입 모드
                   if (isExistingUser) {
+                    // 이미 Firestore에 문서가 있는 경우: 메인 페이지로
                     window.location.href = '/';
                   } else {
+                    // 신규 사용자: 회원가입 페이지로
                     if (window.location.pathname !== '/register') {
                       window.location.href = '/register';
                     } else {

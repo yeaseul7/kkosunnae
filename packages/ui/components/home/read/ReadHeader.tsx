@@ -1,10 +1,11 @@
 import { PostData } from '@/packages/type/postType';
 import NextImage from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback } from 'react';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { useCallback, useEffect, useState } from 'react';
+import { doc, deleteDoc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
+import { PiDogFill } from 'react-icons/pi';
 
 export default function ReadHeader({
   post,
@@ -16,8 +17,44 @@ export default function ReadHeader({
   const router = useRouter();
   const params = useParams();
   const { user } = useAuth();
+  const [authorNickname, setAuthorNickname] = useState<string>('');
+  const [authorPhotoURL, setAuthorPhotoURL] = useState<string | null>(null);
 
   const postId = params.id as string;
+
+  // 작성자 정보를 Firestore의 users 컬렉션에서 가져오기
+  useEffect(() => {
+    const fetchAuthorInfo = async () => {
+      if (!post?.authorId) {
+        setAuthorNickname('');
+        setAuthorPhotoURL(null);
+        return;
+      }
+
+      try {
+        const userDoc = await getDoc(doc(firestore, 'users', post.authorId));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setAuthorNickname(
+            userData?.nickname ||
+              userData?.displayName ||
+              post?.authorName ||
+              '탈퇴한 사용자',
+          );
+          setAuthorPhotoURL(userData?.photoURL || null);
+        } else {
+          setAuthorNickname(post?.authorName || '탈퇴한 사용자');
+          setAuthorPhotoURL(post?.authorPhotoURL || null);
+        }
+      } catch (error) {
+        console.error('작성자 정보 가져오기 실패:', error);
+        setAuthorNickname(post?.authorName || '탈퇴한 사용자');
+        setAuthorPhotoURL(post?.authorPhotoURL || null);
+      }
+    };
+
+    fetchAuthorInfo();
+  }, [post?.authorId, post?.authorName, post?.authorPhotoURL]);
 
   const handleEdit = useCallback(() => {
     router.push(`/edit/${postId}`);
@@ -34,13 +71,11 @@ export default function ReadHeader({
       return;
     }
 
-    // 작성자 확인
     if (post.authorId !== user.uid) {
       alert('본인이 작성한 게시물만 삭제할 수 있습니다.');
       return;
     }
 
-    // 삭제 확인
     const confirmed = window.confirm('정말로 이 게시물을 삭제하시겠습니까?');
     if (!confirmed) {
       return;
@@ -75,20 +110,22 @@ export default function ReadHeader({
 
       <div className="flex gap-4 justify-between items-center mb-4">
         <div className="flex gap-2 items-center">
-          {post?.authorPhotoURL ? (
+          {authorPhotoURL ? (
             <NextImage
-              src={post?.authorPhotoURL}
-              alt={post?.authorName}
+              src={authorPhotoURL}
+              alt={authorNickname || 'User'}
               width={28}
               height={28}
               className="object-cover w-7 h-7 rounded-full"
             />
           ) : (
-            <div className="w-7 h-7 bg-gray-300 rounded-full"></div>
+            <div className="flex overflow-hidden justify-center items-center w-7 h-7 rounded-full bg-element3 shrink-0">
+              <PiDogFill className="text-lg" />
+            </div>
           )}
           <div className="flex gap-2 items-center">
             <div className="pr-2 text-base font-semibold">
-              {post?.authorName}
+              {authorNickname || post?.authorName || '탈퇴한 사용자'}
             </div>
             {post?.createdAt && (
               <div className="text-sm text-gray-500">

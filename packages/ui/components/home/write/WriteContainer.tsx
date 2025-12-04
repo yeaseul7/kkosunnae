@@ -74,7 +74,7 @@ export default function WriteContainer({ className }: WriteContainerProps) {
         />
         <TagInput
           postData={postData as PostData}
-          setPostData={setPostData as Dispatch<SetStateAction<PostData>>}
+          setPostData={setPostData as Dispatch<SetStateAction<PostData | null>>}
         />
         <DecorateHr />
         <div className="flex-1 min-h-0">

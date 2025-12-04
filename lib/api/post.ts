@@ -175,11 +175,10 @@ export async function getTrendingBoardsData(
 ): Promise<PostData[]> {
   try {
     const boardsCol = collection(firestore, 'boards');
-    // 효율성을 위해 먼저 좋아요가 있는 게시물만 가져오기 (최대 100개만 처리)
     const q = query(
       boardsCol,
-      orderBy('likes', 'desc'),
-      limit(Math.min(limitCount * 5, 100)), // limitCount의 5배 또는 최대 100개
+      orderBy('createdAt', 'desc'),
+      limit(Math.min(limitCount * 5, 100)),
     );
     const boardsSnapshot = await getDocs(q);
     const boardsList = boardsSnapshot.docs.map((doc) => ({
@@ -187,8 +186,7 @@ export async function getTrendingBoardsData(
       ...doc.data(),
     })) as PostData[];
 
-    // 각 게시물의 댓글 개수를 병렬로 가져오기 (배치 크기 제한)
-    const BATCH_SIZE = 20; // 한 번에 처리할 최대 게시물 수
+    const BATCH_SIZE = 20;
     const postsWithCommentCount: Array<{
       post: PostData;
       commentCount: number;

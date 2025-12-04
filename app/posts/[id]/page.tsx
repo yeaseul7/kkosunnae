@@ -15,7 +15,7 @@ export default function PostsListPage() {
     <div className="flex justify-center items-center min-h-screen font-sans bg-white">
       <main className="flex flex-col justify-between items-center px-4 py-4 w-full max-w-6xl min-h-screen bg-whitesm:items-start">
         <PageTemplate visibleHomeTab={false}>
-          <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-4">
+          <div className="flex flex-col gap-4 px-4 mx-auto w-full max-w-4xl sm:px-6 lg:px-8">
             <UserHeader />
             <DecorateHr />
             <TagList userId={userId} />

@@ -14,15 +14,14 @@ export default function TagInput({
   postData,
   setPostData,
 }: {
-  postData: PostData;
-  setPostData: Dispatch<SetStateAction<PostData>>;
+  postData: PostData | null;
+  setPostData: Dispatch<SetStateAction<PostData | null>>;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const valueRef = useRef<string>('');
 
   const [value, setValue] = useState('');
 
-  // valueRef를 항상 최신 값으로 동기화
   useEffect(() => {
     valueRef.current = value;
   }, [value]);
@@ -33,12 +32,58 @@ export default function TagInput({
       if (!trimmedTag || isEmptyOrWhitespace(trimmedTag)) return;
 
       setPostData((prev) => {
+        if (!prev) {
+          return {
+            id: '',
+            title: '',
+            content: '',
+            tags: [trimmedTag],
+            authorId: '',
+            authorName: '',
+            authorPhotoURL: null,
+            createdAt: null,
+            updatedAt: null,
+            likes: 0,
+          };
+        }
         const currentTags = prev.tags || [];
         if (currentTags.includes(trimmedTag)) return prev;
         return { ...prev, tags: [...currentTags, trimmedTag] };
       });
       setValue('');
       valueRef.current = '';
+    },
+    [setPostData],
+  );
+
+  const insertMultipleTags = useCallback(
+    (tags: string[]) => {
+      const validTags = tags
+        .map((tag) => tag.trim())
+        .filter((tag) => tag && !isEmptyOrWhitespace(tag));
+
+      if (validTags.length === 0) return;
+
+      setPostData((prev) => {
+        if (!prev) {
+          return {
+            id: '',
+            title: '',
+            content: '',
+            tags: validTags,
+            authorId: '',
+            authorName: '',
+            authorPhotoURL: null,
+            createdAt: null,
+            updatedAt: null,
+            likes: 0,
+          };
+        }
+        const currentTags = prev.tags || [];
+        const newTags = validTags.filter((tag) => !currentTags.includes(tag));
+        if (newTags.length === 0) return prev;
+        return { ...prev, tags: [...currentTags, ...newTags] };
+      });
     },
     [setPostData],
   );
@@ -67,10 +112,13 @@ export default function TagInput({
 
   const removeTag = useCallback(
     (tag: string) => {
-      setPostData((prev) => ({
-        ...prev,
-        tags: (prev.tags || []).filter((t) => t !== tag),
-      }));
+      setPostData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          tags: (prev.tags || []).filter((t) => t !== tag),
+        };
+      });
     },
     [setPostData],
   );
@@ -78,8 +126,9 @@ export default function TagInput({
   return (
     <div ref={containerRef} className="flex flex-col gap-2 my-4 w-full">
       <div className="flex flex-wrap gap-2 items-center">
-        {postData?.tags?.length > 0 &&
-          postData?.tags?.map((tag) => (
+        {postData?.tags &&
+          postData.tags.length > 0 &&
+          postData.tags.map((tag) => (
             <div
               key={tag}
               className="px-2 py-1 text-sm whitespace-nowrap rounded-full cursor-pointer bg-element2 text-primary1 shrink-0"
@@ -97,8 +146,25 @@ export default function TagInput({
         value={value}
         onChange={(e) => {
           const newValue = e.target.value;
-          setValue(newValue);
-          valueRef.current = newValue;
+
+          if (newValue.includes(',')) {
+            const parts = newValue.split(',');
+            const tagsToAdd = parts
+              .slice(0, -1)
+              .map((part) => part.trim())
+              .filter((part) => part);
+            const remainingText = parts[parts.length - 1].trim();
+
+            if (tagsToAdd.length > 0) {
+              insertMultipleTags(tagsToAdd);
+            }
+
+            setValue(remainingText);
+            valueRef.current = remainingText;
+          } else {
+            setValue(newValue);
+            valueRef.current = newValue;
+          }
         }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
