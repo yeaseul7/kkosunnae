@@ -2,7 +2,7 @@
 import { firestore } from '@/lib/firebase/firebase';
 import { doc, getDoc, Timestamp } from 'firebase/firestore';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Image } from '@tiptap/extension-image';
@@ -21,7 +21,7 @@ interface PostData {
   updatedAt: Timestamp | null;
 }
 
-export default function ReadPage() {
+function ReadPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const postId = searchParams.get('id');
@@ -150,5 +150,13 @@ export default function ReadPage() {
         </PageTemplate>
       </main>
     </div>
+  );
+}
+
+export default function ReadPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <ReadPageContent />
+    </Suspense>
   );
 }
