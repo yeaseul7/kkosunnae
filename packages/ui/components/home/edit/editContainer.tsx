@@ -113,7 +113,7 @@ export default function EditContainer({ className }: { className?: string }) {
         />
         <TagInput
           postData={post}
-          setPostData={setPost as Dispatch<SetStateAction<PostData>>}
+          setPostData={setPost as Dispatch<SetStateAction<PostData | null>>}
         />
         <DecorateHr />
         <div className="flex-1 w-full min-h-0">
