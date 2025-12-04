@@ -14,6 +14,7 @@ import {
   signOut,
   onAuthStateChanged,
   GoogleAuthProvider,
+  GithubAuthProvider,
   signInWithPopup,
   User,
   signInWithEmailLink,
@@ -29,6 +30,7 @@ interface AuthContextType {
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   loginWithGoogle: () => Promise<void>;
+  loginWithGithub: () => Promise<void>;
 }
 
 // AuthContext 컨텍스트 생성
@@ -39,6 +41,7 @@ const AuthContext = createContext<AuthContextType>({
   register: async () => {},
   logout: async () => {},
   loginWithGoogle: async () => {},
+  loginWithGithub: async () => {},
 });
 
 // AuthProvider 컴포넌트 정의
@@ -205,9 +208,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // GitHub 로그인 함수 (팝업 사용)
+  const loginWithGithub = async () => {
+    try {
+      const provider = new GithubAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const currentUser = result.user;
+
+      if (currentUser) {
+        try {
+          const userDoc = await getDoc(
+            doc(firestore, 'users', currentUser.uid),
+          );
+          const isExistingUser = userDoc.exists();
+
+          if (!isExistingUser) {
+            if (typeof window !== 'undefined') {
+              window.location.href = '/register';
+            }
+          }
+        } catch (error) {
+          console.error('사용자 정보 확인 중 오류:', error);
+          if (typeof window !== 'undefined') {
+            window.location.href = '/register';
+          }
+        }
+      }
+    } catch (error) {
+      console.error('GitHub 로그인 팝업 실패:', error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, logout, loginWithGoogle }}
+      value={{
+        user,
+        loading,
+        login,
+        register,
+        logout,
+        loginWithGoogle,
+        loginWithGithub,
+      }}
     >
       {children}
     </AuthContext.Provider>

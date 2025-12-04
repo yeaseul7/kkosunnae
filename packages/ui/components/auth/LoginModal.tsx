@@ -4,6 +4,7 @@ import { sendSignInLinkToEmail } from 'firebase/auth';
 import { auth } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
 import { FcGoogle } from 'react-icons/fc';
+import { FaGithub } from 'react-icons/fa';
 
 interface LoginModalProps {
   onClose?: () => void;
@@ -16,12 +17,13 @@ const isValidEmail = (email: string): boolean => {
 };
 
 export default function LoginModal({ onClose }: LoginModalProps) {
-  const { loginWithGoogle, user } = useAuth();
+  const { loginWithGoogle, loginWithGithub, user } = useAuth();
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const modalRef = useRef<HTMLDivElement>(null);
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isGithubLoading, setIsGithubLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [emailSent, setEmailSent] = useState(false);
   const [emailError, setEmailError] = useState('');
@@ -166,6 +168,22 @@ export default function LoginModal({ onClose }: LoginModalProps) {
       setIsGoogleLoading(false);
     }
   };
+  const handleGithubLogin = async () => {
+    setIsGithubLoading(true);
+    setMessage('');
+
+    try {
+      await loginWithGithub();
+    } catch (error) {
+      setMessage(
+        `Github 로그인 실패: ${
+          error instanceof Error ? error.message : '알 수 없는 오류'
+        }`,
+      );
+    } finally {
+      setIsGithubLoading(false);
+    }
+  };
 
   return (
     <div className="flex fixed inset-0 justify-center items-center z-[9999]">
@@ -200,7 +218,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            <form onSubmit={emailAuth} className="space-y-4">
+            {/* <form onSubmit={emailAuth} className="space-y-4">
               <div className="flex flex-col gap-2">
                 <label className="font-bold text-text3">
                   이메일로 {authMode === 'login' ? '로그인' : '회원가입'}
@@ -240,23 +258,36 @@ export default function LoginModal({ onClose }: LoginModalProps) {
               >
                 {isLoading ? '전송 중...' : '이메일 링크 전송'}
               </button>
-            </form>
-            <div className="my-8">
-              <div className="flex relative items-center mb-4">
+            </form> */}
+            <div className="flex gap-4 justify-center my-8">
+              {/* <div className="flex relative items-center mb-4">
                 <label className="font-bold text-text3">
                   소셜계정으로 {authMode === 'login' ? '로그인' : '회원가입'}
                 </label>
-              </div>
+              </div> */}
               <button
                 onClick={handleGoogleLogin}
                 disabled={isGoogleLoading || isLoading}
-                className="flex justify-center items-center w-full"
+                className="flex justify-center items-center"
               >
                 {isGoogleLoading ? (
                   `${authMode === 'login' ? '로그인' : '회원가입'} 중...`
                 ) : (
                   <div className="p-2 rounded-full border border-border3 hover:bg-gray-50">
                     <FcGoogle className="text-2xl" />
+                  </div>
+                )}
+              </button>
+              <button
+                onClick={handleGithubLogin}
+                disabled={isGithubLoading || isLoading}
+                className="flex justify-center items-center"
+              >
+                {isGoogleLoading ? (
+                  `${authMode === 'login' ? '로그인' : '회원가입'} 중...`
+                ) : (
+                  <div className="p-2 rounded-full border border-border3 hover:bg-gray-50">
+                    <FaGithub className="text-2xl" />
                   </div>
                 )}
               </button>
