@@ -81,17 +81,19 @@ export default function ReadPostPage() {
                 뒤로가기
               </button>
 
-              <article className="p-8 bg-white">
-                <ReadHeader post={post} isEditing={false} />
+              <div className="relative">
+                <Liked />
+                <article className="p-8 bg-white">
+                  <ReadHeader post={post} isEditing={false} />
 
-                <div className="max-w-none prose">
-                  {editor && (
-                    <EditorContent editor={editor} className="tiptap" />
-                  )}
-                </div>
-              </article>
+                  <div className="max-w-none prose">
+                    {editor && (
+                      <EditorContent editor={editor} className="tiptap" />
+                    )}
+                  </div>
+                </article>
+              </div>
               <ReadFooter post={post} postId={postId} />
-              <Liked />
             </>
           )}
         </PageTemplate>
