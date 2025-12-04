@@ -1,27 +1,24 @@
 'use client';
 
 import { timeframeMap } from '@/packages/utils/timeframeMap';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { MdArrowDropDown } from 'react-icons/md';
 
 export default function TimePicker() {
   const [isOpenLocal, setIsOpenLocal] = useState(false);
   const [selectedTimeframe, setSelectedTimeframe] = useState('weekly');
 
-  useEffect(() => {
-    console.log(isOpenLocal);
-  }, [isOpenLocal]);
   return (
-    <div className="relative bg-white h-8 w-24 rounded flex items-center justify-between px-2 font-semibold text-gray-600 shadow-sm cursor-pointer hover:opacity-75 transition-opacity text-sm">
+    <div className="flex relative z-50 justify-between items-center px-2 w-24 h-8 text-sm font-semibold text-gray-600 bg-white rounded shadow-sm cursor-pointer">
       <div
-        className="flex items-center gap-2 justify-between w-full"
+        className="flex gap-2 justify-between items-center w-full"
         onClick={() => setIsOpenLocal((prev) => !prev)}
       >
         {timeframeMap[selectedTimeframe as keyof typeof timeframeMap]}
         <MdArrowDropDown className="w-6 h-6" />
       </div>
       {isOpenLocal && (
-        <ul className="absolute top-full left-0 mt-1 w-full bg-white rounded-lg shadow-lg p-2 z-10">
+        <ul className="absolute left-0 top-full z-10 p-2 mt-1 w-full bg-white rounded-lg shadow-lg">
           {Object.entries(timeframeMap).map(([key, value]) => (
             <li
               key={key}

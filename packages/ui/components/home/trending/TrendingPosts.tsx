@@ -1,36 +1,19 @@
 'use client';
-import { getBoardsData } from '@/lib/api/post';
+import { getTrendingBoardsData } from '@/lib/api/post';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-
-import { Timestamp } from 'firebase/firestore';
-import { HiHeart } from 'react-icons/hi2';
-import { PiDogFill } from 'react-icons/pi';
 import PostCard from '../../base/PostCard';
 import Loading from '../../base/Loading';
-
-export interface PostData {
-  id: string;
-  title: string;
-  content: string;
-  tags: string[];
-  authorId: string;
-  authorName: string;
-  authorPhotoURL: string | null;
-  createdAt: Timestamp | null;
-  updatedAt: Timestamp | null;
-}
+import { PostData } from '@/packages/type/postType';
 
 export default function TrendingPosts() {
-  const router = useRouter();
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const postsData = await getBoardsData();
-        setPosts(postsData as PostData[]);
+        const postsData = await getTrendingBoardsData();
+        setPosts(postsData);
       } catch (e) {
         console.error('게시물 조회 중 오류 발생:', e);
       } finally {

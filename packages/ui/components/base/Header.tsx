@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import RoundButton from '../common/RoundButton';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import LoginModal from '../auth/LoginModal';
 import HeaderUserIcon from './HeaderUserIcon';
@@ -18,14 +18,36 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
   const router = useRouter();
   const { user, loading } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // 바깥 클릭 시 메뉴 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isUserMenuOpen &&
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    if (isUserMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isUserMenuOpen]);
 
   const handleNotificationClick = useCallback(() => {
     console.log('Notification clicked');
   }, []);
 
   const handleSearchClick = useCallback(() => {
-    console.log('Search clicked');
-  }, []);
+    router.push('/search');
+  }, [router]);
 
   const writeArticle = useCallback(() => {
     router.push('/write');
@@ -73,7 +95,10 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
             {!loading && (
               <>
                 {user ? (
-                  <div className="flex relative items-center group">
+                  <div
+                    ref={userMenuRef}
+                    className="flex relative items-center group"
+                  >
                     <RoundButton onClick={writeArticle} className="mr-2">
                       새 글 작성
                     </RoundButton>

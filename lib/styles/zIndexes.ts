@@ -1,6 +1,6 @@
 const zIndexes = {
   OpaqueLayer: 10,
-  AuthModal: 20,
+  AuthModal: 9999,
   Toolbar: 10,
   Popup: 60,
   WriteFooter: 10,

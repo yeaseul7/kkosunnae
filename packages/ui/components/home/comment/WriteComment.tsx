@@ -13,9 +13,8 @@ export default function WriteComment({ postId }: { postId: string }) {
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-      // 3줄 기준 높이 계산 (line-height: 1.5rem = 24px)
       const lineHeight = 24;
-      const fixedHeight = lineHeight * 3; // 3줄 고정
+      const fixedHeight = lineHeight * 3;
 
       textarea.style.height = `${fixedHeight}px`;
       textarea.style.overflowY = 'auto';
@@ -31,7 +30,6 @@ export default function WriteComment({ postId }: { postId: string }) {
 
     setIsSubmitting(true);
     try {
-      // comments 컬렉션에 댓글 추가 (첫 댓글이면 컬렉션이 자동 생성됨)
       const commentsCollection = collection(
         firestore,
         'boards',
@@ -44,6 +42,7 @@ export default function WriteComment({ postId }: { postId: string }) {
         authorName: user.displayName || user.email || '익명',
         authorPhotoURL: user.photoURL || null,
         createdAt: serverTimestamp(),
+        likes: 0,
       });
 
       setComment('');

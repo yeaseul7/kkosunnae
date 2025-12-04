@@ -32,8 +32,6 @@ export default function WriteContainer({ className }: WriteContainerProps) {
       const postDataToSave = {
         ...postData,
         authorId: user.uid,
-        authorName: user.displayName || user.email || '익명',
-        authorPhotoURL: user.photoURL || null,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };

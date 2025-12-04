@@ -1,0 +1,54 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 'users' 컬렉션에 대해서는 모든 사람이 읽을 수 있고, 자신의 정보만 생성/수정 가능
+    match /users/{userId} {
+      allow read: if true; // 모든 사람이 프로필을 읽을 수 있음 (로그아웃 상태에서도 게시물 작성자 정보 표시용)
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 'boards' 컬렉션에 대해서는 로그인된 사용자만 생성 가능
+    match /boards/{boardId} {
+      allow create: if request.auth != null;
+      allow read: if true; // 모든 사람이 읽을 수 있게 (필요시)
+      allow update: if request.auth != null && (
+        request.auth.uid == resource.data.authorId || // 작성자가 모든 필드 수정 가능
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])) // 로그인한 사용자는 likes 필드만 업데이트 가능 (increment 포함)
+      );
+      allow delete: if request.auth != null && request.auth.uid == resource.data.authorId; // 작성자만 삭제
+
+      // 좋아요 서브컬렉션 규칙 추가
+      match /likeList/{userId} {
+        allow read: if true; // 모든 사람이 좋아요 목록을 읽을 수 있음
+        allow create: if request.auth != null && request.auth.uid == userId; // 자신의 ID로만 좋아요 생성 가능
+        allow delete: if request.auth != null && request.auth.uid == userId; // 자신의 좋아요만 삭제 가능
+      }
+
+      // 댓글 서브컬렉션 규칙 추가
+      match /comments/{commentId} {
+        allow read: if true; // 모든 사람이 댓글을 읽을 수 있음
+        allow create: if request.auth != null; // 로그인된 사용자만 댓글 작성 가능
+        allow update: if request.auth != null && (
+          request.auth.uid == resource.data.authorId || // 작성자가 수정하는 경우
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])) // likes 필드만 업데이트하는 경우
+        );
+        allow delete: if request.auth != null && request.auth.uid == resource.data.authorId; // 작성자만 삭제
+
+        // 댓글 좋아요 서브컬렉션 규칙 추가
+        match /likeList/{userId} {
+          allow read: if true; // 모든 사람이 좋아요 목록을 읽을 수 있음
+          allow create: if request.auth != null && request.auth.uid == userId; // 자신의 ID로만 좋아요 생성 가능
+          allow delete: if request.auth != null && request.auth.uid == userId; // 자신의 좋아요만 삭제 가능
+        }
+      }
+    }
+
+    // 모든 문서에 대한 기본 접근은 여전히 막고
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

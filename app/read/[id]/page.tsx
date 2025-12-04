@@ -13,6 +13,7 @@ import NotFound from '@/packages/ui/components/base/NotFound';
 import { PostData } from '@/packages/type/postType';
 import ReadHeader from '@/packages/ui/components/home/read/ReadHeader';
 import ReadFooter from '@/packages/ui/components/home/read/ReadFooter';
+import Liked from '@/packages/ui/components/home/comment/Liked';
 
 export default function ReadPostPage() {
   const params = useParams();
@@ -90,6 +91,7 @@ export default function ReadPostPage() {
                 </div>
               </article>
               <ReadFooter post={post} postId={postId} />
+              <Liked />
             </>
           )}
         </PageTemplate>

@@ -92,7 +92,7 @@ module.exports = {
       },
       zIndex: {
         opaqueLayer: 10,
-        authModal: 20,
+        authModal: 9999,
         toolbar: 10,
         popup: 60,
         writeFooter: 10,

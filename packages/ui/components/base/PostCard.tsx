@@ -1,15 +1,18 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { PostData } from '../home/trending/TrendingPosts';
 import Image from 'next/image';
 import { Timestamp } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
+import { firestore } from '@/lib/firebase/firebase';
+import { useState, useEffect } from 'react';
 import { HiHeart } from 'react-icons/hi2';
 import { PiDogFill } from 'react-icons/pi';
+import { HiChatBubbleLeft } from 'react-icons/hi2';
+import { PostData } from '@/packages/type/postType';
 
 export default function PostCard({ post }: { post: PostData }) {
   const router = useRouter();
-
-  // 날짜 포맷팅 함수
+  const [commentCount, setCommentCount] = useState<number>(0);
   const formatDate = (timestamp: Timestamp | null): string => {
     if (!timestamp) return '';
 
@@ -67,6 +70,27 @@ export default function PostCard({ post }: { post: PostData }) {
 
   const thumbnailImage = extractFirstImage(post.content);
 
+  // 댓글 개수 가져오기
+  useEffect(() => {
+    const fetchCommentCount = async () => {
+      if (!post.id) return;
+      try {
+        const commentsCollection = collection(
+          firestore,
+          'boards',
+          post.id,
+          'comments',
+        );
+        const commentsSnapshot = await getDocs(commentsCollection);
+        setCommentCount(commentsSnapshot.size);
+      } catch (error) {
+        console.error('댓글 개수 가져오기 실패:', error);
+      }
+    };
+
+    fetchCommentCount();
+  }, [post.id]);
+
   return (
     <article
       key={post.id}
@@ -95,7 +119,6 @@ export default function PostCard({ post }: { post: PostData }) {
           <div className="flex gap-2 items-center text-xs text-gray-500">
             <span>{formatDate(post.createdAt)}</span>
             <span>·</span>
-            <span>0개의 댓글</span>
           </div>
         </div>
         <div className="flex justify-between items-center pt-3 mt-3 border-t border-gray-100">
@@ -113,11 +136,19 @@ export default function PostCard({ post }: { post: PostData }) {
                 <PiDogFill className="text-xs text-gray-500" />
               </div>
             )}
-            <span className="text-sm text-gray-700">by {post.authorName}</span>
+            <span className="text-sm text-gray-700">
+              by {post.authorName || '탈퇴한 사용자'}
+            </span>
           </div>
-          <div className="flex gap-1 items-center text-gray-500">
-            <HiHeart className="w-4 h-4" />
-            <span className="text-sm">0</span>
+          <div className="flex gap-3 items-center text-gray-500">
+            <div className="flex gap-1 items-center">
+              <HiHeart className="w-4 h-4" />
+              <span className="text-sm">{post.likes || 0}</span>
+            </div>
+            <div className="flex gap-1 items-center">
+              <HiChatBubbleLeft className="w-4 h-4" />
+              <span className="text-sm">{commentCount}</span>
+            </div>
           </div>
         </div>
       </div>

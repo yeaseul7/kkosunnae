@@ -1,12 +1,6 @@
 'use client';
 import { firestore } from '@/lib/firebase/firebase';
-import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  Timestamp,
-} from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { PiDogFill } from 'react-icons/pi';
@@ -18,33 +12,35 @@ export default function CommentList({ postId }: { postId: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!postId) return;
+    if (!postId) {
+      return;
+    }
 
-    const fetchComments = async () => {
-      try {
-        const commentCollection = collection(
-          firestore,
-          'boards',
-          postId,
-          'comments',
-        );
-        const q = query(commentCollection, orderBy('createdAt', 'desc'));
-        const commentSnapshot = await getDocs(q);
+    const commentCollection = collection(
+      firestore,
+      'boards',
+      postId,
+      'comments',
+    );
+    const q = query(commentCollection, orderBy('createdAt', 'desc'));
 
-        const commentsList = commentSnapshot.docs.map((doc) => ({
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const commentsList = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         })) as unknown as CommentData[];
-        console.log(commentsList);
         setComments(commentsList);
-      } catch (error) {
-        console.error('댓글 조회 중 오류 발생:', error);
-      } finally {
         setLoading(false);
-      }
-    };
+      },
+      (error) => {
+        console.error('댓글 조회 중 오류 발생:', error);
+        setLoading(false);
+      },
+    );
 
-    fetchComments();
+    return () => unsubscribe();
   }, [postId]);
 
   if (loading) {
@@ -88,7 +84,10 @@ export default function CommentList({ postId }: { postId: string }) {
             )}
           </div>
           <div className="flex flex-col flex-1 gap-1">
-            <CommentContainer commentData={comment as CommentData} />
+            <CommentContainer
+              commentData={comment as CommentData}
+              postId={postId}
+            />
           </div>
         </div>
       ))}

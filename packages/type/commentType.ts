@@ -7,4 +7,5 @@ export interface CommentData {
   authorPhotoURL: string;
   content: string;
   createdAt: Timestamp | null;
+  likes?: number;
 }

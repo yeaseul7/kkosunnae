@@ -1,28 +1,12 @@
 'use client';
-import { getBoardsData, getRecentBoardsData } from '@/lib/api/post';
+import { getRecentBoardsData } from '@/lib/api/post';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 
-import { Timestamp } from 'firebase/firestore';
-import { HiHeart } from 'react-icons/hi2';
-import { PiDogFill } from 'react-icons/pi';
 import PostCard from '../../base/PostCard';
 import Loading from '../../base/Loading';
-
-export interface PostData {
-  id: string;
-  title: string;
-  content: string;
-  tags: string[];
-  authorId: string;
-  authorName: string;
-  authorPhotoURL: string | null;
-  createdAt: Timestamp | null;
-  updatedAt: Timestamp | null;
-}
+import { PostData } from '@/packages/type/postType';
 
 export default function RecentPosts() {
-  const router = useRouter();
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
 

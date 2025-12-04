@@ -1,63 +1,50 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import {
   doc,
-  updateDoc,
-  increment,
   getDoc,
   setDoc,
+  updateDoc,
+  increment,
   deleteDoc,
   collection,
   serverTimestamp,
 } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
-import { CommentData } from '@/packages/type/commentType';
-import { BsHeart, BsHeartFill } from 'react-icons/bs';
+import { HiHeart, HiOutlineHeart } from 'react-icons/hi2';
+import { BsShare } from 'react-icons/bs';
 
-export default function CommentFooter({
-  commentData,
-  postId,
-}: {
-  commentData: CommentData;
-  postId: string;
-}) {
+export default function Liked() {
+  const params = useParams();
+  const postId = params.id as string;
   const { user } = useAuth();
-  const [likes, setLikes] = useState<number>(commentData.likes || 0);
+  const [likes, setLikes] = useState<number>(0);
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
-    const fetchLikeStatus = async () => {
-      if (!postId || !commentData.id) {
+    const fetchLikes = async () => {
+      if (!postId) {
         setLoading(false);
         return;
       }
 
       try {
-        const commentRef = doc(
-          firestore,
-          'boards',
-          postId,
-          'comments',
-          commentData.id,
-        );
-        const commentDoc = await getDoc(commentRef);
-        if (commentDoc.exists()) {
-          const data = commentDoc.data();
+        const postDoc = await getDoc(doc(firestore, 'boards', postId));
+        if (postDoc.exists()) {
+          const data = postDoc.data();
           const likesCount = data.likes || 0;
           setLikes(likesCount);
         }
 
-        // 사용자가 좋아요를 눌렀는지 확인
         if (user) {
           const likeListCollection = collection(
             firestore,
             'boards',
             postId,
-            'comments',
-            commentData.id,
             'likeList',
           );
           const userLikeDoc = doc(likeListCollection, user.uid);
@@ -67,14 +54,14 @@ export default function CommentFooter({
           setIsLiked(false);
         }
       } catch (error) {
-        console.error('댓글 좋아요 정보 가져오기 실패:', error);
+        console.error('좋아요 정보 가져오기 실패:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchLikeStatus();
-  }, [postId, commentData.id, user]);
+    fetchLikes();
+  }, [postId, user]);
 
   const handleLike = async () => {
     if (!user) {
@@ -82,21 +69,16 @@ export default function CommentFooter({
       return;
     }
 
-    if (!postId || !commentData.id || isUpdating) return;
+    if (!postId || isUpdating) return;
 
     setIsUpdating(true);
-    try {
-      const commentRef = doc(
-        firestore,
-        'boards',
-        postId,
-        'comments',
-        commentData.id,
-      );
-      const commentDoc = await getDoc(commentRef);
 
-      if (!commentDoc.exists()) {
-        alert('댓글을 찾을 수 없습니다.');
+    try {
+      const postRef = doc(firestore, 'boards', postId);
+      const postDoc = await getDoc(postRef);
+
+      if (!postDoc.exists()) {
+        alert('게시물을 찾을 수 없습니다.');
         return;
       }
 
@@ -104,35 +86,31 @@ export default function CommentFooter({
         firestore,
         'boards',
         postId,
-        'comments',
-        commentData.id,
         'likeList',
       );
       const userLikeDoc = doc(likeListCollection, user.uid);
 
       if (isLiked) {
-        // 좋아요 취소
         await deleteDoc(userLikeDoc);
-        await updateDoc(commentRef, {
+        await updateDoc(postRef, {
           likes: increment(-1),
         });
         setLikes((prev) => Math.max(0, prev - 1));
         setIsLiked(false);
       } else {
-        // 좋아요 추가
         await setDoc(userLikeDoc, {
           uid: user.uid,
           isLiked: true,
           createdAt: serverTimestamp(),
         });
-        await updateDoc(commentRef, {
+        await updateDoc(postRef, {
           likes: increment(1),
         });
         setLikes((prev) => prev + 1);
         setIsLiked(true);
       }
     } catch (error) {
-      console.error('댓글 좋아요 업데이트 실패:', error);
+      console.error('좋아요 업데이트 실패:', error);
       alert('좋아요 처리 중 오류가 발생했습니다.');
     } finally {
       setIsUpdating(false);
@@ -140,31 +118,36 @@ export default function CommentFooter({
   };
 
   if (loading) {
-    return (
-      <div className="flex gap-2 justify-between items-center mt-4">
-        <div></div>
-        <div className="flex gap-2 items-center">
-          <div className="flex gap-1 items-center text-gray-400">
-            <BsHeart />
-          </div>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="flex gap-2 justify-between items-center mt-4">
-      <div></div>
-      <div className="flex gap-2 items-center">
+    <div className="fixed left-48 top-60 z-50">
+      <div className="flex flex-col items-center justify-center gap-3 p-2 rounded-4xl shadow-lg transition-all duration-200 bg-gray-1">
         <button
           onClick={handleLike}
           disabled={isUpdating}
-          className={`flex gap-1 items-center transition-opacity disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-75 ${
-            isLiked ? 'text-red-500' : 'text-primary1'
-          }`}
+          className={`rounded-full p-3 ${
+            isLiked
+              ? 'bg-red-500 text-white hover:bg-red-600'
+              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+          } ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          aria-label="좋아요"
         >
-          {isLiked ? <BsHeartFill /> : <BsHeart />}
-          {likes > 0 && <span className="text-sm">{likes}</span>}
+          {isLiked ? (
+            <HiHeart className="w-5 h-5" />
+          ) : (
+            <HiOutlineHeart className="w-5 h-5" />
+          )}
+        </button>
+        <span className="text-xs font-semibold">{likes}</span>
+        <button
+          onClick={handleLike}
+          disabled={isUpdating}
+          className={`rounded-full p-3 ${'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'} ${'cursor-pointer'}`}
+          aria-label="공유"
+        >
+          <BsShare className="w-5 h-5" />
         </button>
       </div>
     </div>

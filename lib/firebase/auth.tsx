@@ -8,6 +8,7 @@ import {
   ReactNode,
 } from 'react';
 import { auth } from './firebase';
+import { firestore } from './firebase';
 import {
   createUserWithEmailAndPassword,
   signOut,
@@ -16,7 +17,9 @@ import {
   signInWithPopup,
   User,
   signInWithEmailLink,
+  isSignInWithEmailLink,
 } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 // 컨텍스트 타입 정의
 interface AuthContextType {
@@ -43,13 +46,100 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 사용자 상태 업데이트
+  // 사용자 상태 업데이트 및 이메일 링크 인증 처리
   useEffect(() => {
     // 인증 상태 변경 구독 (즉시 현재 상태를 반환함)
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
     });
+
+    // 이메일 링크 인증 처리 (전역적으로 처리)
+    const handleEmailLinkAuth = async () => {
+      if (typeof window === 'undefined') return;
+
+      if (isSignInWithEmailLink(auth, window.location.href)) {
+        try {
+          let emailForSignIn = window.localStorage.getItem('emailForSignIn');
+
+          // 같은 브라우저가 아니면 이메일 입력 필요
+          if (!emailForSignIn) {
+            emailForSignIn = window.prompt('이메일 주소를 입력해주세요:');
+          }
+
+          if (emailForSignIn) {
+            await signInWithEmailLink(
+              auth,
+              emailForSignIn,
+              window.location.href,
+            );
+
+            // authMode 확인
+            const authMode =
+              window.localStorage.getItem('authMode') || 'register';
+            window.localStorage.removeItem('emailForSignIn');
+            window.localStorage.removeItem('authMode');
+
+            // 인증된 사용자 정보로 기존 사용자인지 확인
+            const currentUser = auth.currentUser;
+            if (currentUser) {
+              try {
+                const userDoc = await getDoc(
+                  doc(firestore, 'users', currentUser.uid),
+                );
+                const isExistingUser = userDoc.exists();
+
+                // 로그인 모드: 기존 사용자만 메인으로, 신규 사용자는 /register로
+                // 회원가입 모드: 신규 사용자는 /register로, 기존 사용자는 메인으로
+                if (authMode === 'login') {
+                  if (isExistingUser) {
+                    // 기존 사용자: 메인 페이지로
+                    window.location.href = '/';
+                  } else {
+                    alert(
+                      '등록된 계정이 없습니다. 회원가입 페이지로 이동합니다.',
+                    );
+                    window.location.href = '/register';
+                  }
+                } else {
+                  if (isExistingUser) {
+                    window.location.href = '/';
+                  } else {
+                    if (window.location.pathname !== '/register') {
+                      window.location.href = '/register';
+                    } else {
+                      window.history.replaceState(
+                        {},
+                        document.title,
+                        '/register',
+                      );
+                    }
+                  }
+                }
+              } catch (error) {
+                console.error('사용자 정보 확인 중 오류:', error);
+                if (window.location.pathname !== '/register') {
+                  window.location.href = '/register';
+                } else {
+                  window.history.replaceState({}, document.title, '/register');
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error('이메일 링크 로그인 실패:', error);
+          window.localStorage.removeItem('emailForSignIn');
+          // 에러가 발생해도 /register 페이지로 이동
+          if (window.location.pathname !== '/register') {
+            window.location.href = '/register';
+          } else {
+            window.history.replaceState({}, document.title, '/register');
+          }
+        }
+      }
+    };
+
+    handleEmailLinkAuth();
 
     return () => unsubscribe();
   }, []);
@@ -73,8 +163,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const loginWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      // 팝업이 성공적으로 완료되면 onAuthStateChanged가 자동으로 user를 업데이트함
+      const result = await signInWithPopup(auth, provider);
+      const currentUser = result.user;
+
+      // Firestore에서 사용자 존재 여부 확인
+      if (currentUser) {
+        try {
+          const userDoc = await getDoc(
+            doc(firestore, 'users', currentUser.uid),
+          );
+          const isExistingUser = userDoc.exists();
+
+          // 신규 사용자는 /register로 리다이렉트
+          if (!isExistingUser) {
+            if (typeof window !== 'undefined') {
+              window.location.href = '/register';
+            }
+          }
+          // 기존 사용자는 onAuthStateChanged가 자동으로 처리함
+        } catch (error) {
+          console.error('사용자 정보 확인 중 오류:', error);
+          // 에러 발생 시에도 신규 사용자로 간주하고 /register로 이동
+          if (typeof window !== 'undefined') {
+            window.location.href = '/register';
+          }
+        }
+      }
     } catch (error) {
       console.error('Google 로그인 팝업 실패:', error);
       throw error;

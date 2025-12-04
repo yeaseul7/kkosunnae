@@ -97,22 +97,24 @@ export default function ReadHeader({
             )}
           </div>
         </div>
-        <div className="flex gap-1 items-center">
-          {!isEditing && (
+        {post?.authorId === user?.uid && (
+          <div className="flex gap-1 items-center">
+            {!isEditing && (
+              <button
+                onClick={handleEdit}
+                className="px-2 py-1 text-gray-500 whitespace-nowrap transition-colors cursor-pointer shrink-0 hover:text-gray-900"
+              >
+                수정
+              </button>
+            )}
             <button
-              onClick={handleEdit}
+              onClick={handleDelete}
               className="px-2 py-1 text-gray-500 whitespace-nowrap transition-colors cursor-pointer shrink-0 hover:text-gray-900"
             >
-              수정
+              삭제
             </button>
-          )}
-          <button
-            onClick={handleDelete}
-            className="px-2 py-1 text-gray-500 whitespace-nowrap transition-colors cursor-pointer shrink-0 hover:text-gray-900"
-          >
-            삭제
-          </button>
-        </div>
+          </div>
+        )}
       </div>
 
       {post?.tags && post?.tags.length > 0 && (

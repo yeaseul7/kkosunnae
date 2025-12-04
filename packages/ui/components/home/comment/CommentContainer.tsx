@@ -5,8 +5,10 @@ import CommentFooter from './CommentFooter';
 
 export default function CommentContainer({
   commentData,
+  postId,
 }: {
   commentData: CommentData;
+  postId: string;
 }) {
   const { authorName, createdAt, content } = commentData;
 
@@ -17,7 +19,7 @@ export default function CommentContainer({
       </div>
       <p className="text-sm text-gray-700 whitespace-pre-wrap">{content}</p>
       <div>
-        <CommentFooter commentData={commentData} />
+        <CommentFooter commentData={commentData} postId={postId} />
       </div>
     </div>
   );
