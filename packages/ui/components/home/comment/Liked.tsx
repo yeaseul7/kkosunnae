@@ -116,6 +116,12 @@ export default function Liked() {
       setIsUpdating(false);
     }
   };
+  const handleShare = () => {
+    if (!postId) return;
+    const url = `${window.location.origin}/read/${postId}`;
+    navigator.clipboard.writeText(url);
+    alert('공유 링크가 복사되었습니다.');
+  };
 
   if (loading) {
     return null;
@@ -142,8 +148,7 @@ export default function Liked() {
         </button>
         <span className="text-xs font-semibold">{likes}</span>
         <button
-          onClick={handleLike}
-          disabled={isUpdating}
+          onClick={handleShare}
           className={`p-3 rounded-full ${'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'} ${'cursor-pointer'}`}
           aria-label="공유"
         >

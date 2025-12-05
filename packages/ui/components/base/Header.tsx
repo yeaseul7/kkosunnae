@@ -62,10 +62,10 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
       <div className="flex justify-between items-center px-4 w-full h-full">
         <Link href="/">
           <Image
-            src="/static/images/unleashedLogo.png"
+            src="/static/images/logorow-xl.png"
             alt="Logo"
-            width={100}
-            height={100}
+            width={180}
+            height={180}
           />
         </Link>
         {visibleHeaderButtons && (

@@ -14,6 +14,8 @@ import { PostData } from '@/packages/type/postType';
 import ReadHeader from '@/packages/ui/components/home/read/ReadHeader';
 import ReadFooter from '@/packages/ui/components/home/read/ReadFooter';
 import Liked from '@/packages/ui/components/home/comment/Liked';
+import PageFooter from '@/packages/ui/components/base/PageFooter';
+import DecorateHr from '@/packages/ui/components/base/DecorateHr';
 
 export default function ReadPostPage() {
   const params = useParams();
@@ -97,6 +99,7 @@ export default function ReadPostPage() {
             </>
           )}
         </PageTemplate>
+        <PageFooter />
       </main>
     </div>
   );

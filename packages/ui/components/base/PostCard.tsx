@@ -105,12 +105,12 @@ export default function PostCard({ post }: { post: PostData }) {
           className="object-cover"
         />
       </div>
-      <div className="flex flex-col flex-1 p-4">
-        <h2 className="mb-2 text-lg font-semibold text-gray-900 line-clamp-2">
+      <div className="flex flex-col flex-1 p-3">
+        <h2 className="mb-2 text-base font-semibold text-gray-900 line-clamp-2">
           {post.title}
         </h2>
 
-        <p className="mb-4 text-sm text-gray-600 line-clamp-3">
+        <p className="mb-3 text-xs text-gray-600 line-clamp-2">
           {extractText(post.content)}
         </p>
 

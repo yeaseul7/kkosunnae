@@ -10,8 +10,8 @@ export default function ReadFooter({
 }) {
   return (
     <div className="flex flex-col w-full">
-      <WriteComment postId={postId} />
       <CommentList postId={postId} />
+      <WriteComment postId={postId} />
     </div>
   );
 }

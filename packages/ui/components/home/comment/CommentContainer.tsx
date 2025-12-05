@@ -15,7 +15,7 @@ export default function CommentContainer({
   return (
     <div className="flex flex-col flex-1 gap-1">
       <div className="flex gap-2 items-center">
-        <CommentHeader commentData={commentData} />
+        <CommentHeader commentData={commentData} postId={postId} />
       </div>
       <p className="text-sm text-gray-700 whitespace-pre-wrap">{content}</p>
       <div>

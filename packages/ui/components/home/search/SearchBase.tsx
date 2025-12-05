@@ -6,6 +6,7 @@ import { getBoardsDataBySearch } from '@/lib/api/post';
 import Loading from '../../base/Loading';
 import { PostData } from '@/packages/type/postType';
 import PostCard from '../../base/PostCard';
+import SearchResult from './SearchResult';
 
 export default function SearchBase() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,20 +28,8 @@ export default function SearchBase() {
     if (loading) {
       return <Loading />;
     }
-    if (boardsData.length === 0) {
-      return (
-        <div className="flex justify-center items-center py-8 text-gray-500">
-          검색 결과가 없습니다.
-        </div>
-      );
-    }
-    return (
-      <div className="grid grid-cols-1 gap-6 pt-8 w-full md:grid-cols-2 lg:grid-cols-3">
-        {boardsData.map((board) => (
-          <PostCard key={board.id} post={board} />
-        ))}
-      </div>
-    );
+
+    return <SearchResult boardsData={boardsData as unknown as PostData[]} />;
   };
 
   return (

@@ -15,15 +15,19 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | unLeashed',
-    default: 'unLeashed',
+    template: '%s | 꼬순내',
+    default: '꼬순내',
   },
   description: '반려동물의 발자국 저장소',
+  icons: {
+    icon: '/static/images/logo.png',
+    apple: '/static/images/logo.png',
+  },
   openGraph: {
-    title: 'unLeashed',
+    title: '꼬순내',
     description: '반려동물의 발자국 저장소',
-    url: 'https://unleashed.com',
-    siteName: 'unLeashed',
+    url: 'https://kkosunnae.com',
+    siteName: 'kkosunnae',
     locale: 'ko_KR',
     type: 'website',
   },

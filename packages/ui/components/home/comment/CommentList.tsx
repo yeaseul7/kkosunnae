@@ -61,6 +61,7 @@ export default function CommentList({ postId }: { postId: string }) {
 
   return (
     <div className="flex flex-col gap-4 p-4 px-10 w-full">
+      <div className="text-sm text-gray-500">댓글 {comments.length}개</div>
       {comments.map((comment, index) => (
         <div
           key={comment.id}

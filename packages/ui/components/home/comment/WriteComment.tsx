@@ -3,6 +3,7 @@ import { useRef, useEffect, useState } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
+import { VscSend } from 'react-icons/vsc';
 
 export default function WriteComment({ postId }: { postId: string }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -64,6 +65,9 @@ export default function WriteComment({ postId }: { postId: string }) {
     }
   };
 
+  const commentLength = comment.length;
+  const maxLength = 500;
+
   return (
     <div className="flex flex-col p-4 px-10 w-full">
       <div className="flex flex-col gap-2 p-4 w-full rounded-md border border-gray-200">
@@ -71,19 +75,42 @@ export default function WriteComment({ postId }: { postId: string }) {
           ref={textareaRef}
           placeholder="댓글을 입력하세요 (Cmd/Ctrl + Enter로 전송)"
           value={comment}
-          onChange={(e) => setComment(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value.length <= maxLength) {
+              setComment(e.target.value);
+            }
+          }}
           onKeyDown={handleKeyDown}
           className="overflow-y-auto w-full text-sm leading-6 outline-none resize-none"
           rows={3}
           disabled={isSubmitting}
+          maxLength={maxLength}
         />
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
+          <span
+            className={`text-xs ${
+              commentLength >= maxLength
+                ? 'text-red-500'
+                : commentLength >= maxLength * 0.9
+                ? 'text-orange-500'
+                : 'text-gray-500'
+            }`}
+          >
+            {commentLength}/{maxLength}
+          </span>
           <button
             onClick={handleSubmit}
-            disabled={!comment.trim() || isSubmitting}
-            className="px-4 py-2 text-sm text-white rounded bg-primary1 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary2"
+            disabled={
+              !comment.trim() || isSubmitting || commentLength > maxLength
+            }
+            className="flex justify-center items-center p-2 text-white rounded-full transition-colors bg-primary1 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary2"
+            aria-label="댓글 전송"
           >
-            {isSubmitting ? '전송 중...' : '댓글 작성'}
+            {isSubmitting ? (
+              <span className="text-sm">전송 중...</span>
+            ) : (
+              <VscSend className="w-5 h-5" />
+            )}
           </button>
         </div>
       </div>
