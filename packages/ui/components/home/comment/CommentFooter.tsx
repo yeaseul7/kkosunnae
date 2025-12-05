@@ -17,6 +17,7 @@ import { CommentData } from '@/packages/type/commentType';
 import { BsHeart, BsHeartFill, BsPlusSquare } from 'react-icons/bs';
 import ReplyWrite from './ReplyWrite';
 import ReplyList from './ReplyList';
+import { createHistory } from '@/lib/api/hisotry';
 
 export default function CommentFooter({
   commentData,
@@ -159,6 +160,20 @@ export default function CommentFooter({
         });
         setLikes((prev) => prev + 1);
         setIsLiked(true);
+
+        // 댓글 작성자에게 좋아요 알림 생성
+        const commentDocData = commentDoc.data();
+        if (commentDocData?.authorId) {
+          await createHistory(
+            commentDocData.authorId,
+            user.uid,
+            'like',
+            'comment',
+            commentData.id,
+            postId,
+            commentData.id,
+          );
+        }
       }
     } catch (error) {
       console.error('댓글 좋아요 업데이트 실패:', error);

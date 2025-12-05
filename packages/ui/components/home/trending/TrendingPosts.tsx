@@ -8,7 +8,6 @@ import { PostData } from '@/packages/type/postType';
 export default function TrendingPosts() {
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchPosts = async () => {
       try {

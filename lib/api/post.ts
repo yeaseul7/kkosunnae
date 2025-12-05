@@ -200,12 +200,21 @@ export async function getTrendingBoardsData(
             );
             const commentsSnapshot = await getDocs(commentsCollection);
             const commentCount = commentsSnapshot.size;
+
+            // 각 댓글의 repliesCount 합산
+            let totalRepliesCount = 0;
+            commentsSnapshot.forEach((commentDoc) => {
+              const commentData = commentDoc.data();
+              totalRepliesCount += commentData.repliesCount || 0;
+            });
+
+            const totalCommentCount = commentCount + totalRepliesCount;
             const likes = post.likes || 0;
-            const engagementScore = likes + commentCount;
+            const engagementScore = likes + totalCommentCount;
 
             return {
               post,
-              commentCount,
+              commentCount: totalCommentCount,
               engagementScore,
             };
           } catch (error) {

@@ -53,6 +53,7 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
             width={30}
             height={30}
             className="block md:hidden"
+            loading="eager"
           />
           <Image
             src="/static/images/logorow-xl.png"
@@ -60,6 +61,7 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
             width={180}
             height={180}
             className="hidden md:block"
+            loading="eager"
           />
         </Link>
         {visibleHeaderButtons && (

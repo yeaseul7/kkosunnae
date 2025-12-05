@@ -7,6 +7,16 @@ service cloud.firestore {
       allow read: if true; // 모든 사람이 프로필을 읽을 수 있음 (로그아웃 상태에서도 게시물 작성자 정보 표시용)
       allow create: if request.auth != null && request.auth.uid == userId;
       allow update: if request.auth != null && request.auth.uid == userId;
+
+      // 히스토리 서브컬렉션 규칙 추가
+      match /history/{historyId} {
+        allow read: if request.auth != null && request.auth.uid == userId; // 자신의 히스토리만 읽을 수 있음
+        allow create: if request.auth != null; // 로그인된 사용자는 누구나 히스토리 생성 가능 (알림 생성용)
+        allow update: if request.auth != null && request.auth.uid == userId && (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']) // 자신의 히스토리에서 isRead 필드만 업데이트 가능
+        );
+        allow delete: if request.auth != null && request.auth.uid == userId; // 자신의 히스토리만 삭제 가능
+      }
     }
 
     // 'boards' 컬렉션에 대해서는 로그인된 사용자만 생성 가능
@@ -32,7 +42,9 @@ service cloud.firestore {
         allow create: if request.auth != null; // 로그인된 사용자만 댓글 작성 가능
         allow update: if request.auth != null && (
           request.auth.uid == resource.data.authorId || // 작성자가 수정하는 경우
-          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])) // likes 필드만 업데이트하는 경우
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])) || // likes 필드만 업데이트하는 경우
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['repliesCount'])) || // repliesCount 필드만 업데이트하는 경우
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes', 'repliesCount'])) // likes와 repliesCount 필드만 업데이트하는 경우
         );
         allow delete: if request.auth != null && request.auth.uid == resource.data.authorId; // 작성자만 삭제
 

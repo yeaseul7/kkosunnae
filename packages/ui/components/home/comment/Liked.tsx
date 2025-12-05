@@ -15,6 +15,7 @@ import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
 import { HiHeart, HiOutlineHeart } from 'react-icons/hi2';
 import { BsShare } from 'react-icons/bs';
+import { createHistory } from '@/lib/api/hisotry';
 
 export default function Liked() {
   const params = useParams();
@@ -108,6 +109,18 @@ export default function Liked() {
         });
         setLikes((prev) => prev + 1);
         setIsLiked(true);
+
+        const postData = postDoc.data();
+        if (postData?.authorId) {
+          await createHistory(
+            postData.authorId,
+            user.uid,
+            'like',
+            'post',
+            postId,
+            postId,
+          );
+        }
       }
     } catch (error) {
       console.error('좋아요 업데이트 실패:', error);
@@ -150,7 +163,7 @@ export default function Liked() {
         </button>
         <button
           onClick={handleShare}
-          className="flex gap-2 items-center px-4 py-2 rounded-full bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 cursor-pointer"
+          className="flex gap-2 items-center px-4 py-2 text-gray-700 bg-white rounded-full border border-gray-200 cursor-pointer hover:bg-gray-50"
           aria-label="공유"
         >
           <BsShare className="w-5 h-5" />

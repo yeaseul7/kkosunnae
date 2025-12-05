@@ -1,9 +1,16 @@
 'use client';
 import { useRef, useEffect, useState } from 'react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  getDoc,
+} from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
 import { VscSend } from 'react-icons/vsc';
+import { createHistory } from '@/lib/api/hisotry';
 
 export default function WriteComment({ postId }: { postId: string }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -31,18 +38,41 @@ export default function WriteComment({ postId }: { postId: string }) {
 
     setIsSubmitting(true);
     try {
+      // 게시물 정보 가져오기
+      const postRef = doc(firestore, 'boards', postId);
+      const postDoc = await getDoc(postRef);
+
+      if (!postDoc.exists()) {
+        alert('게시물을 찾을 수 없습니다.');
+        return;
+      }
+
       const commentsCollection = collection(
         firestore,
         'boards',
         postId,
         'comments',
       );
-      await addDoc(commentsCollection, {
+      const commentDocRef = await addDoc(commentsCollection, {
         content: comment.trim(),
         authorId: user.uid,
         createdAt: serverTimestamp(),
         likes: 0,
       });
+
+      // 게시물 작성자에게 댓글 알림 생성
+      const postData = postDoc.data();
+      if (postData?.authorId) {
+        await createHistory(
+          postData.authorId,
+          user.uid,
+          'comment',
+          'comment',
+          commentDocRef.id,
+          postId,
+          commentDocRef.id,
+        );
+      }
 
       setComment('');
       if (textareaRef.current) {

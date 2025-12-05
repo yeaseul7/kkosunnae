@@ -63,7 +63,17 @@ export default function PostCard({ post }: { post: PostData }) {
           'comments',
         );
         const commentsSnapshot = await getDocs(commentsCollection);
-        setCommentCount(commentsSnapshot.size);
+        const commentCount = commentsSnapshot.size;
+
+        // 각 댓글의 repliesCount 합산
+        let totalRepliesCount = 0;
+        commentsSnapshot.forEach((commentDoc) => {
+          const commentData = commentDoc.data();
+          totalRepliesCount += commentData.repliesCount || 0;
+        });
+
+        const totalCommentCount = commentCount + totalRepliesCount;
+        setCommentCount(totalCommentCount);
       } catch (error) {
         console.error('댓글 개수 가져오기 실패:', error);
       }
@@ -84,6 +94,7 @@ export default function PostCard({ post }: { post: PostData }) {
           alt={post.title || '게시물 이미지'}
           fill
           className="object-cover"
+          sizes="100vw"
         />
       </div>
       <div className="flex flex-col flex-1 p-3">

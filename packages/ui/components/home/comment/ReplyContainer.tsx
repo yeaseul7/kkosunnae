@@ -1,6 +1,6 @@
 import { ReplyData } from '@/packages/type/commentType';
 import { useMemo, useState } from 'react';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc, updateDoc, increment } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
 import { formatDate } from '@/packages/utils/dateFormatting';
@@ -53,6 +53,18 @@ export default function ReplyContainer({
         replyData.id,
       );
       await deleteDoc(replyRef);
+
+      // 상위 댓글의 repliesCount 감소
+      const commentRef = doc(
+        firestore,
+        'boards',
+        postId,
+        'comments',
+        commentId,
+      );
+      await updateDoc(commentRef, {
+        repliesCount: increment(-1),
+      });
     } catch (error) {
       console.error('대댓글 삭제 중 오류 발생:', error);
       alert('대댓글 삭제 중 오류가 발생했습니다.');

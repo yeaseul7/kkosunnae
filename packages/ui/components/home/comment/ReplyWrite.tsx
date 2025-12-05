@@ -1,9 +1,18 @@
 'use client';
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  updateDoc,
+  increment,
+  getDoc,
+} from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
 import { VscSend } from 'react-icons/vsc';
+import { createHistory } from '@/lib/api/hisotry';
 
 export default function ReplyWrite({
   postId,
@@ -75,6 +84,21 @@ export default function ReplyWrite({
 
     setIsSubmitting(true);
     try {
+      // 댓글 정보 가져오기
+      const commentRef = doc(
+        firestore,
+        'boards',
+        postId,
+        'comments',
+        commentId,
+      );
+      const commentDoc = await getDoc(commentRef);
+
+      if (!commentDoc.exists()) {
+        alert('댓글을 찾을 수 없습니다.');
+        return;
+      }
+
       const repliesCollection = collection(
         firestore,
         'boards',
@@ -83,12 +107,32 @@ export default function ReplyWrite({
         commentId,
         'replies',
       );
-      await addDoc(repliesCollection, {
+      const replyDocRef = await addDoc(repliesCollection, {
         content: reply.trim(),
         authorId: user.uid,
         createdAt: serverTimestamp(),
         likes: 0,
       });
+
+      // 상위 댓글의 repliesCount 증가
+      await updateDoc(commentRef, {
+        repliesCount: increment(1),
+      });
+
+      // 댓글 작성자에게 대댓글 알림 생성
+      const commentData = commentDoc.data();
+      if (commentData?.authorId) {
+        await createHistory(
+          commentData.authorId,
+          user.uid,
+          'reply',
+          'reply',
+          replyDocRef.id,
+          postId,
+          commentId,
+          replyDocRef.id,
+        );
+      }
 
       setReply('');
       if (textareaRef.current) {
