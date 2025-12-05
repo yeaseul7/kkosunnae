@@ -1,21 +1,26 @@
 import { CommentData } from '@/packages/type/commentType';
-import { Timestamp } from 'firebase/firestore';
 import CommentHeader from './CommentHeader';
 import CommentFooter from './CommentFooter';
 
 export default function CommentContainer({
   commentData,
   postId,
+  isLoadingAuthorInfo,
 }: {
   commentData: CommentData;
   postId: string;
+  isLoadingAuthorInfo?: boolean;
 }) {
-  const { authorName, createdAt, content } = commentData;
+  const { content } = commentData;
 
   return (
     <div className="flex flex-col flex-1 gap-1">
       <div className="flex gap-2 items-center">
-        <CommentHeader commentData={commentData} postId={postId} />
+        <CommentHeader
+          commentData={commentData}
+          postId={postId}
+          isLoadingAuthorInfo={isLoadingAuthorInfo}
+        />
       </div>
       <p className="text-sm text-gray-700 whitespace-pre-wrap">{content}</p>
       <div>

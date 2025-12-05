@@ -100,7 +100,7 @@ export default function PostCard({ post }: { post: PostData }) {
       <div className="relative w-full bg-gray-200 aspect-video">
         <Image
           src={thumbnailImage || '/static/images/DefaultImage.png'}
-          alt={post.title}
+          alt={post.title || '게시물 이미지'}
           fill
           className="object-cover"
         />
@@ -126,7 +126,7 @@ export default function PostCard({ post }: { post: PostData }) {
             {post.authorPhotoURL ? (
               <Image
                 src={post.authorPhotoURL}
-                alt={post.authorName}
+                alt={post.authorName || '작성자 프로필 이미지'}
                 width={24}
                 height={24}
                 className="object-cover w-6 h-6 rounded-full"

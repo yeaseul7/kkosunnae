@@ -1,6 +1,13 @@
 'use client';
 import { firestore } from '@/lib/firebase/firebase';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+  doc,
+  getDoc,
+} from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { PiDogFill } from 'react-icons/pi';
@@ -10,6 +17,70 @@ import { CommentData } from '@/packages/type/commentType';
 export default function CommentList({ postId }: { postId: string }) {
   const [comments, setComments] = useState<CommentData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authorInfoMap, setAuthorInfoMap] = useState<
+    Map<string, { nickname: string; photoURL: string | null }>
+  >(new Map());
+
+  // 작성자 정보 가져오기
+  useEffect(() => {
+    const fetchAuthorInfo = async () => {
+      if (comments.length === 0) return;
+
+      const uniqueAuthorIds = [
+        ...new Set(
+          comments
+            .filter((comment) => comment.authorId)
+            .map((comment) => comment.authorId),
+        ),
+      ];
+
+      if (uniqueAuthorIds.length === 0) return;
+
+      setAuthorInfoMap((prevMap) => {
+        const authorIdsToFetch = uniqueAuthorIds.filter(
+          (authorId) => !prevMap.has(authorId),
+        );
+
+        if (authorIdsToFetch.length === 0) return prevMap;
+
+        const newAuthorInfoMap = new Map(prevMap);
+        Promise.all(
+          authorIdsToFetch.map(async (authorId) => {
+            try {
+              const userDoc = await getDoc(doc(firestore, 'users', authorId));
+              if (userDoc.exists()) {
+                const userData = userDoc.data();
+                newAuthorInfoMap.set(authorId, {
+                  nickname:
+                    userData?.nickname ||
+                    userData?.displayName ||
+                    '탈퇴한 사용자',
+                  photoURL: userData?.photoURL || null,
+                });
+              } else {
+                newAuthorInfoMap.set(authorId, {
+                  nickname: '탈퇴한 사용자',
+                  photoURL: null,
+                });
+              }
+            } catch (error) {
+              console.error(`작성자 ${authorId} 정보 가져오기 실패:`, error);
+              newAuthorInfoMap.set(authorId, {
+                nickname: '탈퇴한 사용자',
+                photoURL: null,
+              });
+            }
+          }),
+        ).then(() => {
+          setAuthorInfoMap(new Map(newAuthorInfoMap));
+        });
+
+        return prevMap;
+      });
+    };
+
+    fetchAuthorInfo();
+  }, [comments]);
 
   useEffect(() => {
     if (!postId) {
@@ -59,39 +130,80 @@ export default function CommentList({ postId }: { postId: string }) {
     );
   }
 
+  const enrichedComments = comments.map((comment) => {
+    if (!comment.authorId) return comment;
+
+    const authorInfo = authorInfoMap.get(comment.authorId);
+    if (authorInfo) {
+      return {
+        ...comment,
+        authorName: authorInfo.nickname || '탈퇴한 사용자',
+        authorPhotoURL: authorInfo.photoURL ?? null,
+      };
+    }
+
+    return comment;
+  });
+  console.log(enrichedComments);
+
   return (
     <div className="flex flex-col gap-4 p-4 px-10 w-full">
       <div className="text-sm text-gray-500">댓글 {comments.length}개</div>
-      {comments.map((comment, index) => (
-        <div
-          key={comment.id}
-          className={`flex gap-3 p-4 w-full ${
-            index !== comments.length - 1 ? 'border-b border-gray-200' : ''
-          }`}
-        >
-          <div className="shrink-0">
-            {comment.authorPhotoURL ? (
-              <Image
-                src={comment.authorPhotoURL}
-                alt={comment.authorName}
-                width={40}
-                height={40}
-                className="object-cover w-10 h-10 rounded-full"
+      {enrichedComments.map((comment, index) => {
+        const authorInfo = comment.authorId
+          ? authorInfoMap.get(comment.authorId)
+          : null;
+        const displayPhotoURL =
+          authorInfo?.photoURL ?? comment.authorPhotoURL ?? null;
+        const displayName =
+          authorInfo?.nickname ?? comment.authorName ?? '탈퇴한 사용자';
+
+        return (
+          <div
+            key={comment.id}
+            className={`flex gap-3 p-4 w-full ${
+              index !== enrichedComments.length - 1
+                ? 'border-b border-gray-200'
+                : ''
+            }`}
+          >
+            <div className="shrink-0">
+              {comment.authorId && !authorInfoMap.has(comment.authorId) ? (
+                <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" />
+              ) : displayPhotoURL ? (
+                <Image
+                  src={displayPhotoURL}
+                  alt={displayName}
+                  width={40}
+                  height={40}
+                  className="object-cover w-10 h-10 rounded-full"
+                />
+              ) : (
+                <div className="flex justify-center items-center w-10 h-10 bg-gray-200 rounded-full">
+                  <PiDogFill className="text-lg text-gray-500" />
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col flex-1 gap-1">
+              <CommentContainer
+                commentData={
+                  {
+                    ...comment,
+                    authorName: displayName,
+                    authorPhotoURL: displayPhotoURL,
+                  } as CommentData
+                }
+                postId={postId}
+                isLoadingAuthorInfo={
+                  comment.authorId
+                    ? !authorInfoMap.has(comment.authorId)
+                    : false
+                }
               />
-            ) : (
-              <div className="flex justify-center items-center w-10 h-10 bg-gray-200 rounded-full">
-                <PiDogFill className="text-lg text-gray-500" />
-              </div>
-            )}
+            </div>
           </div>
-          <div className="flex flex-col flex-1 gap-1">
-            <CommentContainer
-              commentData={comment as CommentData}
-              postId={postId}
-            />
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

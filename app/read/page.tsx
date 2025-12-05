@@ -28,6 +28,7 @@ function ReadPageContent() {
   const [post, setPost] = useState<PostData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [canGoBack, setCanGoBack] = useState(false);
 
   const editor = useEditor({
     extensions: [StarterKit, Image],
@@ -35,6 +36,18 @@ function ReadPageContent() {
     editable: false,
     immediatelyRender: false,
   });
+
+  useEffect(() => {
+    // 이전 페이지가 있는지 확인 (같은 사이트 내에서 온 경우)
+    if (typeof window !== 'undefined') {
+      const referrer = document.referrer;
+      const currentOrigin = window.location.origin;
+      const hasReferrer = Boolean(
+        referrer && referrer.startsWith(currentOrigin),
+      );
+      setCanGoBack(hasReferrer);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -81,23 +94,27 @@ function ReadPageContent() {
               <div className="text-red-500">
                 {error || '게시물을 찾을 수 없습니다.'}
               </div>
-              <button
-                onClick={() => router.back()}
-                className="px-4 py-2 mt-4 text-white bg-blue-500 rounded"
-              >
-                뒤로가기
-              </button>
+              {canGoBack && (
+                <button
+                  onClick={() => router.back()}
+                  className="px-4 py-2 mt-4 text-white bg-blue-500 rounded"
+                >
+                  뒤로가기
+                </button>
+              )}
             </div>
           )}
 
           {!loading && !error && post && (
             <>
-              <button
-                onClick={() => router.back()}
-                className="mb-4 text-gray-600 hover:text-gray-800"
-              >
-                ← 뒤로가기
-              </button>
+              {canGoBack && (
+                <button
+                  onClick={() => router.back()}
+                  className="mb-4 text-gray-600 hover:text-gray-800"
+                >
+                  ← 뒤로가기
+                </button>
+              )}
 
               <article className="p-8 bg-white rounded-lg shadow">
                 <header className="mb-6">

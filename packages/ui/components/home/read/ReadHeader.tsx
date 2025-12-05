@@ -76,7 +76,7 @@ export default function ReadHeader({
       return;
     }
 
-    const confirmed = window.confirm('정말로 이 게시물을 삭제하시겠습니까?');
+    const confirmed = window.confirm('게시물을 삭제하시겠습니까?');
     if (!confirmed) {
       return;
     }
@@ -84,7 +84,7 @@ export default function ReadHeader({
     try {
       await deleteDoc(doc(firestore, 'boards', postId));
       alert('게시물이 성공적으로 삭제되었습니다.');
-      router.push('/'); // 홈으로 리다이렉트
+      router.push('/');
     } catch (e) {
       console.error('게시물 삭제 중 오류 발생:', e);
 

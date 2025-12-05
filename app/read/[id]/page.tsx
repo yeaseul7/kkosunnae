@@ -15,7 +15,6 @@ import ReadHeader from '@/packages/ui/components/home/read/ReadHeader';
 import ReadFooter from '@/packages/ui/components/home/read/ReadFooter';
 import Liked from '@/packages/ui/components/home/comment/Liked';
 import PageFooter from '@/packages/ui/components/base/PageFooter';
-import DecorateHr from '@/packages/ui/components/base/DecorateHr';
 
 export default function ReadPostPage() {
   const params = useParams();
@@ -24,6 +23,7 @@ export default function ReadPostPage() {
   const [post, setPost] = useState<PostData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [canGoBack, setCanGoBack] = useState(false);
 
   const editor = useEditor({
     extensions: [StarterKit, Image],
@@ -31,6 +31,25 @@ export default function ReadPostPage() {
     editable: false,
     immediatelyRender: false,
   });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hasVisitedBefore =
+        sessionStorage.getItem('hasVisitedSite') === 'true';
+
+      const referrer = document.referrer;
+      const currentOrigin = window.location.origin;
+      const hasReferrer = Boolean(
+        referrer && referrer.length > 0 && referrer.startsWith(currentOrigin),
+      );
+
+      if (!hasVisitedBefore) {
+        sessionStorage.setItem('hasVisitedSite', 'true');
+      }
+
+      setCanGoBack(hasReferrer);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -48,7 +67,6 @@ export default function ReadPostPage() {
           const data = docSnap.data() as PostData;
           setPost(data);
 
-          // 에디터에 콘텐츠 설정
           if (editor && data.content) {
             editor.commands.setContent(data.content);
           }
@@ -75,13 +93,15 @@ export default function ReadPostPage() {
 
           {!loading && !error && post && (
             <>
-              <button
-                onClick={() => router.back()}
-                className="flex gap-2 items-center my-4 text-gray-600 hover:text-gray-800"
-              >
-                <IoIosArrowBack />
-                뒤로가기
-              </button>
+              {canGoBack && (
+                <button
+                  onClick={() => router.back()}
+                  className="flex gap-2 items-center my-4 text-gray-600 hover:text-gray-800"
+                >
+                  <IoIosArrowBack />
+                  뒤로가기
+                </button>
+              )}
 
               <div className="relative">
                 <Liked />

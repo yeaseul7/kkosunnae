@@ -40,8 +40,6 @@ export default function WriteComment({ postId }: { postId: string }) {
       await addDoc(commentsCollection, {
         content: comment.trim(),
         authorId: user.uid,
-        authorName: user.displayName || user.email || '익명',
-        authorPhotoURL: user.photoURL || null,
         createdAt: serverTimestamp(),
         likes: 0,
       });

@@ -8,9 +8,11 @@ import { firestore } from '@/lib/firebase/firebase';
 export default function CommentHeader({
   commentData,
   postId,
+  isLoadingAuthorInfo,
 }: {
   commentData: CommentData;
   postId: string;
+  isLoadingAuthorInfo?: boolean;
 }) {
   const { authorName, createdAt } = commentData;
   const { user } = useAuth();
@@ -28,7 +30,7 @@ export default function CommentHeader({
       return;
     }
 
-    if (!confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
+    if (!confirm('댓글을 삭제하시겠습니까?')) {
       return;
     }
 
@@ -77,6 +79,18 @@ export default function CommentHeader({
       });
     }
   };
+  if (isLoadingAuthorInfo) {
+    return (
+      <div className="flex justify-between w-full">
+        <div className="flex gap-2 items-center">
+          <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
+          <div className="h-3 w-20 bg-gray-200 rounded animate-pulse" />
+        </div>
+        <div className="flex gap-2 items-center"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex justify-between w-full">
       <div className="flex gap-2 items-center">
