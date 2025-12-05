@@ -1,11 +1,10 @@
 'use client';
 import { MdArrowDropDown } from 'react-icons/md';
-import { PiDogFill } from 'react-icons/pi';
-import Image from 'next/image';
 import { useAuth } from '@/lib/firebase/auth';
 import { firestore } from '@/lib/firebase/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
+import UserProfile from '../common/UserProfile';
 
 export default function HeaderUserIcon({
   setIsUserMenuOpen,
@@ -58,19 +57,14 @@ export default function HeaderUserIcon({
       className="flex items-center ml-2 cursor-pointer group"
       onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
     >
-      {userPhotoURL ? (
-        <Image
-          src={userPhotoURL}
-          alt={userDisplayName}
-          width={40}
-          height={40}
-          className="w-10 h-10 rounded-full object-cover transition-all duration-125 ease-in shadow-[0px_0_8px_rgba(0,0,0,0.085)] group-hover:shadow-[0px_0_12px_rgba(0,0,0,0.1)]"
-        />
-      ) : (
-        <div className="flex justify-center items-center w-10 h-10 rounded-full bg-element3">
-          <PiDogFill className="text-2xl" />
-        </div>
-      )}
+      <UserProfile
+        profileUrl={userPhotoURL || ''}
+        profileName={userDisplayName || ''}
+        imgSize={40}
+        sizeClass="w-10 h-10"
+        existName={false}
+        iconSize="text-xl"
+      />
       <MdArrowDropDown className="ml-1 text-text3 transition-all duration-125 ease-in -mr-1.75 text-2xl group-hover:text-text1" />
     </button>
   );

@@ -9,11 +9,14 @@ import {
   deleteDoc,
   collection,
   serverTimestamp,
+  onSnapshot,
 } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
 import { CommentData } from '@/packages/type/commentType';
-import { BsHeart, BsHeartFill } from 'react-icons/bs';
+import { BsHeart, BsHeartFill, BsPlusSquare } from 'react-icons/bs';
+import ReplyWrite from './ReplyWrite';
+import ReplyList from './ReplyList';
 
 export default function CommentFooter({
   commentData,
@@ -27,7 +30,9 @@ export default function CommentFooter({
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
-
+  const [isReplyWriting, setIsReplyWriting] = useState(false);
+  const [isReplyListOpen, setIsReplyListOpen] = useState(false);
+  const [replyCount, setReplyCount] = useState<number>(0);
   useEffect(() => {
     const fetchLikeStatus = async () => {
       if (!postId || !commentData.id) {
@@ -75,6 +80,30 @@ export default function CommentFooter({
 
     fetchLikeStatus();
   }, [postId, commentData.id, user]);
+
+  // 대댓글 개수 실시간 업데이트
+  useEffect(() => {
+    if (!postId || !commentData.id) return;
+
+    const repliesCollection = collection(
+      firestore,
+      'boards',
+      postId,
+      'comments',
+      commentData.id,
+      'replies',
+    );
+
+    const unsubscribe = onSnapshot(repliesCollection, (snapshot) => {
+      setReplyCount(snapshot.size);
+    });
+
+    return () => unsubscribe();
+  }, [postId, commentData.id]);
+
+  const handleReply = () => {
+    setIsReplyWriting((prev) => !prev);
+  };
 
   const handleLike = async () => {
     if (!user) {
@@ -153,9 +182,27 @@ export default function CommentFooter({
   }
 
   return (
-    <div className="flex gap-2 justify-between items-center mt-4">
-      <div></div>
-      <div className="flex gap-2 items-center">
+    <div className="flex flex-col gap-2 mt-4">
+      <div className="flex gap-2 justify-between items-center w-full">
+        <div>
+          {replyCount > 0 ? (
+            <button
+              onClick={() => setIsReplyListOpen((prev) => !prev)}
+              className="flex gap-1 items-center text-xs text-primary1"
+            >
+              <BsPlusSquare className="w-3 h-3" />
+              {replyCount}개의 대댓글
+            </button>
+          ) : (
+            <button
+              onClick={handleReply}
+              className="flex gap-1 items-center text-xs text-primary1"
+            >
+              <BsPlusSquare className="w-3 h-3" />
+              대댓글 작성
+            </button>
+          )}
+        </div>
         <button
           onClick={handleLike}
           disabled={isUpdating}
@@ -167,6 +214,21 @@ export default function CommentFooter({
           {likes > 0 && <span className="text-sm">{likes}</span>}
         </button>
       </div>
+
+      {isReplyWriting && commentData.id && (
+        <ReplyWrite
+          postId={postId}
+          commentId={commentData.id}
+          onReplySubmitted={() => setIsReplyWriting(false)}
+        />
+      )}
+      {isReplyListOpen && commentData.id && (
+        <ReplyList
+          postId={postId}
+          commentId={commentData.id}
+          onReplyListClosed={() => setIsReplyListOpen(false)}
+        />
+      )}
     </div>
   );
 }

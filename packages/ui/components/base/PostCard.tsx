@@ -1,47 +1,19 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Timestamp } from 'firebase/firestore';
 import { collection, getDocs } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { HiHeart } from 'react-icons/hi2';
-import { PiDogFill } from 'react-icons/pi';
 import { HiChatBubbleLeft } from 'react-icons/hi2';
 import { PostData } from '@/packages/type/postType';
+import { formatDate } from '@/packages/utils/dateFormatting';
+import UserProfile from '../common/UserProfile';
 
 export default function PostCard({ post }: { post: PostData }) {
   const router = useRouter();
   const [commentCount, setCommentCount] = useState<number>(0);
-  const formatDate = (timestamp: Timestamp | null): string => {
-    if (!timestamp) return '';
 
-    const date = timestamp.toDate();
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-    if (days === 0) {
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      if (hours === 0) {
-        const minutes = Math.floor(diff / (1000 * 60));
-        return minutes <= 0 ? '방금 전' : `${minutes}분 전`;
-      }
-      return `약 ${hours}시간 전`;
-    } else if (days === 1) {
-      return '어제';
-    } else if (days < 7) {
-      return `${days}일 전`;
-    } else {
-      return date.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    }
-  };
-
-  // 콘텐츠에서 텍스트만 추출 (HTML 태그 제거)
   const extractText = (html: string): string => {
     if (!html) return '';
     const text = html
@@ -51,13 +23,11 @@ export default function PostCard({ post }: { post: PostData }) {
     return text.length > 150 ? text.substring(0, 150) + '...' : text;
   };
 
-  // 콘텐츠에서 첫 번째 이미지 URL 추출
   const extractFirstImage = (html: string | undefined): string | null => {
     if (!html || typeof html !== 'string') {
       return null;
     }
 
-    // <img> 태그에서 src 속성 추출
     const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/i;
     const match = html.match(imgRegex);
 
@@ -70,7 +40,18 @@ export default function PostCard({ post }: { post: PostData }) {
 
   const thumbnailImage = extractFirstImage(post.content);
 
-  // 댓글 개수 가져오기
+  // 태그에 따라 기본 이미지 결정
+  const defaultImage = useMemo(() => {
+    if (!post.tags || post.tags.length === 0) {
+      return '/static/images/defaultDogImg.png';
+    }
+    const catTags = ['고양이', '냥냥이', '냥이', '냥', '냐옹', '츄르', '야옹'];
+    if (catTags.some((tag) => post.tags.includes(tag))) {
+      return '/static/images/defaultCatImg.png';
+    }
+    return '/static/images/defaultDogImg.png';
+  }, [post.tags]);
+
   useEffect(() => {
     const fetchCommentCount = async () => {
       if (!post.id) return;
@@ -99,7 +80,7 @@ export default function PostCard({ post }: { post: PostData }) {
     >
       <div className="relative w-full bg-gray-200 aspect-video">
         <Image
-          src={thumbnailImage || '/static/images/DefaultImage.png'}
+          src={thumbnailImage || defaultImage}
           alt={post.title || '게시물 이미지'}
           fill
           className="object-cover"
@@ -114,7 +95,6 @@ export default function PostCard({ post }: { post: PostData }) {
           {extractText(post.content)}
         </p>
 
-        {/* 하단 메타 정보 */}
         <div className="flex justify-between items-center mt-auto">
           <div className="flex gap-2 items-center text-xs text-gray-500">
             <span>{formatDate(post.createdAt)}</span>
@@ -122,24 +102,15 @@ export default function PostCard({ post }: { post: PostData }) {
           </div>
         </div>
         <div className="flex justify-between items-center pt-3 mt-3 border-t border-gray-100">
-          <div className="flex gap-2 items-center">
-            {post.authorPhotoURL ? (
-              <Image
-                src={post.authorPhotoURL}
-                alt={post.authorName || '작성자 프로필 이미지'}
-                width={24}
-                height={24}
-                className="object-cover w-6 h-6 rounded-full"
-              />
-            ) : (
-              <div className="flex justify-center items-center w-6 h-6 bg-gray-200 rounded-full">
-                <PiDogFill className="text-xs text-gray-500" />
-              </div>
-            )}
-            <span className="text-sm text-gray-700">
-              by {post.authorName || '탈퇴한 사용자'}
-            </span>
-          </div>
+          <UserProfile
+            profileUrl={post.authorPhotoURL || ''}
+            profileName={post.authorName || ''}
+            imgSize={24}
+            sizeClass="w-6 h-6"
+            existName={true}
+            iconSize="text-xs"
+          />
+
           <div className="flex gap-3 items-center text-gray-500">
             <div className="flex gap-1 items-center">
               <HiHeart className="w-4 h-4" />

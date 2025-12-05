@@ -10,11 +10,13 @@ import {
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { PiDogFill } from 'react-icons/pi';
 import CommentContainer from './CommentContainer';
 import { CommentData } from '@/packages/type/commentType';
+import { useRouter } from 'next/navigation';
+import UserProfile from '../../common/UserProfile';
 
 export default function CommentList({ postId }: { postId: string }) {
+  const router = useRouter();
   const [comments, setComments] = useState<CommentData[]>([]);
   const [loading, setLoading] = useState(true);
   const [authorInfoMap, setAuthorInfoMap] = useState<
@@ -129,6 +131,10 @@ export default function CommentList({ postId }: { postId: string }) {
       </div>
     );
   }
+  const handleClickAuthor = (authorId: string) => {
+    if (!authorId) return;
+    router.push(`/posts/${authorId}`);
+  };
 
   const enrichedComments = comments.map((comment) => {
     if (!comment.authorId) return comment;
@@ -147,7 +153,7 @@ export default function CommentList({ postId }: { postId: string }) {
   console.log(enrichedComments);
 
   return (
-    <div className="flex flex-col gap-4 p-4 px-10 w-full">
+    <div className="flex flex-col gap-4 p-4 px-4 w-full sm:px-6 md:px-10">
       <div className="text-sm text-gray-500">댓글 {comments.length}개</div>
       {enrichedComments.map((comment, index) => {
         const authorInfo = comment.authorId
@@ -161,30 +167,29 @@ export default function CommentList({ postId }: { postId: string }) {
         return (
           <div
             key={comment.id}
-            className={`flex gap-3 p-4 w-full ${
+            className={`flex gap-3 p-2 sm:p-4 w-full items-start ${
               index !== enrichedComments.length - 1
                 ? 'border-b border-gray-200'
                 : ''
             }`}
           >
-            <div className="shrink-0">
-              {comment.authorId && !authorInfoMap.has(comment.authorId) ? (
-                <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" />
-              ) : displayPhotoURL ? (
-                <Image
-                  src={displayPhotoURL}
-                  alt={displayName}
-                  width={40}
-                  height={40}
-                  className="object-cover w-10 h-10 rounded-full"
-                />
-              ) : (
-                <div className="flex justify-center items-center w-10 h-10 bg-gray-200 rounded-full">
-                  <PiDogFill className="text-lg text-gray-500" />
-                </div>
-              )}
-            </div>
-            <div className="flex flex-col flex-1 gap-1">
+            <button onClick={() => handleClickAuthor(comment.authorId)}>
+              <div className="shrink-0">
+                {comment.authorId && !authorInfoMap.has(comment.authorId) ? (
+                  <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" />
+                ) : (
+                  <UserProfile
+                    profileUrl={displayPhotoURL || ''}
+                    profileName={displayName || ''}
+                    imgSize={40}
+                    sizeClass="w-10 h-10"
+                    existName={false}
+                    iconSize="text-lg"
+                  />
+                )}
+              </div>
+            </button>
+            <div className="flex flex-col flex-1 gap-1 min-w-0">
               <CommentContainer
                 commentData={
                   {

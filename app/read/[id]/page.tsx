@@ -86,7 +86,7 @@ export default function ReadPostPage() {
 
   return (
     <div className="flex justify-center items-center min-h-screen font-sans bg-white">
-      <main className="flex flex-col items-center px-4 py-4 w-full max-w-6xl min-h-screen">
+      <main className="flex flex-col items-center px-4 py-4 w-full max-w-full min-h-screen sm:px-6 sm:py-6 lg:px-8 lg:py-8 sm:max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl">
         <PageTemplate visibleHeaderButtons={true} visibleHomeTab={false}>
           {loading && <Loading />}
           {error && !loading && <NotFound error={error} />}
@@ -96,19 +96,19 @@ export default function ReadPostPage() {
               {canGoBack && (
                 <button
                   onClick={() => router.back()}
-                  className="flex gap-2 items-center my-4 text-gray-600 hover:text-gray-800"
+                  className="flex gap-2 items-center my-4 text-gray-600 sm:my-6 hover:text-gray-800"
                 >
                   <IoIosArrowBack />
                   뒤로가기
                 </button>
               )}
 
-              <div className="relative">
+              <div className="relative w-full">
                 <Liked />
-                <article className="p-8 bg-white">
+                <article className="p-4 w-full bg-white sm:p-6 lg:p-8">
                   <ReadHeader post={post} isEditing={false} />
 
-                  <div className="max-w-none prose">
+                  <div className="max-w-none prose prose-sm sm:prose-base lg:prose-lg">
                     {editor && (
                       <EditorContent editor={editor} className="tiptap" />
                     )}

@@ -1,11 +1,10 @@
 import { PostData } from '@/packages/type/postType';
-import NextImage from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { doc, deleteDoc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
-import { PiDogFill } from 'react-icons/pi';
+import UserProfile from '../../common/UserProfile';
 
 export default function ReadHeader({
   post,
@@ -110,19 +109,16 @@ export default function ReadHeader({
 
       <div className="flex gap-4 justify-between items-center mb-4">
         <div className="flex gap-2 items-center">
-          {authorPhotoURL ? (
-            <NextImage
-              src={authorPhotoURL}
-              alt={authorNickname || 'User'}
-              width={28}
-              height={28}
-              className="object-cover w-7 h-7 rounded-full"
+          <button onClick={() => router.push(`/posts/${post?.authorId}`)}>
+            <UserProfile
+              profileUrl={authorPhotoURL || ''}
+              profileName={authorNickname || ''}
+              imgSize={28}
+              sizeClass="w-7 h-7"
+              existName={false}
+              iconSize="text-lg"
             />
-          ) : (
-            <div className="flex overflow-hidden justify-center items-center w-7 h-7 rounded-full bg-element3 shrink-0">
-              <PiDogFill className="text-lg" />
-            </div>
-          )}
+          </button>
           <div className="flex gap-2 items-center">
             <div className="pr-2 text-base font-semibold">
               {authorNickname || post?.authorName || '탈퇴한 사용자'}

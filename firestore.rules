@@ -42,6 +42,17 @@ service cloud.firestore {
           allow create: if request.auth != null && request.auth.uid == userId; // 자신의 ID로만 좋아요 생성 가능
           allow delete: if request.auth != null && request.auth.uid == userId; // 자신의 좋아요만 삭제 가능
         }
+
+        // 대댓글 서브컬렉션 규칙 추가
+        match /replies/{replyId} {
+          allow read: if true; // 모든 사람이 대댓글을 읽을 수 있음
+          allow create: if request.auth != null; // 로그인된 사용자만 대댓글 작성 가능
+          allow update: if request.auth != null && (
+            request.auth.uid == resource.data.authorId || // 작성자가 수정하는 경우
+            (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])) // likes 필드만 업데이트하는 경우
+          );
+          allow delete: if request.auth != null && request.auth.uid == resource.data.authorId; // 작성자만 삭제
+        }
       }
     }
 

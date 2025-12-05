@@ -9,3 +9,11 @@ export interface CommentData {
   createdAt: Timestamp | null;
   likes?: number;
 }
+
+export interface ReplyData {
+  id: string;
+  authorId: string;
+  content: string;
+  createdAt: Timestamp | null;
+  likes?: number;
+}

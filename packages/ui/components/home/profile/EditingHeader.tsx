@@ -1,5 +1,4 @@
-import Image from 'next/image';
-import { PiDogFill } from 'react-icons/pi';
+import UserProfile from '../../common/UserProfile';
 
 interface EditingHeaderProps {
   currentPhotoURL: string | null;
@@ -19,19 +18,14 @@ export default function EditingHeader({
 }: EditingHeaderProps) {
   return (
     <div className="relative">
-      {currentPhotoURL ? (
-        <Image
-          src={currentPhotoURL}
-          alt={currentName || 'User'}
-          width={112}
-          height={112}
-          className="w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28 rounded-full object-cover transition-all duration-125 ease-in shadow-[0px_0_8px_rgba(0,0,0,0.085)]"
-        />
-      ) : (
-        <div className="flex shrink-0 justify-center items-center w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28 aspect-square rounded-full overflow-hidden bg-element3">
-          <PiDogFill className="text-2xl sm:text-3xl lg:text-4xl" />
-        </div>
-      )}
+      <UserProfile
+        profileUrl={currentPhotoURL || ''}
+        profileName={currentName || ''}
+        imgSize={112}
+        sizeClass="w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28"
+        existName={false}
+        iconSize="text-2xl sm:text-3xl lg:text-4xl"
+      />
       <input
         ref={fileInputRef}
         type="file"

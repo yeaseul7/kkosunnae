@@ -1,6 +1,5 @@
 import { PostData } from '@/packages/type/postType';
 import { Dispatch, SetStateAction } from 'react';
-import { PiDogFill } from 'react-icons/pi';
 
 export default function WriteHeader({
   postData,

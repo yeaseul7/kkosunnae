@@ -4,6 +4,7 @@ import { Timestamp } from 'firebase/firestore';
 import { useMemo, useState } from 'react';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
+import { formatDate } from '@/packages/utils/dateFormatting';
 
 export default function CommentHeader({
   commentData,
@@ -54,37 +55,12 @@ export default function CommentHeader({
     }
   };
 
-  const formatDate = (timestamp: Timestamp | null): string => {
-    if (!timestamp) return '';
-    const date = timestamp.toDate();
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    if (days === 0) {
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      if (hours === 0) {
-        const minutes = Math.floor(diff / (1000 * 60));
-        return minutes <= 0 ? '방금 전' : `${minutes}분 전`;
-      }
-      return `약 ${hours}시간 전`;
-    } else if (days === 1) {
-      return '어제';
-    } else if (days < 7) {
-      return `${days}일 전`;
-    } else {
-      return date.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    }
-  };
   if (isLoadingAuthorInfo) {
     return (
       <div className="flex justify-between w-full">
         <div className="flex gap-2 items-center">
-          <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
-          <div className="h-3 w-20 bg-gray-200 rounded animate-pulse" />
+          <div className="w-24 h-4 bg-gray-200 rounded animate-pulse" />
+          <div className="w-20 h-3 bg-gray-200 rounded animate-pulse" />
         </div>
         <div className="flex gap-2 items-center"></div>
       </div>
