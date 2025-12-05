@@ -1,9 +1,6 @@
 'use client';
 import { MdArrowDropDown } from 'react-icons/md';
-import { useAuth } from '@/lib/firebase/auth';
-import { firestore } from '@/lib/firebase/firebase';
-import { doc, getDoc } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import UserProfile from '../common/UserProfile';
 
 export default function HeaderUserIcon({
@@ -13,44 +10,8 @@ export default function HeaderUserIcon({
   setIsUserMenuOpen: (isOpen: boolean) => void;
   isUserMenuOpen: boolean;
 }) {
-  const { user } = useAuth();
-  const [userPhotoURL, setUserPhotoURL] = useState<string | null>(null);
-  const [userDisplayName, setUserDisplayName] = useState<string>('');
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!user?.uid) {
-        setUserPhotoURL(null);
-        setUserDisplayName('');
-        return;
-      }
-
-      try {
-        const userDoc = await getDoc(doc(firestore, 'users', user.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setUserPhotoURL(userData?.photoURL || null);
-          setUserDisplayName(
-            userData?.nickname ||
-              userData?.displayName ||
-              user.displayName ||
-              'User',
-          );
-        } else {
-          // Firestore에 문서가 없으면 Auth의 정보 사용
-          setUserPhotoURL(user.photoURL || null);
-          setUserDisplayName(user.displayName || 'User');
-        }
-      } catch (error) {
-        console.error('사용자 프로필 가져오기 실패:', error);
-        // 오류 시 Auth의 정보 사용
-        setUserPhotoURL(user.photoURL || null);
-        setUserDisplayName(user.displayName || 'User');
-      }
-    };
-
-    fetchUserProfile();
-  }, [user]);
+  const { photoURL: userPhotoURL, nickname: userDisplayName } =
+    useUserProfile();
 
   return (
     <button

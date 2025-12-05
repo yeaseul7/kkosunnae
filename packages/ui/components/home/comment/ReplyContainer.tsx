@@ -1,11 +1,11 @@
 import { ReplyData } from '@/packages/type/commentType';
-import { useEffect, useMemo, useState } from 'react';
-import { doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { useMemo, useState } from 'react';
+import { doc, deleteDoc } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
-import { UserInfo } from '@/packages/type/userType';
 import { formatDate } from '@/packages/utils/dateFormatting';
 import UserProfile from '../../common/UserProfile';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 export default function ReplyContainer({
   replyData,
@@ -17,25 +17,17 @@ export default function ReplyContainer({
   commentId: string;
 }) {
   const { user } = useAuth();
-  const [authorInfo, setAuthorInfo] = useState<UserInfo | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { photoURL, nickname, loading } = useUserProfile(
+    replyData.authorId,
+    '탈퇴한 사용자',
+    null,
+  );
 
   const isMine = useMemo(
     () => user?.uid === replyData.authorId,
     [user, replyData.authorId],
   );
-
-  useEffect(() => {
-    const fetchAuthorInfo = async () => {
-      const authorInfo = await getDoc(
-        doc(firestore, 'users', replyData.authorId),
-      );
-      if (authorInfo.exists()) {
-        setAuthorInfo(authorInfo.data() as UserInfo);
-      }
-    };
-    fetchAuthorInfo();
-  }, [replyData.authorId]);
 
   const handleDelete = async () => {
     if (!user) {
@@ -74,18 +66,26 @@ export default function ReplyContainer({
       <div className="flex gap-2 justify-between items-center">
         <div className="flex gap-2 items-center">
           <div className="w-8 h-8 bg-gray-200 rounded-full">
-            <UserProfile
-              profileUrl={authorInfo?.photoURL || ''}
-              profileName={authorInfo?.nickname || ''}
-              imgSize={32}
-              sizeClass="w-8 h-8"
-              existName={false}
-              iconSize="text-sm"
-            />
+            {loading ? (
+              <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
+            ) : (
+              <UserProfile
+                profileUrl={photoURL || ''}
+                profileName={nickname || ''}
+                imgSize={32}
+                sizeClass="w-8 h-8"
+                existName={false}
+                iconSize="text-sm"
+              />
+            )}
           </div>
           <div className="flex flex-col gap-1 items-center">
             <div className="text-sm font-semibold text-gray-900">
-              {authorInfo?.nickname}
+              {loading ? (
+                <div className="w-16 h-4 bg-gray-200 rounded animate-pulse" />
+              ) : (
+                nickname
+              )}
             </div>
             <div className="text-xs text-gray-500">
               {formatDate(replyData.createdAt)}

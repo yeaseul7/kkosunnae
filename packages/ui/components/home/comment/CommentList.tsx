@@ -1,88 +1,23 @@
 'use client';
 import { firestore } from '@/lib/firebase/firebase';
-import {
-  collection,
-  query,
-  orderBy,
-  onSnapshot,
-  doc,
-  getDoc,
-} from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import CommentContainer from './CommentContainer';
 import { CommentData } from '@/packages/type/commentType';
 import { useRouter } from 'next/navigation';
 import UserProfile from '../../common/UserProfile';
+import { useUserProfiles } from '@/hooks/useUserProfile';
 
 export default function CommentList({ postId }: { postId: string }) {
   const router = useRouter();
   const [comments, setComments] = useState<CommentData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [authorInfoMap, setAuthorInfoMap] = useState<
-    Map<string, { nickname: string; photoURL: string | null }>
-  >(new Map());
 
   // 작성자 정보 가져오기
-  useEffect(() => {
-    const fetchAuthorInfo = async () => {
-      if (comments.length === 0) return;
-
-      const uniqueAuthorIds = [
-        ...new Set(
-          comments
-            .filter((comment) => comment.authorId)
-            .map((comment) => comment.authorId),
-        ),
-      ];
-
-      if (uniqueAuthorIds.length === 0) return;
-
-      setAuthorInfoMap((prevMap) => {
-        const authorIdsToFetch = uniqueAuthorIds.filter(
-          (authorId) => !prevMap.has(authorId),
-        );
-
-        if (authorIdsToFetch.length === 0) return prevMap;
-
-        const newAuthorInfoMap = new Map(prevMap);
-        Promise.all(
-          authorIdsToFetch.map(async (authorId) => {
-            try {
-              const userDoc = await getDoc(doc(firestore, 'users', authorId));
-              if (userDoc.exists()) {
-                const userData = userDoc.data();
-                newAuthorInfoMap.set(authorId, {
-                  nickname:
-                    userData?.nickname ||
-                    userData?.displayName ||
-                    '탈퇴한 사용자',
-                  photoURL: userData?.photoURL || null,
-                });
-              } else {
-                newAuthorInfoMap.set(authorId, {
-                  nickname: '탈퇴한 사용자',
-                  photoURL: null,
-                });
-              }
-            } catch (error) {
-              console.error(`작성자 ${authorId} 정보 가져오기 실패:`, error);
-              newAuthorInfoMap.set(authorId, {
-                nickname: '탈퇴한 사용자',
-                photoURL: null,
-              });
-            }
-          }),
-        ).then(() => {
-          setAuthorInfoMap(new Map(newAuthorInfoMap));
-        });
-
-        return prevMap;
-      });
-    };
-
-    fetchAuthorInfo();
-  }, [comments]);
+  const authorIds = comments
+    .map((comment) => comment.authorId)
+    .filter((id): id is string => id !== null && id !== undefined);
+  const authorInfoMap = useUserProfiles(authorIds);
 
   useEffect(() => {
     if (!postId) {

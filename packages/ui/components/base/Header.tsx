@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import RoundButton from '../common/RoundButton';
-import { useCallback, useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useRef } from 'react';
+import { useClickOutside } from '@/packages/utils/clickEvent';
 import { useRouter } from 'next/navigation';
 import LoginModal from '../auth/LoginModal';
 import HeaderUserIcon from './HeaderUserIcon';
@@ -20,29 +21,14 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  // 바깥 클릭 시 메뉴 닫기
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isUserMenuOpen &&
-        userMenuRef.current &&
-        !userMenuRef.current.contains(event.target as Node)
-      ) {
-        setIsUserMenuOpen(false);
-      }
-    };
-
-    if (isUserMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isUserMenuOpen]);
+  useClickOutside<HTMLDivElement>(
+    userMenuRef,
+    () => setIsUserMenuOpen(false),
+    isUserMenuOpen,
+  );
 
   const handleNotificationClick = useCallback(() => {
-    console.log('Notification clicked');
+    alert('아직 구현되지 않은 기능입니다.');
   }, []);
 
   const handleSearchClick = useCallback(() => {

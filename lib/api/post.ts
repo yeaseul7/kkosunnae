@@ -11,15 +11,13 @@ import {
 import { firestore } from '../firebase/firebase';
 import { PostData } from '@/packages/type/postType';
 
-// 작성자 정보 캐시 (메모리 캐시, 세션 동안 유지)
 const authorInfoCache = new Map<
   string,
   { nickname: string; photoURL: string | null; cachedAt: number }
 >();
 
-const CACHE_TTL = 5 * 60 * 1000; // 5분 캐시
+const CACHE_TTL = 5 * 60 * 1000;
 
-// 작성자 정보를 가져와서 게시물 데이터에 추가하는 헬퍼 함수 (export하여 다른 곳에서도 사용 가능)
 export async function enrichPostsWithAuthorInfo(
   posts: PostData[],
 ): Promise<PostData[]> {
@@ -27,7 +25,6 @@ export async function enrichPostsWithAuthorInfo(
     return posts;
   }
 
-  // 고유한 authorId 추출 (유효한 authorId만)
   const uniqueAuthorIds = [
     ...new Set(
       posts.filter((post) => post.authorId).map((post) => post.authorId),
@@ -38,7 +35,6 @@ export async function enrichPostsWithAuthorInfo(
     return posts;
   }
 
-  // 캐시에서 가져오거나 Firestore에서 조회
   const authorInfoMap = new Map<
     string,
     { nickname: string; photoURL: string | null }
@@ -46,7 +42,6 @@ export async function enrichPostsWithAuthorInfo(
   const now = Date.now();
   const authorIdsToFetch: string[] = [];
 
-  // 캐시 확인
   uniqueAuthorIds.forEach((authorId) => {
     const cached = authorInfoCache.get(authorId);
     if (cached && now - cached.cachedAt < CACHE_TTL) {
@@ -59,7 +54,6 @@ export async function enrichPostsWithAuthorInfo(
     }
   });
 
-  // 캐시에 없는 작성자 정보만 병렬로 가져오기
   if (authorIdsToFetch.length > 0) {
     await Promise.all(
       authorIdsToFetch.map(async (authorId) => {
@@ -81,7 +75,6 @@ export async function enrichPostsWithAuthorInfo(
               });
             }
           } else {
-            // Firestore에 문서가 없으면 기본값 설정
             console.warn(
               `작성자 ${authorId}의 users 문서가 존재하지 않습니다.`,
             );
@@ -91,14 +84,12 @@ export async function enrichPostsWithAuthorInfo(
             };
           }
 
-          // 캐시에 저장
           authorInfoCache.set(authorId, {
             ...authorInfo,
             cachedAt: now,
           });
           authorInfoMap.set(authorId, authorInfo);
         } catch (error) {
-          // 권한 오류인 경우 상세 로그 출력
           const firebaseError = error as { code?: string; message?: string };
           if (firebaseError?.code === 'permission-denied') {
             console.warn(
@@ -113,7 +104,6 @@ export async function enrichPostsWithAuthorInfo(
             nickname: '',
             photoURL: null,
           };
-          // 권한 오류도 캐시에 저장하여 반복 요청 방지 (단기간)
           authorInfoCache.set(authorId, {
             ...defaultInfo,
             cachedAt: now,
@@ -124,7 +114,6 @@ export async function enrichPostsWithAuthorInfo(
     );
   }
 
-  // 게시물 데이터에 작성자 정보 추가
   return posts.map((post) => {
     if (!post.authorId) {
       return post;
@@ -139,7 +128,6 @@ export async function enrichPostsWithAuthorInfo(
       };
     }
 
-    // 작성자 정보를 가져오지 못한 경우 기존 값 유지
     return post;
   });
 }
@@ -155,7 +143,6 @@ export async function getBoardsData(): Promise<PostData[]> {
   return await enrichPostsWithAuthorInfo(boardsList);
 }
 
-// 최근 게시물만 가져오는 API
 export async function getRecentBoardsData(
   limitCount: number = 20,
 ): Promise<PostData[]> {
