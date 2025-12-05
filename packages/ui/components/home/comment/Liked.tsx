@@ -128,12 +128,13 @@ export default function Liked() {
   }
 
   return (
-    <div className="fixed top-1/4 -translate-y-1/2 right-4 xl:right-[calc((100vw-1152px)/2-4rem)] z-50">
-      <div className="flex flex-col gap-3 justify-center items-center p-2 shadow-lg transition-all duration-200 rounded-4xl bg-gray-1">
+    <>
+      {/* 모바일 버전 - 게시물 내부에 표시 */}
+      <div className="flex gap-3 justify-center items-center py-4 md:hidden">
         <button
           onClick={handleLike}
           disabled={isUpdating}
-          className={`rounded-full p-3 ${
+          className={`flex gap-2 items-center px-4 py-2 rounded-full ${
             isLiked
               ? 'text-white bg-red-500 hover:bg-red-600'
               : 'text-gray-700 bg-white border border-gray-200 hover:bg-gray-50'
@@ -145,16 +146,49 @@ export default function Liked() {
           ) : (
             <HiOutlineHeart className="w-5 h-5" />
           )}
+          <span className="text-sm font-semibold">{likes}</span>
         </button>
-        <span className="text-xs font-semibold">{likes}</span>
         <button
           onClick={handleShare}
-          className={`p-3 rounded-full ${'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'} ${'cursor-pointer'}`}
+          className="flex gap-2 items-center px-4 py-2 rounded-full bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 cursor-pointer"
           aria-label="공유"
         >
           <BsShare className="w-5 h-5" />
+          <span className="text-sm font-semibold">공유</span>
         </button>
       </div>
-    </div>
+
+      {/* 데스크톱 버전 - fixed 위치 */}
+      <div className="hidden fixed top-1/4 -translate-y-1/2 right-4 xl:right-[calc((100vw-1152px)/2-4rem)] z-50 md:block">
+        <div className="flex flex-col gap-3 justify-center items-center p-2 shadow-lg transition-all duration-200 rounded-4xl bg-gray-1">
+          <button
+            onClick={handleLike}
+            disabled={isUpdating}
+            className={`rounded-full p-3 ${
+              isLiked
+                ? 'text-white bg-red-500 hover:bg-red-600'
+                : 'text-gray-700 bg-white border border-gray-200 hover:bg-gray-50'
+            } ${
+              isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+            }`}
+            aria-label="좋아요"
+          >
+            {isLiked ? (
+              <HiHeart className="w-5 h-5" />
+            ) : (
+              <HiOutlineHeart className="w-5 h-5" />
+            )}
+          </button>
+          <span className="text-xs font-semibold">{likes}</span>
+          <button
+            onClick={handleShare}
+            className={`p-3 rounded-full ${'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'} ${'cursor-pointer'}`}
+            aria-label="공유"
+          >
+            <BsShare className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </>
   );
 }

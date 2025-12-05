@@ -96,14 +96,14 @@ export default function TagList({ userId }: { userId?: string }) {
 
   return (
     <div>
-      <div className="mb-4">
-        <label className="text-lg font-semibold">태그 목록</label>
+      <div className="mb-3 sm:mb-4">
+        <label className="text-base sm:text-lg font-semibold">태그 목록</label>
       </div>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2 sm:gap-3">
         {tags.map((tagCount) => (
           <div
             key={tagCount.tag}
-            className="px-4 py-2 text-base rounded-full bg-element2 text-text1"
+            className="px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 text-xs sm:text-sm md:text-base rounded-full bg-element2 text-text1 whitespace-nowrap"
           >
             {tagCount.tag} ({tagCount.count})
           </div>

@@ -17,14 +17,14 @@ export default function EditingHeader({
   isUploading,
 }: EditingHeaderProps) {
   return (
-    <div className="relative">
+    <div className="flex relative flex-col items-center">
       <UserProfile
         profileUrl={currentPhotoURL || ''}
         profileName={currentName || ''}
-        imgSize={112}
-        sizeClass="w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28"
+        imgSize={144}
+        sizeClass="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32"
         existName={false}
-        iconSize="text-2xl sm:text-3xl lg:text-4xl"
+        iconSize="text-3xl sm:text-4xl md:text-5xl lg:text-6xl"
       />
       <input
         ref={fileInputRef}
@@ -33,17 +33,17 @@ export default function EditingHeader({
         onChange={handleImageChange}
         className="hidden"
       />
-      <div className="flex flex-col gap-2 mt-4">
+      <div className="flex flex-col gap-2 items-center mt-3 sm:mt-4">
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
-          className="px-2 py-1 w-16 text-sm font-bold text-white rounded sm:w-20 lg:w-28 bg-primary1 hover:bg-primary2 disabled:opacity-50"
+          className="px-3 py-1.5 sm:px-4 sm:py-2 w-full sm:w-auto min-w-[120px] sm:min-w-[140px] lg:min-w-[160px] text-xs sm:text-sm font-bold text-white rounded bg-primary1 hover:bg-primary2 disabled:opacity-50 transition-colors"
         >
           {isUploading ? '업로드 중...' : '이미지 변경'}
         </button>
         <button
           onClick={handleImageRemove}
-          className="px-2 py-1 w-16 text-sm font-bold sm:w-20 lg:w-28 text-primary1 hover:text-primary2"
+          className="px-3 py-1.5 sm:px-4 sm:py-2 w-full sm:w-auto min-w-[120px] sm:min-w-[140px] lg:min-w-[160px] text-xs sm:text-sm font-bold text-primary1 hover:text-primary2 transition-colors"
         >
           이미지 제거
         </button>

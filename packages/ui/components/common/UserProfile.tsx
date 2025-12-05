@@ -19,16 +19,17 @@ export default function UserProfile({
   return (
     <div className="flex gap-2 items-center">
       {profileUrl ? (
-        <Image
-          src={profileUrl}
-          alt={profileName || '작성자 프로필 이미지'}
-          width={imgSize}
-          height={imgSize}
-          className={`object-cover rounded-full ${sizeClass}`}
-        />
+        <div className={`relative shrink-0 aspect-square ${sizeClass}`}>
+          <Image
+            src={profileUrl}
+            alt={profileName || '작성자 프로필 이미지'}
+            fill
+            className="object-cover rounded-full"
+          />
+        </div>
       ) : (
         <div
-          className={`flex justify-center items-center bg-gray-200 rounded-full ${sizeClass}`}
+          className={`flex justify-center items-center bg-gray-200 rounded-full shrink-0 aspect-square ${sizeClass}`}
         >
           <PiDogFill className={`text-gray-500 ${iconSize}`} />
         </div>

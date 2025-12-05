@@ -23,7 +23,7 @@ export default function RoundButton({
   ...rest
 }: RoundButtonProps) {
   const baseClasses =
-    'px-4 py-1 rounded-full border flex items-center justify-center font-medium transition-all duration-500 ease-in-out';
+    'px-2 py-1 sm:px-3 md:px-4 text-xs sm:text-sm md:text-base rounded-full border flex items-center justify-center font-medium transition-all duration-500 ease-in-out whitespace-nowrap';
   const defaultBgColor = bgcolor || 'bg-white';
   const defaultBorderColor = borderColor || 'border-stone-900';
   const defaultTextColor = 'text-stone-900';

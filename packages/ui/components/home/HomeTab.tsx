@@ -22,8 +22,8 @@ export default function HomeTab() {
   }, []);
 
   return (
-    <div className="flex gap-2 justify-between items-center mt-4 w-full">
-      <div className="flex gap-2 items-center">
+    <div className="flex flex-col gap-3 mt-4 w-full sm:flex-row sm:justify-between sm:items-center">
+      <div className="flex gap-2 items-center sm:gap-2">
         <NavLink
           to="/trending"
           activeClassName="active !border-primary1"
@@ -37,9 +37,12 @@ export default function HomeTab() {
           <Lottie
             animationData={animationData}
             loop={true}
-            style={{ height: '30px' }}
+            className="w-10 h-10 sm:w-12 sm:h-12"
+            style={{ height: '24px' }}
           />
-          <span className="font-bold">이번주 귀요미</span>
+          <span className="text-sm font-bold whitespace-nowrap sm:text-sm md:text-base">
+            이번달 랭킹
+          </span>
         </NavLink>
         <NavLink
           to="/recent"
@@ -51,11 +54,17 @@ export default function HomeTab() {
             isRecentActive ? '!text-primary1 !border-primary1' : '!text-black'
           }`}
         >
-          <MdAccessTime className="w-6 h-6" />
-          최근 귀요미
+          <MdAccessTime className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+          <span className="text-sm whitespace-nowrap sm:text-sm md:text-base">
+            최근<span className="hidden sm:inline">귀요미 </span>
+          </span>
         </NavLink>
       </div>
-      {(pathname === '/' || pathname.startsWith('/trending')) && <TimePicker />}
+      {/* {(pathname === '/' || pathname.startsWith('/trending')) && (
+        <div className="flex justify-end sm:justify-start">
+          <TimePicker />
+        </div>
+      )} */}
     </div>
   );
 }

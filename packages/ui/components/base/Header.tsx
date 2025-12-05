@@ -46,17 +46,25 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
   return (
     <header className="w-full h-16 bg-white">
       <div className="flex justify-between items-center px-4 w-full h-full">
-        <Link href="/">
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/static/images/logoicon.png"
+            alt="Logo"
+            width={30}
+            height={30}
+            className="block md:hidden"
+          />
           <Image
             src="/static/images/logorow-xl.png"
             alt="Logo"
             width={180}
             height={180}
+            className="hidden md:block"
           />
         </Link>
         {visibleHeaderButtons && (
           <div className="flex gap-2 items-center">
-            <button
+            {/* <button
               className="p-2 rounded-full hover:bg-gray-200"
               onClick={handleNotificationClick}
             >
@@ -66,7 +74,7 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
                 width={25}
                 height={25}
               />
-            </button>
+            </button> */}
             <button
               className="p-2 rounded-full hover:bg-gray-200"
               onClick={handleSearchClick}

@@ -104,7 +104,6 @@ export default function ReadPostPage() {
               )}
 
               <div className="relative w-full">
-                <Liked />
                 <article className="p-4 w-full bg-white sm:p-6 lg:p-8">
                   <ReadHeader post={post} isEditing={false} />
 
@@ -113,6 +112,7 @@ export default function ReadPostPage() {
                       <EditorContent editor={editor} className="tiptap" />
                     )}
                   </div>
+                  <Liked />
                 </article>
               </div>
               <ReadFooter post={post} postId={postId} />

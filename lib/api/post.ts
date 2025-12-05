@@ -7,6 +7,7 @@ import {
   where,
   doc,
   getDoc,
+  Timestamp,
 } from 'firebase/firestore';
 import { firestore } from '../firebase/firebase';
 import { PostData } from '@/packages/type/postType';
@@ -161,9 +162,15 @@ export async function getTrendingBoardsData(
   limitCount: number = 20,
 ): Promise<PostData[]> {
   try {
+    // 최근 한 달 전 날짜 계산
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    const oneMonthAgoTimestamp = Timestamp.fromDate(oneMonthAgo);
+
     const boardsCol = collection(firestore, 'boards');
     const q = query(
       boardsCol,
+      where('createdAt', '>=', oneMonthAgoTimestamp),
       orderBy('createdAt', 'desc'),
       limit(Math.min(limitCount * 5, 100)),
     );
