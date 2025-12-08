@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/lib/firebase/auth';
 import { FcGoogle } from 'react-icons/fc';
 import { FaGithub } from 'react-icons/fa';
+import { useClickOutsideModal } from '@/packages/utils/clickEvent';
 
 interface LoginModalProps {
   onClose?: () => void;
@@ -21,40 +22,13 @@ export default function LoginModal({ onClose }: LoginModalProps) {
   const [emailError, setEmailError] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
 
-  // 사용자 로그인 상태 변경 시 모달 닫기
   useEffect(() => {
     if (user) {
       onClose?.();
     }
   }, [user, onClose]);
 
-  useEffect(() => {
-    // 링크 처리는 AuthProvider에서 전역적으로 처리됩니다
-
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
-        onClose?.();
-      }
-    };
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose?.();
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
-
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [onClose]);
+  useClickOutsideModal(modalRef, () => onClose?.(), !!onClose);
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);

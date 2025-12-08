@@ -2,6 +2,10 @@
 import { isEmptyOrWhitespace } from '@/lib/utils';
 import { PostData } from '@/packages/type/postType';
 import {
+  useClickOutside,
+  useClickOutsideModal,
+} from '@/packages/utils/clickEvent';
+import {
   Dispatch,
   SetStateAction,
   useCallback,
@@ -88,27 +92,16 @@ export default function TagInput({
     [setPostData],
   );
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        const currentValue = valueRef.current.trim();
-        if (currentValue) {
-          insertTag(currentValue);
-        }
+  useClickOutsideModal(
+    containerRef,
+    () => {
+      const currentValue = valueRef.current.trim();
+      if (currentValue) {
+        insertTag(currentValue);
       }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('touchstart', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
-    };
-  }, [insertTag]);
+    },
+    !!value,
+  );
 
   const removeTag = useCallback(
     (tag: string) => {

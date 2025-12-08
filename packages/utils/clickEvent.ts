@@ -26,3 +26,36 @@ export function useClickOutside<T extends HTMLElement = HTMLDivElement>(
     };
   }, [ref, callback, isEnabled]);
 }
+
+export function useClickOutsideModal<T extends HTMLElement = HTMLDivElement>(
+  ref: RefObject<T | null>,
+  callback: () => void,
+  isEnabled: boolean = true,
+) {
+  useEffect(() => {
+    if (!isEnabled) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        callback();
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        callback();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [callback, ref, isEnabled]);
+}

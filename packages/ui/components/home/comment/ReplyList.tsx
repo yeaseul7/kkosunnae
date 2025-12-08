@@ -6,6 +6,7 @@ import { ReplyData } from '@/packages/type/commentType';
 import ReplyContainer from './ReplyContainer';
 import ReplyWrite from './ReplyWrite';
 import DecorateHr from '../../base/DecorateHr';
+import { useClickOutside } from '@/packages/utils/clickEvent';
 
 export default function ReplyList({
   postId,
@@ -59,22 +60,7 @@ export default function ReplyList({
     fetchReplies();
   }, [postId, commentId]);
 
-  // 바깥쪽 클릭 시 닫기
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        onReplyListClosed();
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [onReplyListClosed]);
+  useClickOutside(containerRef, () => onReplyListClosed(), isReplyListOpen);
 
   return (
     <div

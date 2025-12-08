@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import ReadPostContent from '@/packages/ui/components/home/read/ReadPostContent';
 import { getPostById } from '@/lib/api/post';
 
-// HTML에서 텍스트 추출 헬퍼 함수
 function extractText(html: string | undefined): string {
   if (!html) return '';
   return html
@@ -11,7 +10,6 @@ function extractText(html: string | undefined): string {
     .trim();
 }
 
-// 이미지 URL 추출 헬퍼 함수
 function extractFirstImage(html: string | undefined): string | null {
   if (!html || typeof html !== 'string') {
     return null;
@@ -28,7 +26,6 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id: postId } = await params;
 
-  // 환경에 따른 기본 URL 설정
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
@@ -42,10 +39,8 @@ export async function generateMetadata({
       const description =
         extractText(post.content).substring(0, 160) || '꼬순내 게시물';
 
-      // 이미지 URL을 절대 경로로 변환
       let imageUrl = extractFirstImage(post.content);
       if (imageUrl) {
-        // 상대 경로인 경우 절대 경로로 변환
         if (imageUrl.startsWith('/')) {
           imageUrl = `${baseUrl}${imageUrl}`;
         } else if (!imageUrl.startsWith('http')) {

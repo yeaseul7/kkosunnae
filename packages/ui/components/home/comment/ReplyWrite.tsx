@@ -56,14 +56,11 @@ export default function ReplyWrite({
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
-        // 바깥쪽 클릭 시 닫기
         if (reply.trim() || textareaRef.current?.value.trim()) {
-          // 입력 내용이 있으면 확인 후 닫기
           if (confirm('작성 중인 대댓글이 있습니다. 정말 닫으시겠습니까?')) {
             handleCancel();
           }
         } else {
-          // 입력 내용이 없으면 바로 닫기
           handleCancel();
         }
       }
