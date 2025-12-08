@@ -5,6 +5,7 @@ import { doc, deleteDoc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
 import UserProfile from '../../common/UserProfile';
+import { formatDateSimple } from '@/packages/utils/dateFormatting';
 
 export default function ReadHeader({
   post,
@@ -125,7 +126,7 @@ export default function ReadHeader({
             </div>
             {post?.createdAt && (
               <div className="text-sm text-gray-500">
-                {post?.createdAt.toDate().toLocaleDateString()}
+                {formatDateSimple(post.createdAt)}
               </div>
             )}
           </div>

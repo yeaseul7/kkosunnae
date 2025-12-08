@@ -298,3 +298,65 @@ export async function getBoardsDataBySearch(
     return [];
   }
 }
+
+export async function getPostById(postId: string): Promise<PostData | null> {
+  if (!postId) {
+    return null;
+  }
+
+  try {
+    const docRef = doc(firestore, 'boards', postId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const postData = { id: docSnap.id, ...docSnap.data() } as PostData;
+      const enrichedPosts = await enrichPostsWithAuthorInfo([postData]);
+      const post = enrichedPosts[0] || null;
+
+      if (post) {
+        // Timestamp를 직렬화 가능한 형태로 변환
+        return JSON.parse(
+          JSON.stringify(post, (key, value) => {
+            // Firestore Timestamp 객체를 일반 객체로 변환
+            if (
+              value &&
+              typeof value === 'object' &&
+              value.constructor?.name === 'Timestamp'
+            ) {
+              const timestamp = value as Timestamp;
+              return {
+                seconds: timestamp.seconds,
+                nanoseconds: timestamp.nanoseconds,
+              };
+            }
+            // Timestamp와 유사한 객체도 변환 (seconds, nanoseconds 속성이 있는 경우)
+            if (
+              value &&
+              typeof value === 'object' &&
+              'seconds' in value &&
+              'nanoseconds' in value &&
+              typeof (value as { toDate?: () => Date }).toDate === 'function'
+            ) {
+              const timestampLike = value as {
+                seconds: number;
+                nanoseconds: number;
+              };
+              return {
+                seconds: timestampLike.seconds,
+                nanoseconds: timestampLike.nanoseconds,
+              };
+            }
+            return value;
+          }),
+        ) as PostData;
+      }
+
+      return null;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('게시물 조회 중 오류 발생:', error);
+    return null;
+  }
+}

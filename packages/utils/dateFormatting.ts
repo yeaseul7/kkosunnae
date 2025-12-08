@@ -1,8 +1,34 @@
 import { Timestamp } from 'firebase/firestore';
 
-export const formatDate = (timestamp: Timestamp | null): string => {
-  if (!timestamp) return '';
-  const date = timestamp.toDate();
+// Timestamp 또는 일반 객체를 Date로 변환하는 헬퍼 함수
+function toDate(
+  timestamp: Timestamp | { seconds: number; nanoseconds: number } | null,
+): Date | null {
+  if (!timestamp) return null;
+
+  // Timestamp 객체인 경우
+  if (typeof (timestamp as Timestamp).toDate === 'function') {
+    return (timestamp as Timestamp).toDate();
+  }
+
+  // 일반 객체 { seconds, nanoseconds }인 경우
+  if (
+    typeof timestamp === 'object' &&
+    'seconds' in timestamp &&
+    typeof timestamp.seconds === 'number'
+  ) {
+    return new Date(timestamp.seconds * 1000);
+  }
+
+  return null;
+}
+
+export const formatDate = (
+  timestamp: Timestamp | { seconds: number; nanoseconds: number } | null,
+): string => {
+  const date = toDate(timestamp);
+  if (!date) return '';
+
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -24,4 +50,13 @@ export const formatDate = (timestamp: Timestamp | null): string => {
       day: 'numeric',
     });
   }
+};
+
+// 날짜를 간단한 형식으로 포맷하는 함수 (예: 2024.01.01)
+export const formatDateSimple = (
+  timestamp: Timestamp | { seconds: number; nanoseconds: number } | null,
+): string => {
+  const date = toDate(timestamp);
+  if (!date) return '';
+  return date.toLocaleDateString('ko-KR');
 };

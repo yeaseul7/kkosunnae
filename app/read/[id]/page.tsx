@@ -1,126 +1,132 @@
-'use client';
-import { firestore } from '@/lib/firebase/firebase';
-import { doc, getDoc } from 'firebase/firestore';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { EditorContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import { Image } from '@tiptap/extension-image';
-import PageTemplate from '@/packages/ui/components/base/PageTemplate';
-import { IoIosArrowBack } from 'react-icons/io';
-import Loading from '@/packages/ui/components/base/Loading';
-import NotFound from '@/packages/ui/components/base/NotFound';
-import { PostData } from '@/packages/type/postType';
-import ReadHeader from '@/packages/ui/components/home/read/ReadHeader';
-import ReadFooter from '@/packages/ui/components/home/read/ReadFooter';
-import Liked from '@/packages/ui/components/home/comment/Liked';
-import PageFooter from '@/packages/ui/components/base/PageFooter';
+import { Metadata } from 'next';
+import ReadPostContent from '@/packages/ui/components/home/read/ReadPostContent';
+import { getPostById } from '@/lib/api/post';
 
-export default function ReadPostPage() {
-  const params = useParams();
-  const router = useRouter();
-  const postId = params.id as string;
-  const [post, setPost] = useState<PostData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [canGoBack, setCanGoBack] = useState(false);
+// HTML에서 텍스트 추출 헬퍼 함수
+function extractText(html: string | undefined): string {
+  if (!html) return '';
+  return html
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
-  const editor = useEditor({
-    extensions: [StarterKit, Image],
-    content: '',
-    editable: false,
-    immediatelyRender: false,
-  });
+// 이미지 URL 추출 헬퍼 함수
+function extractFirstImage(html: string | undefined): string | null {
+  if (!html || typeof html !== 'string') {
+    return null;
+  }
+  const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/i;
+  const match = html.match(imgRegex);
+  return match && match[1] ? match[1] : null;
+}
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const hasVisitedBefore =
-        sessionStorage.getItem('hasVisitedSite') === 'true';
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id: postId } = await params;
 
-      const referrer = document.referrer;
-      const currentOrigin = window.location.origin;
-      const hasReferrer = Boolean(
-        referrer && referrer.length > 0 && referrer.startsWith(currentOrigin),
-      );
+  // 환경에 따른 기본 URL 설정
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+    'http://localhost:3001';
 
-      if (!hasVisitedBefore) {
-        sessionStorage.setItem('hasVisitedSite', 'true');
-      }
+  try {
+    const post = await getPostById(postId);
 
-      setCanGoBack(hasReferrer);
-    }
-  }, []);
+    if (post) {
+      const title = post.title || '게시물';
+      const description =
+        extractText(post.content).substring(0, 160) || '꼬순내 게시물';
 
-  useEffect(() => {
-    const fetchPost = async () => {
-      if (!postId) {
-        setError('게시물 ID가 없습니다.');
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const docRef = doc(firestore, 'boards', postId);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const data = docSnap.data() as PostData;
-          setPost(data);
-
-          if (editor && data.content) {
-            editor.commands.setContent(data.content);
-          }
-        } else {
-          setError('게시물을 찾을 수 없습니다.');
+      // 이미지 URL을 절대 경로로 변환
+      let imageUrl = extractFirstImage(post.content);
+      if (imageUrl) {
+        // 상대 경로인 경우 절대 경로로 변환
+        if (imageUrl.startsWith('/')) {
+          imageUrl = `${baseUrl}${imageUrl}`;
+        } else if (!imageUrl.startsWith('http')) {
+          imageUrl = `${baseUrl}/${imageUrl}`;
         }
-      } catch (e) {
-        console.error('게시물 조회 중 오류 발생:', e);
-        setError('게시물을 불러오는 중 오류가 발생했습니다.');
-      } finally {
-        setLoading(false);
+      } else {
+        imageUrl = `${baseUrl}/static/images/defaultDogImg.png`;
       }
-    };
 
-    fetchPost();
-  }, [postId, editor]);
+      const url = `${baseUrl}/read/${postId}`;
 
-  return (
-    <div className="flex justify-center items-center min-h-screen font-sans bg-white">
-      <main className="flex flex-col items-center px-4 py-4 w-full max-w-full min-h-screen sm:px-6 sm:py-6 lg:px-8 lg:py-8 sm:max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl">
-        <PageTemplate visibleHeaderButtons={true} visibleHomeTab={false}>
-          {loading && <Loading />}
-          {error && !loading && <NotFound error={error} />}
+      return {
+        title: `${title} | 꼬순내`,
+        description,
+        metadataBase: new URL(baseUrl),
+        openGraph: {
+          title,
+          description,
+          url,
+          siteName: '꼬순내',
+          images: [
+            {
+              url: imageUrl,
+              width: 1200,
+              height: 630,
+              alt: title,
+            },
+          ],
+          locale: 'ko_KR',
+          type: 'article',
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title,
+          description,
+          images: [imageUrl],
+        },
+      };
+    }
+  } catch (error) {
+    console.error('메타데이터 생성 중 오류:', error);
+  }
 
-          {!loading && !error && post && (
-            <>
-              {canGoBack && (
-                <button
-                  onClick={() => router.back()}
-                  className="flex gap-2 items-center my-4 text-gray-600 sm:my-6 hover:text-gray-800"
-                >
-                  <IoIosArrowBack />
-                  뒤로가기
-                </button>
-              )}
+  const defaultImageUrl = `${baseUrl}/static/images/defaultDogImg.png`;
 
-              <div className="relative w-full">
-                <article className="p-4 w-full bg-white sm:p-6 lg:p-8">
-                  <ReadHeader post={post} isEditing={false} />
+  return {
+    title: '게시물 | 꼬순내',
+    description: '꼬순내 게시물',
+    metadataBase: new URL(baseUrl),
+    openGraph: {
+      title: '게시물 | 꼬순내',
+      description: '꼬순내 게시물',
+      url: `${baseUrl}/read/${postId}`,
+      siteName: '꼬순내',
+      images: [
+        {
+          url: defaultImageUrl,
+          width: 1200,
+          height: 630,
+          alt: '꼬순내',
+        },
+      ],
+      locale: 'ko_KR',
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: '게시물 | 꼬순내',
+      description: '꼬순내 게시물',
+      images: [defaultImageUrl],
+    },
+  };
+}
 
-                  <div className="max-w-none prose prose-sm sm:prose-base lg:prose-lg">
-                    {editor && (
-                      <EditorContent editor={editor} className="tiptap" />
-                    )}
-                  </div>
-                  <Liked />
-                </article>
-              </div>
-              <ReadFooter post={post} postId={postId} />
-            </>
-          )}
-        </PageTemplate>
-        <PageFooter />
-      </main>
-    </div>
-  );
+export default async function ReadPostPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id: postId } = await params;
+  const post = await getPostById(postId);
+
+  return <ReadPostContent postId={postId} initialPost={post} />;
 }

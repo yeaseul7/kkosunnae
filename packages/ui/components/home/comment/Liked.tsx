@@ -129,11 +129,44 @@ export default function Liked() {
       setIsUpdating(false);
     }
   };
-  const handleShare = () => {
+  const handleShare = async () => {
     if (!postId) return;
     const url = `${window.location.origin}/read/${postId}`;
-    navigator.clipboard.writeText(url);
-    alert('공유 링크가 복사되었습니다.');
+
+    try {
+      // 클립보드 API 사용 시도
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+        alert('공유 링크가 복사되었습니다.');
+      } else {
+        // 대체 방법: 임시 textarea 요소 사용
+        const textarea = document.createElement('textarea');
+        textarea.value = url;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        textarea.setSelectionRange(0, 99999); // 모바일 지원
+
+        try {
+          const successful = document.execCommand('copy');
+          if (successful) {
+            alert('공유 링크가 복사되었습니다.');
+          } else {
+            throw new Error('복사 실패');
+          }
+        } catch (err) {
+          // 복사 실패 시 URL을 직접 보여주기
+          prompt('공유 링크를 복사하세요:', url);
+        } finally {
+          document.body.removeChild(textarea);
+        }
+      }
+    } catch (error) {
+      console.error('클립보드 복사 실패:', error);
+      // 복사 실패 시 URL을 직접 보여주기
+      prompt('공유 링크를 복사하세요:', url);
+    }
   };
 
   if (loading) {
