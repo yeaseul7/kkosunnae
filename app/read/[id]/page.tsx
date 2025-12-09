@@ -53,7 +53,7 @@ export async function generateMetadata({
       const url = `${baseUrl}/read/${postId}`;
 
       return {
-        title: `${title} | 꼬순내`,
+        title: `${title} `,
         description,
         metadataBase: new URL(baseUrl),
         openGraph: {

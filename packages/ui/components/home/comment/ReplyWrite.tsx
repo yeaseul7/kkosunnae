@@ -81,7 +81,6 @@ export default function ReplyWrite({
 
     setIsSubmitting(true);
     try {
-      // 댓글 정보 가져오기
       const commentRef = doc(
         firestore,
         'boards',
@@ -111,12 +110,10 @@ export default function ReplyWrite({
         likes: 0,
       });
 
-      // 상위 댓글의 repliesCount 증가
       await updateDoc(commentRef, {
         repliesCount: increment(1),
       });
 
-      // 댓글 작성자에게 대댓글 알림 생성
       const commentData = commentDoc.data();
       if (commentData?.authorId) {
         await createHistory(

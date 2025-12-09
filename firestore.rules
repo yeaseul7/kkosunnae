@@ -8,15 +8,27 @@ service cloud.firestore {
       allow create: if request.auth != null && request.auth.uid == userId;
       allow update: if request.auth != null && request.auth.uid == userId;
 
-      // 히스토리 서브컬렉션 규칙 추가
-      match /history/{historyId} {
-        allow read: if request.auth != null && request.auth.uid == userId; // 자신의 히스토리만 읽을 수 있음
-        allow create: if request.auth != null; // 로그인된 사용자는 누구나 히스토리 생성 가능 (알림 생성용)
-        allow update: if request.auth != null && request.auth.uid == userId && (
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']) // 자신의 히스토리에서 isRead 필드만 업데이트 가능
-        );
-        allow delete: if request.auth != null && request.auth.uid == userId; // 자신의 히스토리만 삭제 가능
-      }
+   match /history/{historyId} {
+  // [수정됨] 읽기 권한: 주인(B)이거나, 또는 행동한 사람(A)인 경우 허용
+  allow read: if request.auth != null && (
+    request.auth.uid == userId || 
+    resource.data.actorId == request.auth.uid
+  );
+
+  allow create: if request.auth != null; 
+  
+  // 업데이트는 주인만 가능 (읽음 처리 등)
+  allow update: if request.auth != null && request.auth.uid == userId && (
+    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']) 
+  );
+  
+  // [수정됨] 삭제 권한: 주인(B)이거나, 행동한 사람(A)인 경우 허용
+  // 복잡한 조건 필요 없이 actorId만 확인하면 됩니다. (어차피 본인이 만든 것만 지우면 되니까요)
+  allow delete: if request.auth != null && (
+    request.auth.uid == userId || 
+    resource.data.actorId == request.auth.uid
+  );
+}
     }
 
     // 'boards' 컬렉션에 대해서는 로그인된 사용자만 생성 가능

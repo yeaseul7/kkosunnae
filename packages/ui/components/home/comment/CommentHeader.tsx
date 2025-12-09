@@ -1,10 +1,10 @@
 import { useAuth } from '@/lib/firebase/auth';
 import { CommentData } from '@/packages/type/commentType';
-import { Timestamp } from 'firebase/firestore';
 import { useMemo, useState } from 'react';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
 import { formatDate } from '@/packages/utils/dateFormatting';
+import { deleteHistoryByCommentId } from '@/lib/api/hisotry';
 
 export default function CommentHeader({
   commentData,
@@ -19,7 +19,6 @@ export default function CommentHeader({
   const { user } = useAuth();
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // 파생 상태는 직접 계산 (useEffect 불필요)
   const isMine = useMemo(
     () => user?.uid === commentData.authorId,
     [user, commentData.authorId],
@@ -46,6 +45,13 @@ export default function CommentHeader({
         'comments',
         commentData.id,
       );
+
+      await deleteHistoryByCommentId(
+        commentData.id,
+        postId,
+        commentData.authorId,
+      );
+
       await deleteDoc(commentRef);
     } catch (error) {
       console.error('댓글 삭제 중 오류 발생:', error);

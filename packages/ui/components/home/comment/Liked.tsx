@@ -15,7 +15,7 @@ import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
 import { HiHeart, HiOutlineHeart } from 'react-icons/hi2';
 import { BsShare } from 'react-icons/bs';
-import { createHistory } from '@/lib/api/hisotry';
+import { createHistory, deleteHistoryByPostLike } from '@/lib/api/hisotry';
 
 export default function Liked() {
   const params = useParams();
@@ -92,6 +92,10 @@ export default function Liked() {
       const userLikeDoc = doc(likeListCollection, user.uid);
 
       if (isLiked) {
+        const postData = postDoc.data();
+        if (postData?.authorId) {
+          await deleteHistoryByPostLike(postId, user.uid);
+        }
         await deleteDoc(userLikeDoc);
         await updateDoc(postRef, {
           likes: increment(-1),

@@ -11,6 +11,7 @@ import {
   where,
   FieldValue,
   Timestamp,
+  deleteDoc,
 } from 'firebase/firestore';
 import { firestore } from '../firebase/firebase';
 
@@ -238,5 +239,230 @@ export async function markAllHistoryAsRead(userId: string): Promise<void> {
     await Promise.all(updatePromises);
   } catch (error) {
     console.error('모든 히스토리 읽음 표시 실패:', error);
+  }
+}
+
+/**
+ * 히스토리 삭제
+ * @param userId 사용자 ID
+ * @param historyId 히스토리 ID
+ */
+export async function deleteHistory(
+  userId: string,
+  historyId: string,
+): Promise<void> {
+  try {
+    const historyRef = doc(firestore, 'users', userId, 'history', historyId);
+    await deleteDoc(historyRef);
+  } catch (error) {
+    console.error('히스토리 삭제 실패:', error);
+  }
+}
+
+/**
+ * 게시물 좋아요 취소 시 관련 히스토리 삭제
+ * @param postId 게시물 ID
+ * @param actorId 좋아요를 취소한 사용자 ID
+ */
+export async function deleteHistoryByPostLike(
+  postId: string,
+  actorId: string,
+): Promise<void> {
+  try {
+    const postRef = doc(firestore, 'boards', postId);
+    const postDoc = await getDoc(postRef);
+
+    if (!postDoc.exists()) {
+      console.error('게시물을 찾을 수 없습니다.');
+      return;
+    }
+
+    const postData = postDoc.data();
+    const postAuthorId = postData?.authorId;
+
+    if (!postAuthorId) {
+      console.error('게시물 작성자 ID를 찾을 수 없습니다.');
+      return;
+    }
+
+    const historyCollection = collection(
+      firestore,
+      'users',
+      postAuthorId,
+      'history',
+    );
+    const q = query(
+      historyCollection,
+      where('targetType', '==', 'post'),
+      where('action', '==', 'like'),
+      where('postId', '==', postId),
+      where('actorId', '==', actorId),
+    );
+    const historySnapshot = await getDocs(q);
+
+    const deletePromises = historySnapshot.docs.map((doc) =>
+      deleteDoc(doc.ref),
+    );
+    await Promise.all(deletePromises);
+  } catch (error) {
+    console.error('게시물 좋아요 히스토리 삭제 실패:', error);
+  }
+}
+
+/**
+ * 댓글 좋아요 취소 시 관련 히스토리 삭제
+ * @param commentId 댓글 ID
+ * @param postId 게시물 ID
+ * @param actorId 좋아요를 취소한 사용자 ID
+ */
+export async function deleteHistoryByCommentLike(
+  commentId: string,
+  postId: string,
+  actorId: string,
+): Promise<void> {
+  try {
+    const commentRef = doc(firestore, 'boards', postId, 'comments', commentId);
+    const commentDoc = await getDoc(commentRef);
+
+    if (!commentDoc.exists()) {
+      console.error('댓글을 찾을 수 없습니다.');
+      return;
+    }
+
+    const commentData = commentDoc.data();
+    const commentAuthorId = commentData?.authorId;
+
+    if (!commentAuthorId) {
+      console.error('댓글 작성자 ID를 찾을 수 없습니다.');
+      return;
+    }
+
+    const historyCollection = collection(
+      firestore,
+      'users',
+      commentAuthorId,
+      'history',
+    );
+    const q = query(
+      historyCollection,
+      where('targetType', '==', 'comment'),
+      where('action', '==', 'like'),
+      where('commentId', '==', commentId),
+      where('postId', '==', postId),
+      where('actorId', '==', actorId),
+    );
+    const historySnapshot = await getDocs(q);
+
+    const deletePromises = historySnapshot.docs.map((doc) =>
+      deleteDoc(doc.ref),
+    );
+    await Promise.all(deletePromises);
+  } catch (error) {
+    console.error('댓글 좋아요 히스토리 삭제 실패:', error);
+  }
+}
+
+/**
+ * 댓글 삭제 시 관련 히스토리 삭제
+ * @param commentId 삭제되는 댓글 ID
+ * @param postId 게시물 ID
+ */
+export async function deleteHistoryByCommentId(
+  commentId: string,
+  postId: string,
+  authorId: string,
+): Promise<void> {
+  try {
+    const postRef = doc(firestore, 'boards', postId);
+    const postDoc = await getDoc(postRef);
+
+    if (!postDoc.exists()) {
+      console.error('게시물을 찾을 수 없습니다.');
+      return;
+    }
+
+    const postData = postDoc.data();
+    const postAuthorId = postData?.authorId;
+
+    if (!postAuthorId) {
+      console.error('게시물 작성자 ID를 찾을 수 없습니다.');
+      return;
+    }
+
+    const historyCollection = collection(
+      firestore,
+      'users',
+      postAuthorId,
+      'history',
+    );
+    const q = query(
+      historyCollection,
+      where('targetType', '==', 'comment'),
+      where('commentId', '==', commentId),
+      where('postId', '==', postId),
+      where('actorId', '==', authorId),
+    );
+    const historySnapshot = await getDocs(q);
+
+    const deletePromises = historySnapshot.docs.map((doc) =>
+      deleteDoc(doc.ref),
+    );
+    await Promise.all(deletePromises);
+  } catch (error) {
+    console.error('댓글 관련 히스토리 삭제 실패:', error);
+  }
+}
+
+/**
+ * 대댓글 삭제 시 관련 히스토리 삭제
+ * @param replyId 삭제되는 대댓글 ID
+ * @param postId 게시물 ID
+ * @param commentId 댓글 ID
+ * @param authorId 대댓글 작성자 ID
+ */
+export async function deleteHistoryByReplyId(
+  replyId: string,
+  postId: string,
+  commentId: string,
+  authorId: string,
+): Promise<void> {
+  try {
+    const commentRef = doc(firestore, 'boards', postId, 'comments', commentId);
+    const commentDoc = await getDoc(commentRef);
+
+    if (!commentDoc.exists()) {
+      console.error('댓글을 찾을 수 없습니다.');
+      return;
+    }
+
+    const commentData = commentDoc.data();
+    const commentAuthorId = commentData?.authorId;
+
+    if (!commentAuthorId) {
+      console.error('댓글 작성자 ID를 찾을 수 없습니다.');
+      return;
+    }
+
+    const historyCollection = collection(
+      firestore,
+      'users',
+      commentAuthorId,
+      'history',
+    );
+    const q = query(
+      historyCollection,
+      where('targetType', '==', 'reply'),
+      where('replyId', '==', replyId),
+      where('postId', '==', postId),
+      where('actorId', '==', authorId),
+    );
+    const historySnapshot = await getDocs(q);
+
+    const deletePromises = historySnapshot.docs.map((doc) =>
+      deleteDoc(doc.ref),
+    );
+    await Promise.all(deletePromises);
+  } catch (error) {
+    console.error('대댓글 관련 히스토리 삭제 실패:', error);
   }
 }

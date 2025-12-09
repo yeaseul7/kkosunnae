@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/firebase/auth';
 import { formatDate } from '@/packages/utils/dateFormatting';
 import UserProfile from '../../common/UserProfile';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { deleteHistoryByReplyId } from '@/lib/api/hisotry';
 
 export default function ReplyContainer({
   replyData,
@@ -52,9 +53,15 @@ export default function ReplyContainer({
         'replies',
         replyData.id,
       );
+      await deleteHistoryByReplyId(
+        replyData.id,
+        postId,
+        commentId,
+        replyData.authorId,
+      );
+
       await deleteDoc(replyRef);
 
-      // 상위 댓글의 repliesCount 감소
       const commentRef = doc(
         firestore,
         'boards',

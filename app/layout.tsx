@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | 꼬순내',
+    template: '%s',
     default: '꼬순내',
   },
   description: '반려동물의 발자국 저장소',

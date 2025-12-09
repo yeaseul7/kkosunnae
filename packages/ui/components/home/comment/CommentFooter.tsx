@@ -17,7 +17,7 @@ import { CommentData } from '@/packages/type/commentType';
 import { BsHeart, BsHeartFill, BsPlusSquare } from 'react-icons/bs';
 import ReplyWrite from './ReplyWrite';
 import ReplyList from './ReplyList';
-import { createHistory } from '@/lib/api/hisotry';
+import { createHistory, deleteHistoryByCommentLike } from '@/lib/api/hisotry';
 
 export default function CommentFooter({
   commentData,
@@ -141,7 +141,10 @@ export default function CommentFooter({
       const userLikeDoc = doc(likeListCollection, user.uid);
 
       if (isLiked) {
-        // 좋아요 취소
+        const commentDocData = commentDoc.data();
+        if (commentDocData?.authorId) {
+          await deleteHistoryByCommentLike(commentData.id, postId, user.uid);
+        }
         await deleteDoc(userLikeDoc);
         await updateDoc(commentRef, {
           likes: increment(-1),
@@ -149,7 +152,6 @@ export default function CommentFooter({
         setLikes((prev) => Math.max(0, prev - 1));
         setIsLiked(false);
       } else {
-        // 좋아요 추가
         await setDoc(userLikeDoc, {
           uid: user.uid,
           isLiked: true,
@@ -161,7 +163,6 @@ export default function CommentFooter({
         setLikes((prev) => prev + 1);
         setIsLiked(true);
 
-        // 댓글 작성자에게 좋아요 알림 생성
         const commentDocData = commentDoc.data();
         if (commentDocData?.authorId) {
           await createHistory(
