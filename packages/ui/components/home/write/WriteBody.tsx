@@ -44,6 +44,9 @@ export default function WriteBody({
       ResizableImage.configure({
         inline: false,
         allowBase64: false,
+        HTMLAttributes: {
+          style: 'max-width: 100%; display: block;',
+        },
       }),
       ImageUploadNode.configure({
         accept: 'image/*',
@@ -57,15 +60,12 @@ export default function WriteBody({
     onUpdate: ({ editor }) => {
       setPostData({ ...(postData as PostData), content: editor.getHTML() });
     },
-    // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
   });
 
-  // postData.content가 변경될 때 에디터 콘텐츠 업데이트
   useEffect(() => {
     if (editor && postData?.content) {
       const currentContent = editor.getHTML();
-      // 현재 콘텐츠와 다를 때만 업데이트 (무한 루프 방지)
       if (currentContent !== postData.content) {
         editor.commands.setContent(postData.content);
       }

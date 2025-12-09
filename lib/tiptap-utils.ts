@@ -8,7 +8,7 @@ import {
 } from '@tiptap/pm/state';
 import type { Editor, NodeWithPos } from '@tiptap/react';
 
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export const MAC_SYMBOLS: Record<string, string> = {
   mod: '⌘',
@@ -373,7 +373,6 @@ export const handleImageUpload = async (
     );
   }
 
-  // Check if we're in a browser environment
   if (typeof window === 'undefined') {
     throw new Error('Upload can only be performed in browser environment');
   }

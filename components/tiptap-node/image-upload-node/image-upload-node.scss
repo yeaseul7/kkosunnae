@@ -63,8 +63,8 @@
   }
 
   .tiptap-image-upload-icon {
-    width: 0.875rem;
-    height: 0.875rem;
+    width: auto;
+    height: auto;
     color: var(--tiptap-image-upload-icon-color);
   }
 
@@ -103,12 +103,14 @@
   .tiptap-image-upload-drag-area {
     padding: 2rem 1.5rem;
     border: 1.5px dashed var(--tiptap-image-upload-border);
-    border-radius: var(--tt-radius-md, 0.5rem);
+    border-radius: 8px;
     text-align: center;
     cursor: pointer;
     position: relative;
     overflow: hidden;
     transition: all 0.2s ease;
+    margin: 0 1rem;
+    z-index: 0;
 
     &:hover {
       border-color: var(--tiptap-image-upload-border-hover);
@@ -166,7 +168,7 @@
   // === Individual File Preview Styles ===
   .tiptap-image-upload-preview {
     position: relative;
-    border-radius: var(--tt-radius-md, 0.5rem);
+    border-radius: 8px;
     overflow: hidden;
 
     .tiptap-image-upload-progress {
@@ -179,7 +181,7 @@
     .tiptap-image-upload-preview-content {
       position: relative;
       border: 1px solid var(--tiptap-image-upload-border);
-      border-radius: var(--tt-radius-md, 0.5rem);
+      border-radius: 8px;
       padding: 1rem;
       display: flex;
       align-items: center;
