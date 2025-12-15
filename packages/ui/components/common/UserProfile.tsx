@@ -1,3 +1,4 @@
+import getOptimizedCloudinaryUrl from '@/packages/utils/optimization';
 import Image from 'next/image';
 import { PiDogFill } from 'react-icons/pi';
 
@@ -21,7 +22,7 @@ export default function UserProfile({
       {profileUrl ? (
         <div className={`relative shrink-0 aspect-square ${sizeClass}`}>
           <Image
-            src={profileUrl}
+            src={getOptimizedCloudinaryUrl(profileUrl, 100, 100)}
             alt={profileName || '작성자 프로필 이미지'}
             fill
             className="object-cover rounded-full"

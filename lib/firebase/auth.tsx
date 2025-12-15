@@ -22,7 +22,6 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
-// 컨텍스트 타입 정의
 interface AuthContextType {
   user: User | null;
   loading: boolean;
@@ -33,7 +32,6 @@ interface AuthContextType {
   loginWithGithub: () => Promise<void>;
 }
 
-// AuthContext 컨텍스트 생성
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
@@ -44,7 +42,6 @@ const AuthContext = createContext<AuthContextType>({
   loginWithGithub: async () => {},
 });
 
-// AuthProvider 컴포넌트 정의
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);

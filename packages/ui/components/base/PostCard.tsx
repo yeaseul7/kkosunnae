@@ -8,6 +8,7 @@ import { HiHeart } from 'react-icons/hi2';
 import { HiChatBubbleLeft } from 'react-icons/hi2';
 import { PostData } from '@/packages/type/postType';
 import { formatDate } from '@/packages/utils/dateFormatting';
+import getOptimizedCloudinaryUrl from '@/packages/utils/optimization';
 import UserProfile from '../common/UserProfile';
 
 export default function PostCard({ post }: { post: PostData }) {
@@ -38,9 +39,13 @@ export default function PostCard({ post }: { post: PostData }) {
     return null;
   };
 
-  const thumbnailImage = extractFirstImage(post.content);
+  const rawThumbnailImage = extractFirstImage(post.content);
 
-  // 태그에 따라 기본 이미지 결정
+  const thumbnailImage = useMemo(() => {
+    if (!rawThumbnailImage) return null;
+    return getOptimizedCloudinaryUrl(rawThumbnailImage, 300, 300);
+  }, [rawThumbnailImage]);
+
   const defaultImage = useMemo(() => {
     if (!post.tags || post.tags.length === 0) {
       return '/static/images/defaultDogImg.png';
@@ -95,6 +100,7 @@ export default function PostCard({ post }: { post: PostData }) {
           fill
           className="object-cover"
           sizes="100vw"
+          priority={true}
         />
       </div>
       <div className="flex flex-col flex-1 p-3">
