@@ -9,6 +9,7 @@ import { Image } from '@tiptap/extension-image';
 import NextImage from 'next/image';
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
 import Loading from '@/packages/ui/components/base/Loading';
+import { optimizeImageUrlsInHtml } from '@/packages/utils/optimization';
 
 interface PostData {
   title: string;
@@ -65,9 +66,10 @@ function ReadPageContent() {
           const data = docSnap.data() as PostData;
           setPost(data);
 
-          // 에디터에 콘텐츠 설정
+          // 에디터에 콘텐츠 설정 (이미지 URL 최적화)
           if (editor && data.content) {
-            editor.commands.setContent(data.content);
+            const optimizedContent = optimizeImageUrlsInHtml(data.content);
+            editor.commands.setContent(optimizedContent);
           }
         } else {
           setError('게시물을 찾을 수 없습니다.');

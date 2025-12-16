@@ -2,9 +2,10 @@
 
 import { NodeViewWrapper } from '@tiptap/react';
 import { NodeViewProps } from '@tiptap/react';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { CloseIcon } from '@/components/tiptap-icons/close-icon';
 import { isValidPosition } from '@/lib/tiptap-utils';
+import getOptimizedCloudinaryUrl from '@/packages/utils/optimization';
 
 export const ResizableImageNode: React.FC<NodeViewProps> = ({
   node,
@@ -22,6 +23,20 @@ export const ResizableImageNode: React.FC<NodeViewProps> = ({
   } | null>(null);
 
   const { src, alt, title, width, height } = node.attrs;
+  const isEditable = editor.isEditable;
+
+  // Cloudinary URL 최적화 (읽기 모드: 최대 1200px, 편집 모드: 사용자 설정 크기 또는 최대 1200px)
+  const optimizedSrc = useMemo(() => {
+    if (!src) return src;
+
+    // 읽기 전용 모드이거나 크기가 설정되지 않은 경우 최대 1200px로 최적화
+    if (!isEditable || !width) {
+      return getOptimizedCloudinaryUrl(src, 1200);
+    }
+
+    // 편집 모드에서 크기가 설정된 경우 해당 크기로 최적화
+    return getOptimizedCloudinaryUrl(src, width, height || undefined);
+  }, [src, width, height, isEditable]);
 
   // 이미지의 원본 크기 가져오기
   useEffect(() => {
@@ -51,9 +66,9 @@ export const ResizableImageNode: React.FC<NodeViewProps> = ({
           });
         }
       };
-      img.src = src;
+      img.src = optimizedSrc;
     }
-  }, [src, naturalSize, width, height, updateAttributes]);
+  }, [optimizedSrc, naturalSize, width, height, updateAttributes]);
 
   const handleMouseDown = (
     e: React.MouseEvent,
@@ -155,7 +170,7 @@ export const ResizableImageNode: React.FC<NodeViewProps> = ({
     >
       <img
         ref={imgRef}
-        src={src}
+        src={optimizedSrc}
         alt={alt || ''}
         title={title || ''}
         style={{

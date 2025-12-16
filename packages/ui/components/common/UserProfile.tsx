@@ -26,6 +26,7 @@ export default function UserProfile({
             alt={profileName || '작성자 프로필 이미지'}
             fill
             className="object-cover rounded-full"
+            sizes={`${imgSize}px`}
           />
         </div>
       ) : (

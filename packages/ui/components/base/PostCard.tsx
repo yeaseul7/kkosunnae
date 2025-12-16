@@ -99,7 +99,7 @@ export default function PostCard({ post }: { post: PostData }) {
           alt={post.title || '게시물 이미지'}
           fill
           className="object-cover"
-          sizes="100vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority={true}
         />
       </div>

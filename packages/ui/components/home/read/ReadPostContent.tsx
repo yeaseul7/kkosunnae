@@ -15,6 +15,7 @@ import ReadHeader from '@/packages/ui/components/home/read/ReadHeader';
 import ReadFooter from '@/packages/ui/components/home/read/ReadFooter';
 import Liked from '@/packages/ui/components/home/comment/Liked';
 import PageFooter from '@/packages/ui/components/base/PageFooter';
+import { optimizeImageUrlsInHtml } from '@/packages/utils/optimization';
 
 interface ReadPostContentProps {
   postId: string;
@@ -62,7 +63,9 @@ export default function ReadPostContent({
       setPost(initialPost);
       setLoading(false);
       if (editor && initialPost.content) {
-        editor.commands.setContent(initialPost.content);
+        // 이미지 URL 최적화 후 콘텐츠 설정
+        const optimizedContent = optimizeImageUrlsInHtml(initialPost.content);
+        editor.commands.setContent(optimizedContent);
       }
       return;
     }
@@ -83,7 +86,9 @@ export default function ReadPostContent({
           setPost(data);
 
           if (editor && data.content) {
-            editor.commands.setContent(data.content);
+            // 이미지 URL 최적화 후 콘텐츠 설정
+            const optimizedContent = optimizeImageUrlsInHtml(data.content);
+            editor.commands.setContent(optimizedContent);
           }
         } else {
           setError('게시물을 찾을 수 없습니다.');

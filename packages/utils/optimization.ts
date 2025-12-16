@@ -5,7 +5,6 @@
  * @param height (선택) 원하는 높이
  * @returns 최적화된 URL string
  */
-
 export default function getOptimizedCloudinaryUrl(
   url: string,
   width?: number,
@@ -32,4 +31,26 @@ export default function getOptimizedCloudinaryUrl(
     // '/upload/v12345/' 형태라면 '/upload/f_auto,q_auto,w_500/v12345/'로 변경
     return match.replace('/upload/', `/upload/${paramsString}/`);
   });
+}
+
+/**
+ * HTML 콘텐츠의 모든 Cloudinary 이미지 URL을 최적화하는 함수
+ * @param html HTML 문자열
+ * @param maxWidth 최대 너비 (기본값: 1200px)
+ * @returns 최적화된 HTML 문자열
+ */
+export function optimizeImageUrlsInHtml(
+  html: string,
+  maxWidth: number = 1200,
+): string {
+  if (!html) return html;
+
+  // img 태그의 src 속성을 찾아서 최적화
+  return html.replace(
+    /<img([^>]+)src=["']([^"']+)["']([^>]*)>/gi,
+    (match, before, src, after) => {
+      const optimizedSrc = getOptimizedCloudinaryUrl(src, maxWidth);
+      return `<img${before}src="${optimizedSrc}"${after}>`;
+    },
+  );
 }
