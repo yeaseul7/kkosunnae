@@ -24,6 +24,9 @@ export const metadata: Metadata = {
     icon: '/static/images/logo.png',
     apple: '/static/images/logo.png',
   },
+  verification: {
+    google: 'WBwV06sSdVI6wLAiXlN3T32MSQlsqxdSv49eMBt7JWs',
+  },
   openGraph: {
     title: '꼬순내',
     description: '반려동물의 발자국 저장소',
