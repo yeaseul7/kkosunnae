@@ -6,7 +6,8 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postbuild": "next-sitemap"
   },
   "dependencies": {
     "@floating-ui/react": "^0.27.16",
@@ -35,6 +36,7 @@
     "eslint": "^9",
     "eslint-config-next": "^16.0.7",
     "eslint-config-prettier": "^10.1.8",
+    "next-sitemap": "^4.2.3",
     "sass": "^1.94.2",
     "tailwindcss": "^4",
     "typescript": "^5"
