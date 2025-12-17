@@ -6,9 +6,10 @@ module.exports = {
   sitemapSize: 7000, // sitemap별 최대 크기 (최대 크기가 넘어갈 경우 복수개의 sitemap으로 분리됨)
   changefreq: 'daily', // 페이지 주소 변경 빈도 (검색엔진에 제공됨) - always, daily, hourly, monthly, never, weekly, yearly 중 택 1
   priority: 1, // 페이지 주소 우선순위 (검색엔진에 제공됨, 우선순위가 높은 순서대로 크롤링함)
-  exclude: ['/api/*', '/write', '/edit/*'], // sitemap 등록 제외 페이지 주소
+  exclude: ['/api/*', '/write', '/edit/*'], // sitemap 등록 제외 페이지 주소 (동적 sitemap은 Route Handler로 처리)
   additionalPaths: async (config) => {
-    // 동적 sitemap은 별도 Route Handler로 처리되므로 여기서는 제외
+    // 동적 sitemap은 app/sitemap/route.ts Route Handler로 처리
+    // 빌드 시점에는 정적 페이지만 포함
     return [];
   },
   robotsTxtOptions: {
@@ -21,8 +22,7 @@ module.exports = {
       },
       // 추가 정책이 필요할 경우 배열 요소로 추가 작성
     ],
-    additionalSitemaps: [
-      'https://www.kkosunnae.com/sitemap', // 동적 게시물 및 사용자 프로필 sitemap
-    ],
+    // Next.js 기본 sitemap.ts가 자동으로 /sitemap.xml을 생성하므로 additionalSitemaps 불필요
+    additionalSitemaps: [],
   }, // robots.txt 옵션 설정
 };
