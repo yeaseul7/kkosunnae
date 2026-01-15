@@ -22,7 +22,7 @@ export default function HomeTab() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-3 mt-4 w-full sm:flex-row sm:justify-between sm:items-center">
+    <div className="flex flex-col gap-3 mt-4 w-full sm:flex-row sm:justify-center sm:items-center">
       <div className="flex gap-2 items-center sm:gap-2">
         <NavLink
           to="/trending"

@@ -40,6 +40,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '**.githubusercontent.com',
       },
+      {
+        protocol: 'http',
+        hostname: 'openapi.animal.go.kr',
+      },
+      {
+        protocol: 'https',
+        hostname: 'openapi.animal.go.kr',
+      },
     ],
   },
 };

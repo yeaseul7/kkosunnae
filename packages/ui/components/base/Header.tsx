@@ -5,13 +5,14 @@ import Image from 'next/image';
 import RoundButton from '../common/RoundButton';
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { useClickOutside } from '@/packages/utils/clickEvent';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import LoginModal from '../auth/LoginModal';
 import HeaderUserIcon from './HeaderUserIcon';
 import HeaderUserMenu from './HeaderUserMenu';
 import { useAuth } from '@/lib/firebase/auth';
 import NotificationPop from '../home/notification/NotificationPop';
 import { getUnreadHistoryCount } from '@/lib/api/hisotry';
+import NavLink from '../common/NavLink';
 
 interface HeaderProps {
   visibleHeaderButtons?: boolean;
@@ -19,6 +20,7 @@ interface HeaderProps {
 export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const { user, loading } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNotificationPopOpen, setIsNotificationPopOpen] = useState(false);
@@ -66,6 +68,7 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full h-16 bg-white">
       <div className="flex justify-between items-center px-4 mx-auto w-full max-w-7xl h-full sm:px-6">
+        <div className="flex items-center gap-10">
         <Link
           href="/"
           className="flex items-center transition-opacity hover:opacity-80"
@@ -88,6 +91,38 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
             loading="eager"
           />
         </Link>
+        <div className="flex items-center gap-5">
+        <NavLink
+            to="/trending"
+            activeClassName="active"
+            isActive={() => {
+              return pathname === '/trending' || pathname.startsWith('/trending');
+            }}
+            className={`!border-b-0 !p-0 ${
+              pathname === '/trending' || pathname.startsWith('/trending')
+                ? '!text-primary1'
+                : '!text-black'
+            }`}
+          >
+            커뮤니티
+          </NavLink>
+          <NavLink
+            to="/shelter"
+            activeClassName="active"
+            isActive={() => {
+              return pathname === '/shelter' || pathname.startsWith('/shelter');
+            }}
+            className={`!border-b-0 !p-0 ${
+              pathname === '/shelter' || pathname.startsWith('/shelter')
+                ? '!text-primary1'
+                : '!text-black'
+            }`}
+          >
+            구조 동물
+          </NavLink>
+       
+        </div>
+        </div>
         {visibleHeaderButtons && (
           <div className="flex gap-1 items-center sm:gap-2">
             <div ref={notificationRef} className="relative">
@@ -139,7 +174,7 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
                       onClick={writeArticle}
                       className="hidden sm:flex"
                     >
-                      새 글 작성
+                      글쓰기
                     </RoundButton>
                     <HeaderUserIcon
                       setIsUserMenuOpen={setIsUserMenuOpen}

@@ -1,5 +1,9 @@
+'use client';
+
 import HomeTab from '../home/HomeTab';
+import ShelterHomeTab from '../home/shelter/HomeTab';
 import Header from './Header';
+import { usePathname } from 'next/navigation';
 
 interface PageTemplateProps {
   children?: React.ReactNode;
@@ -12,6 +16,9 @@ export default function PageTemplate({
   visibleHomeTab = true,
   visibleHeaderButtons = true,
 }: PageTemplateProps) {
+  const pathname = usePathname();
+  // const isShelterPage = pathname === '/shelter' || pathname.startsWith('/shelter');
+
   return (
     <div className="flex flex-col items-center w-full">
       <div className="w-full">
