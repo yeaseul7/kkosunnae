@@ -69,6 +69,8 @@ export default function ShelterPosts() {
           params.append('upkind', filterParams.upKindCd);
         if (filterParams.bgnde) params.append('bgnde', filterParams.bgnde);
         if (filterParams.endde) params.append('endde', filterParams.endde);
+        if (filterParams.searchQuery)
+          params.append('searchQuery', filterParams.searchQuery);
 
         const response = await fetch(`/api/shelter-data?${params.toString()}`);
         if (!response.ok) {
@@ -91,27 +93,18 @@ export default function ShelterPosts() {
             itemsArray = itemsArray.filter((item) => {
               const rfidCd = item.rfidCd?.toLowerCase() || '';
               const happenPlace = item.happenPlace?.toLowerCase() || '';
+              const careAddr = item.careAddr?.toLowerCase() || '';
               const careNm = item.careNm?.toLowerCase() || '';
               return (
                 rfidCd.includes(searchLower) ||
                 happenPlace.includes(searchLower) ||
+                careAddr.includes(searchLower) ||
                 careNm.includes(searchLower)
               );
             });
           }
 
           const hasMoreData = originalItemsLength === 30;
-          console.log(
-            'fetchShelterAnimalData - page:',
-            page,
-            'originalItemsLength:',
-            originalItemsLength,
-            'hasMoreData:',
-            hasMoreData,
-            'isInitial:',
-            isInitial,
-          );
-
           if (isInitial) {
             setShelterAnimalData(itemsArray);
             setHasMore(hasMoreData);
@@ -141,44 +134,48 @@ export default function ShelterPosts() {
   const filterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleFilterChange = useCallback((newFilters: AnimalFilterState) => {
-    // 필터 state는 즉시 업데이트 (UI 반영)
+    const prevFilters = filtersRef.current;
+    const isSearchQueryChanged =
+      prevFilters.searchQuery !== newFilters.searchQuery;
+    const isOtherFilterChanged =
+      prevFilters.sexCd !== newFilters.sexCd ||
+      prevFilters.state !== newFilters.state ||
+      prevFilters.upKindCd !== newFilters.upKindCd ||
+      prevFilters.bgnde !== newFilters.bgnde ||
+      prevFilters.endde !== newFilters.endde;
+
+    if (!isSearchQueryChanged && !isOtherFilterChanged) {
+      return;
+    }
+
     setFilters(newFilters);
-    
-    // 검색어 변경 시 디바운싱 적용
+
     if (filterTimeoutRef.current) {
       clearTimeout(filterTimeoutRef.current);
+      filterTimeoutRef.current = null;
     }
 
     const applyFilters = () => {
       if (isFilterRequestInProgress.current) return;
-      
-      const prevFilters = filtersRef.current;
-      const isSame = 
-        prevFilters.sexCd === newFilters.sexCd &&
-        prevFilters.state === newFilters.state &&
-        prevFilters.upKindCd === newFilters.upKindCd &&
-        prevFilters.searchQuery === newFilters.searchQuery &&
-        prevFilters.bgnde === newFilters.bgnde &&
-        prevFilters.endde === newFilters.endde;
-      
-      if (isSame) return;
-      
+
       isFilterRequestInProgress.current = true;
       setPageNo(1);
       setShelterAnimalData([]);
       setHasMore(true);
       setLoading(true);
-    
+
       const params = new URLSearchParams();
       params.append('pageNo', '1');
       params.append('numOfRows', '30');
-      
+
       if (newFilters.sexCd) params.append('sex_cd', newFilters.sexCd);
       if (newFilters.state) params.append('state', newFilters.state);
       if (newFilters.upKindCd) params.append('upkind', newFilters.upKindCd);
       if (newFilters.bgnde) params.append('bgnde', newFilters.bgnde);
       if (newFilters.endde) params.append('endde', newFilters.endde);
-      
+      if (newFilters.searchQuery)
+        params.append('searchQuery', newFilters.searchQuery);
+
       fetch(`/api/shelter-data?${params.toString()}`)
         .then((response) => {
           if (!response.ok) throw new Error('Failed to fetch shelter data');
@@ -188,27 +185,30 @@ export default function ShelterPosts() {
           const items = shelterAnimalResponse?.response?.body?.items?.item;
           const totalCount =
             shelterAnimalResponse?.response?.body?.totalCount || 0;
-          
+
           if (items) {
             let itemsArray = Array.isArray(items) ? items : [items];
             const originalItemsLength = itemsArray.length;
-            
+
+            // API route에서 이미 필터링되었지만, 이중 체크를 위해 클라이언트에서도 필터링
             if (newFilters.searchQuery) {
               const searchLower = newFilters.searchQuery.toLowerCase();
               itemsArray = itemsArray.filter((item) => {
                 const rfidCd = item.rfidCd?.toLowerCase() || '';
                 const happenPlace = item.happenPlace?.toLowerCase() || '';
+                const careAddr = item.careAddr?.toLowerCase() || '';
                 const careNm = item.careNm?.toLowerCase() || '';
                 return (
                   rfidCd.includes(searchLower) ||
                   happenPlace.includes(searchLower) ||
+                  careAddr.includes(searchLower) ||
                   careNm.includes(searchLower)
                 );
               });
             }
-            
+
             const hasMoreData = originalItemsLength === 30;
-            
+
             setShelterAnimalData(itemsArray);
             setHasMore(hasMoreData);
           } else {
@@ -225,8 +225,8 @@ export default function ShelterPosts() {
         });
     };
 
-    // 검색어는 500ms 디바운싱, 나머지는 즉시 적용
-    if (newFilters.searchQuery !== filtersRef.current.searchQuery) {
+    // 검색어 변경 시 디바운싱 적용, 다른 필터는 즉시 적용
+    if (isSearchQueryChanged) {
       filterTimeoutRef.current = setTimeout(applyFilters, 500);
     } else {
       applyFilters();
@@ -326,14 +326,14 @@ export default function ShelterPosts() {
     };
   }, [loading, hasMore, isLoadingMore, pageNo, fetchShelterAnimalData]);
 
-  if (loading) {
-    return <Loading />;
-  }
 
   return (
     <>
-      <AnimalFilterHeader filters={filters} onFilterChange={handleFilterChange} />
-      {shelterAnimalData.length === 0 ? (
+      <AnimalFilterHeader
+        filters={filters}
+        onFilterChange={handleFilterChange}
+      />
+      {shelterAnimalData.length === 0 && !loading ? (
         <div className="py-12 text-center text-gray-500">
           유기동물 데이터가 없습니다.
         </div>
@@ -347,11 +347,11 @@ export default function ShelterPosts() {
           ))}
         </div>
       )}
-
+      {loading && <Loading />}
       {hasMore && (
         <div
           ref={observerTarget}
-          className="h-20 flex justify-center items-center py-8"
+          className="h-32 flex justify-center items-center py-12"
           data-testid="infinite-scroll-trigger"
         >
           {isLoadingMore && <Loading />}

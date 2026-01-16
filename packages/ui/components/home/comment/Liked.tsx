@@ -138,12 +138,10 @@ export default function Liked() {
     const url = `${window.location.origin}/read/${postId}`;
 
     try {
-      // 클립보드 API 사용 시도
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(url);
         alert('공유 링크가 복사되었습니다.');
       } else {
-        // 대체 방법: 임시 textarea 요소 사용
         const textarea = document.createElement('textarea');
         textarea.value = url;
         textarea.style.position = 'fixed';
@@ -160,7 +158,6 @@ export default function Liked() {
             throw new Error('복사 실패');
           }
         } catch (err) {
-          // 복사 실패 시 URL을 직접 보여주기
           prompt('공유 링크를 복사하세요:', url);
         } finally {
           document.body.removeChild(textarea);
@@ -168,7 +165,6 @@ export default function Liked() {
       }
     } catch (error) {
       console.error('클립보드 복사 실패:', error);
-      // 복사 실패 시 URL을 직접 보여주기
       prompt('공유 링크를 복사하세요:', url);
     }
   };

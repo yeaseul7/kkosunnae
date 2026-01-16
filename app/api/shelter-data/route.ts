@@ -21,6 +21,7 @@ interface ShelterDataParams {
   rfid_cd?: string; // 동물등록번호(RFID 번호)
   desertion_no?: string; // 유기번호
   notice_no?: string; // 공고번호
+  searchQuery?: string; // 검색어 (rfidCd, happenPlace, careAddr, careNm)
 }
 
 export async function GET(request: NextRequest) {
@@ -67,6 +68,8 @@ export async function GET(request: NextRequest) {
       params.desertion_no = searchParams.get('desertion_no')!;
     if (searchParams.has('notice_no'))
       params.notice_no = searchParams.get('notice_no')!;
+    if (searchParams.has('searchQuery'))
+      params.searchQuery = searchParams.get('searchQuery')!;
 
     // 기본값 설정
     const pageNo = params.pageNo || '1';
@@ -123,6 +126,38 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
+
+    // 검색어 필터링 (rfidCd, happenPlace, careAddr, careNm)
+    if (params.searchQuery && data?.response?.body?.items?.item) {
+      const searchLower = params.searchQuery.toLowerCase();
+      const items = data.response.body.items.item;
+      const itemsArray = Array.isArray(items) ? items : [items];
+      
+      const filteredItems = itemsArray.filter((item: any) => {
+        const rfidCd = item.rfidCd?.toLowerCase() || '';
+        const happenPlace = item.happenPlace?.toLowerCase() || '';
+        const careAddr = item.careAddr?.toLowerCase() || '';
+        const careNm = item.careNm?.toLowerCase() || '';
+        return (
+          rfidCd.includes(searchLower) ||
+          happenPlace.includes(searchLower) ||
+          careAddr.includes(searchLower) ||
+          careNm.includes(searchLower)
+        );
+      });
+
+      // 필터링된 결과로 업데이트
+      if (Array.isArray(items)) {
+        data.response.body.items.item = filteredItems;
+      } else {
+        data.response.body.items.item = filteredItems.length > 0 ? filteredItems[0] : null;
+      }
+      
+      // totalCount도 업데이트
+      if (data.response.body.totalCount) {
+        data.response.body.totalCount = filteredItems.length;
+      }
+    }
 
     return NextResponse.json(data, {
       status: 200,

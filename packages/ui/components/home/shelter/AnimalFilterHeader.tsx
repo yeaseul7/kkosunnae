@@ -76,28 +76,23 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // 검색어는 즉시 업데이트 (디바운싱은 useEffect에서 처리)
     const newFilters = { ...filters, searchQuery: e.target.value };
     onFilterChange(newFilters);
   };
 
-  // 날짜를 YYYYMMDD 형식으로 변환
   const formatDateToYYYYMMDD = (dateString: string): string | null => {
     if (!dateString) return null;
-    // YYYY-MM-DD 형식을 YYYYMMDD로 변환
     return dateString.replace(/-/g, '');
   };
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const dateValue = e.target.value;
     setStartDate(dateValue);
-    // 필터는 onBlur에서 업데이트
   };
 
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const dateValue = e.target.value;
     setEndDate(dateValue);
-    // 필터는 onBlur에서 업데이트
   };
 
   const handleStartDateBlur = () => {

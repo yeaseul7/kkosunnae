@@ -104,56 +104,47 @@ export default function AbandonedCard({
     };
   }, [shelterAnimal?.processState]);
 
-  // 공고종료일 뱃지 계산
   const noticeEndBadge = useMemo(() => {
     if (!shelterAnimal?.noticeEdt) return null;
 
-    // YYYYMMDD 형식을 Date로 변환
     const noticeEdtStr = shelterAnimal.noticeEdt;
     const year = parseInt(noticeEdtStr.substring(0, 4));
-    const month = parseInt(noticeEdtStr.substring(4, 6)) - 1; // 월은 0부터 시작
+    const month = parseInt(noticeEdtStr.substring(4, 6)) - 1; 
     const day = parseInt(noticeEdtStr.substring(6, 8));
     const endDate = new Date(year, month, day);
     
-    // 오늘 날짜 (시간 제외)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     endDate.setHours(0, 0, 0, 0);
     
-    // 날짜 차이 계산 (밀리초를 일로 변환)
     const diffTime = endDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays < 0) {
-      // 지난 경우
       return {
         text: '공고 종료',
         bgColor: 'bg-gray-400',
         textColor: 'text-white',
       };
     } else if (diffDays === 0) {
-      // 오늘 종료
       return {
         text: '오늘 종료',
         bgColor: 'bg-red-500',
         textColor: 'text-white',
       };
     } else if (diffDays === 1) {
-      // 1일 전
       return {
         text: '1일 전',
         bgColor: 'bg-red-500',
         textColor: 'text-white',
       };
     } else if (diffDays <= 7) {
-      // 1주일 이하 (2일~7일)
       return {
         text: `${diffDays}일 전`,
         bgColor: 'bg-orange-500',
         textColor: 'text-white',
       };
     } else {
-      // 1주일 초과
       return {
         text: `${diffDays}일 전`,
         bgColor: 'bg-primary2',
@@ -162,20 +153,18 @@ export default function AbandonedCard({
     }
   }, [shelterAnimal?.noticeEdt]);
   const openGoogleMap = useCallback((e: React.MouseEvent, address: string) => {
-    e.stopPropagation(); // 카드 클릭 이벤트 방지
+    e.stopPropagation(); 
     const encodedAddress = encodeURIComponent(address);
     const url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
     window.open(url, '_blank');
   }, []);
 
-  // hover 시작 시 1초 후 상태 변경
   const handleMouseEnter = useCallback(() => {
     hoverTimeoutRef.current = setTimeout(() => {
       setIsLongHover(true);
     }, 1000);
   }, []);
 
-  // hover 종료 시 상태 초기화
   const handleMouseLeave = useCallback(() => {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
@@ -184,7 +173,6 @@ export default function AbandonedCard({
     setIsLongHover(false);
   }, []);
 
-  // 컴포넌트 언마운트 시 timeout 정리
   useEffect(() => {
     return () => {
       if (hoverTimeoutRef.current) {
@@ -196,7 +184,7 @@ export default function AbandonedCard({
   return (
     <article
       key={shelterAnimal.desertionNo}
-      onClick={() => router.push(`/read/${shelterAnimal.desertionNo}`)}
+      onClick={() => router.push(`/shelter/${shelterAnimal.desertionNo}`)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className="flex overflow-hidden flex-col bg-white rounded-lg shadow-sm transition-all duration-200 cursor-pointer hover:shadow-md hover:scale-[1.02] active:scale-[0.98] w-full max-w-[260px] border border-gray-100"
@@ -311,7 +299,7 @@ export default function AbandonedCard({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              router.push(`/read/${shelterAnimal.desertionNo}`);
+              router.push(`/shelter/${shelterAnimal.desertionNo}`);
             }}
             className="w-full flex justify-center items-center p-2 font-bold text-white rounded-lg bg-primary2 hover:bg-primary1 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 active:translate-y-0 gap-2"
           >
