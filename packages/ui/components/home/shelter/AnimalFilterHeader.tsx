@@ -114,11 +114,11 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
   };
 
   return (
-    <div className="w-full py-6 px-4 bg-white border-b border-gray-200">
+    <div className="w-full pb-4 pt-10 px-4 bg-white">
       <div className="flex flex-col gap-4 w-full max-w-7xl mx-auto">
         {/* 검색창 */}
         <div className="relative w-full">
-          <div className="flex items-center px-4 w-full h-12 bg-white border border-gray-300 rounded-lg shadow-sm focus-within:border-primary1 focus-within:ring-2 focus-within:ring-primary1/20 transition-all">
+          <div className="flex items-center px-4 w-full h-12 bg-white border border-gray-300 rounded-full shadow-sm focus-within:border-primary1 focus-within:ring-2 focus-within:ring-primary1/20 transition-all">
             <Image
               src="/static/svg/icon-search-3.svg"
               alt="Search"
@@ -142,13 +142,13 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
           <div className="relative z-50">
             <button
               onClick={() => setOpenDropdown(openDropdown === 'sexCd' ? null : 'sexCd')}
-              className="flex justify-between items-center px-4 py-2 min-w-[100px] text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
+              className="flex justify-between items-center px-4 py-2 min-w-[100px] text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
             >
               <span>성별: {getFilterLabel('sexCd')}</span>
               <MdArrowDropDown className={`w-5 h-5 transition-transform ${openDropdown === 'sexCd' ? 'rotate-180' : ''}`} />
             </button>
             {openDropdown === 'sexCd' && (
-              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[100px] bg-white rounded-lg shadow-lg border border-gray-200">
+              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[100px] bg-white rounded-full shadow-lg border border-gray-200">
                 {sexOptions.map((option) => (
                   <li
                     key={option.value || 'all'}
@@ -170,13 +170,13 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
           <div className="relative z-50">
             <button
               onClick={() => setOpenDropdown(openDropdown === 'state' ? null : 'state')}
-              className="flex justify-between items-center px-4 py-2 min-w-[100px] text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
+              className="flex justify-between items-center px-4 py-2 min-w-[100px] text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
             >
               <span>상태: {getFilterLabel('state')}</span>
               <MdArrowDropDown className={`w-5 h-5 transition-transform ${openDropdown === 'state' ? 'rotate-180' : ''}`} />
             </button>
             {openDropdown === 'state' && (
-              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[100px] bg-white rounded-lg shadow-lg border border-gray-200">
+              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[100px] bg-white rounded-full shadow-lg border border-gray-200">
                 {stateOptions.map((option) => (
                   <li
                     key={option.value || 'all'}
@@ -198,13 +198,13 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
           <div className="relative z-50">
             <button
               onClick={() => setOpenDropdown(openDropdown === 'upKindCd' ? null : 'upKindCd')}
-              className="flex justify-between items-center px-4 py-2 min-w-[100px] text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
+              className="flex justify-between items-center px-4 py-2 min-w-[100px] text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
             >
               <span>축종: {getFilterLabel('upKindCd')}</span>
               <MdArrowDropDown className={`w-5 h-5 transition-transform ${openDropdown === 'upKindCd' ? 'rotate-180' : ''}`} />
             </button>
             {openDropdown === 'upKindCd' && (
-              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[100px] bg-white rounded-lg shadow-lg border border-gray-200">
+              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[100px] bg-white rounded-full shadow-lg border border-gray-200">
                 {upKindOptions.map((option) => (
                   <li
                     key={option.value || 'all'}
@@ -223,7 +223,7 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
           </div>
 
           {/* 접수일 필터 */}
-          <div className="flex items-center gap-2 px-4 py-1 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm">
+          <div className="flex items-center gap-2 px-4 py-1 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm">
             <label className="text-xs text-gray-500 whitespace-nowrap shrink-0">접수일:</label>
             <div className="flex items-center gap-2">
               <input
@@ -255,7 +255,7 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
                 setStartDate('');
                 setEndDate('');
               }}
-              className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
             >
               필터 초기화
             </button>

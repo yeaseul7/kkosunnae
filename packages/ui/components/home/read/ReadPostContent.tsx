@@ -106,38 +106,39 @@ export default function ReadPostContent({
 
   return (
     <div className="flex justify-center items-center min-h-screen font-sans bg-white">
-      <main className="flex flex-col items-center px-4 py-4 w-full max-w-full min-h-screen sm:px-6 sm:py-6 lg:px-8 lg:py-8 sm:max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl">
+      <main className="flex flex-col justify-between items-center w-full max-w-6xl min-h-screen bg-whitesm:items-start">
         <PageTemplate visibleHeaderButtons={true} visibleHomeTab={false}>
           {loading && <Loading />}
           {error && !loading && <NotFound error={error} />}
+          <div className="w-full px-8">
+            {!loading && !error && post && (
+              <>
+                {canGoBack && (
+                  <button
+                    onClick={() => router.back()}
+                    className="flex gap-2 items-center my-4 text-gray-600 sm:my-6 hover:text-gray-800"
+                  >
+                    <IoIosArrowBack />
+                    뒤로가기
+                  </button>
+                )}
 
-          {!loading && !error && post && (
-            <>
-              {canGoBack && (
-                <button
-                  onClick={() => router.back()}
-                  className="flex gap-2 items-center my-4 text-gray-600 sm:my-6 hover:text-gray-800"
-                >
-                  <IoIosArrowBack />
-                  뒤로가기
-                </button>
-              )}
+                <div className="relative w-full">
+                  <article className="px-4 py-2 w-full bg-white sm:p-6 lg:p-8">
+                    <ReadHeader post={post} isEditing={false} />
 
-              <div className="relative w-full">
-                <article className="p-4 w-full bg-white sm:p-6 lg:p-8">
-                  <ReadHeader post={post} isEditing={false} />
-
-                  <div className="max-w-none prose prose-sm sm:prose-base lg:prose-lg">
-                    {editor && (
-                      <EditorContent editor={editor} className="tiptap" />
-                    )}
-                  </div>
-                  <Liked />
-                </article>
-              </div>
-              <ReadFooter post={post} postId={postId} />
-            </>
-          )}
+                    <div className="max-w-none prose prose-sm sm:prose-base lg:prose-lg">
+                      {editor && (
+                        <EditorContent editor={editor} className="tiptap" />
+                      )}
+                    </div>
+                    <Liked />
+                  </article>
+                </div>
+                <ReadFooter post={post} postId={postId} />
+              </>
+            )}
+          </div>
         </PageTemplate>
         <PageFooter />
       </main>

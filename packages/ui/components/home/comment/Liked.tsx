@@ -205,7 +205,7 @@ export default function Liked() {
       </div>
 
       {/* 데스크톱 버전 - fixed 위치 */}
-      <div className="hidden fixed top-1/4 -translate-y-1/2 right-4 xl:right-[calc((100vw-1152px)/2-4rem)] z-50 md:block">
+      <div className="hidden fixed top-2/5 -translate-y-1/2 right-4 xl:right-[calc((100vw-1152px)/2-4rem)] z-50 md:block">
         <div className="flex flex-col gap-3 justify-center items-center p-2 shadow-lg transition-all duration-200 rounded-4xl bg-gray-1">
           <button
             onClick={handleLike}

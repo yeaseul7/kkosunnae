@@ -26,7 +26,6 @@ export default function AbandonedCard({
   const [isLongHover, setIsLongHover] = useState(false);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 모든 사용 가능한 이미지 URL 배열 생성
   const availableImages = useMemo(() => {
     const images: string[] = [];
     for (let i = 1; i <= 8; i++) {
@@ -40,7 +39,6 @@ export default function AbandonedCard({
     return images;
   }, [shelterAnimal]);
 
-  // 현재 이미지 URL
   const currentImageUrl = useMemo(() => {
     if (availableImages.length === 0) return null;
     if (currentImageIndex >= availableImages.length) return null;
@@ -93,8 +91,8 @@ export default function AbandonedCard({
   const statusBadge = useMemo(() => {
     return {
       text: shelterAnimal?.processState || '상태 미확인',
-      bgColor: 'bg-primary2',
-      textColor: 'text-white',
+      bgColor: '#FFE5D9', // 연한 복숭아/주황색
+      textColor: '#8B4513', // 어두운 갈색 텍스트
     };
   }, [shelterAnimal?.processState]);
 
@@ -114,35 +112,36 @@ export default function AbandonedCard({
     const diffTime = endDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
+    // 기존 색상 규칙을 파스텔톤으로 변환
     if (diffDays < 0) {
       return {
         text: '공고 종료',
-        bgColor: 'bg-gray-400',
-        textColor: 'text-white',
+        bgColor: '#E5E5E5', // 연한 회색
+        textColor: '#6B6B6B', // 어두운 회색 텍스트
       };
     } else if (diffDays === 0) {
       return {
         text: '오늘 종료',
-        bgColor: 'bg-red-500',
-        textColor: 'text-white',
+        bgColor: '#FFE5E5', // 연한 빨강
+        textColor: '#8B1A1A', // 어두운 빨강 텍스트
       };
     } else if (diffDays === 1) {
       return {
         text: '1일 전',
-        bgColor: 'bg-red-500',
-        textColor: 'text-white',
+        bgColor: '#FFE5E5', // 연한 빨강
+        textColor: '#8B1A1A', // 어두운 빨강 텍스트
       };
     } else if (diffDays <= 7) {
       return {
         text: `${diffDays}일 전`,
-        bgColor: 'bg-orange-500',
-        textColor: 'text-white',
+        bgColor: '#FFE8D5', // 연한 주황
+        textColor: '#8B4513', // 어두운 주황 텍스트
       };
     } else {
       return {
         text: `${diffDays}일 전`,
-        bgColor: 'bg-primary2',
-        textColor: 'text-white',
+        bgColor: '#E5F0FF', // 연한 파랑 (primary2 파스텔톤)
+        textColor: '#1E3A5F', // 어두운 파랑 텍스트
       };
     }
   }, [shelterAnimal?.noticeEdt]);
@@ -196,24 +195,57 @@ export default function AbandonedCard({
           loading="lazy"
           onError={handleImageError}
         />
-        {/* 상태 뱃지 */}
-        {shelterAnimal?.processState && (
-          <div
-            className={`absolute top-2 right-2 ${statusBadge.bgColor} ${statusBadge.textColor} px-2 py-1 rounded-full text-xs font-semibold shadow-lg backdrop-blur-sm bg-opacity-90`}
-          >
-            {statusBadge.text}
-          </div>
-        )}
-        {/* 공고종료일 뱃지 */}
-        {noticeEndBadge && (
-          <div
-            className={`absolute top-2 left-2 ${noticeEndBadge.bgColor} ${noticeEndBadge.textColor} px-2 py-1 rounded-full text-xs font-semibold shadow-lg backdrop-blur-sm bg-opacity-90`}
-          >
-            {noticeEndBadge.text}
-          </div>
-        )}
       </div>
       <div className="flex flex-col flex-1 p-4 gap-1 relative">
+        {/* 뱃지 및 지도 버튼 - 상단 일렬 배치 */}
+        <div className="flex items-center gap-2 mb-2">
+          {/* 상태 뱃지 */}
+          {shelterAnimal?.processState && (
+            <div
+              className="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+              style={{
+                backgroundColor: statusBadge.bgColor,
+                color: statusBadge.textColor,
+              }}
+            >
+              {statusBadge.text}
+            </div>
+          )}
+          {/* 공고종료일 뱃지 */}
+          {noticeEndBadge && (
+            <div
+              className="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+              style={{
+                backgroundColor: noticeEndBadge.bgColor,
+                color: noticeEndBadge.textColor,
+              }}
+            >
+              {noticeEndBadge.text}
+            </div>
+          )}
+          {/* 지도 버튼 */}
+          <button
+            onClick={(e) =>
+              openGoogleMap(e, shelterAnimal?.happenPlace || '')
+            }
+            className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-colors duration-200 ml-auto"
+            style={{
+              backgroundColor: '#D4EDDA', // 연한 초록색
+              color: '#155724', // 어두운 초록색 텍스트
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#C3E6CB';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#D4EDDA';
+            }}
+            title="구글 지도에서 지도"
+          >
+            <HiMapPin className="w-3 h-3" />
+            <span>지도</span>
+          </button>
+        </div>
+
         {/* 기본 정보 - 높이 유지하며 부드러운 fade out */}
         <div
           className={`flex flex-col gap-1 transition-opacity duration-300 ease-in-out ${
@@ -221,21 +253,9 @@ export default function AbandonedCard({
           }`}
         >
           <div className="flex flex-col gap-1">
-            <div className="flex items-center justify-between gap-2">
-              <label className="text-xs font-medium text-gray-400">
-                구조 위치
-              </label>
-              <button
-                onClick={(e) =>
-                  openGoogleMap(e, shelterAnimal?.happenPlace || '')
-                }
-                className="flex-shrink-0 flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors duration-200"
-                title="구글 지도에서 위치 보기"
-              >
-                <HiMapPin className="w-3 h-3" />
-                <span>위치 보기</span>
-              </button>
-            </div>
+            <label className="text-xs font-medium text-gray-400">
+              구조 위치
+            </label>
             <p className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug">
               {shelterAnimal?.happenPlace || '정보 없음'}
             </p>

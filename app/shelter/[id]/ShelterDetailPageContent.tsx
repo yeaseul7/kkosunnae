@@ -183,7 +183,7 @@ export default function ShelterDetailPageContent({
 
   return (
     <div className="flex justify-center items-center min-h-screen font-sans bg-white">
-      <main className="flex flex-col justify-between items-center px-4 py-4 w-full max-w-6xl min-h-screen bg-whitesm:items-start">
+      <main className="flex flex-col justify-between items-center w-full max-w-6xl min-h-screen bg-whitesm:items-start">
         <PageTemplate visibleHomeTab={false}>
           <div className="flex flex-col gap-6 px-4 mx-auto w-full max-w-6xl sm:px-6 lg:px-8 py-8">
             <button
@@ -212,7 +212,6 @@ export default function ShelterDetailPageContent({
                   desertionNo={desertionNo}
                 />
 
-                {/* 입양 문의 안내 */}
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 flex flex-col gap-4">
                   <div className="flex items-center gap-2">
                     <FaPaw className="w-5 h-5 text-blue-600" />
@@ -224,7 +223,6 @@ export default function ShelterDetailPageContent({
                   
                   {shelterInfo && (
                     <div className="flex flex-col gap-3 mt-2">
-                      {/* 운영 시간 정보 */}
                       <div className="bg-white rounded-lg p-4 border border-gray-200">
                         <h4 className="text-sm font-semibold text-gray-900 mb-3">운영 시간</h4>
                         <div className="flex flex-col gap-2 text-sm">

@@ -97,22 +97,53 @@ export default function TagList({ userId }: { userId?: string }) {
   const displayTags = tags.slice(0, 10);
   const hasMoreTags = tags.length > 10;
 
+  // 파스텔 색상 팔레트
+  const pastelColors = [
+    { bg: '#FFE5E5', text: '#8B4A4A' }, // 연한 핑크
+    { bg: '#FFF5E1', text: '#8B6F3C' }, // 연한 노랑
+    { bg: '#E5F5E5', text: '#4A8B5A' }, // 연한 초록
+    { bg: '#E5F0FF', text: '#4A6A8B' }, // 연한 파랑
+    { bg: '#F0E5FF', text: '#6A4A8B' }, // 연한 보라
+    { bg: '#FFE8D5', text: '#8B5A4A' }, // 연한 오렌지
+    { bg: '#E5FFF5', text: '#4A8B7A' }, // 연한 민트
+    { bg: '#FFE5F0', text: '#8B4A6A' }, // 연한 살구
+    { bg: '#E5F0F5', text: '#4A6A7A' }, // 연한 하늘색
+    { bg: '#FFF0E5', text: '#8B6A4A' }, // 연한 베이지
+  ];
+
+  // 태그 이름을 기반으로 색상 인덱스 결정 (일관성 유지)
+  const getTagColor = (tag: string) => {
+    let hash = 0;
+    for (let i = 0; i < tag.length; i++) {
+      hash = tag.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % pastelColors.length;
+    return pastelColors[index];
+  };
+
   return (
     <div>
       <div className="mb-3 sm:mb-4">
         {/* <label className="text-base sm:text-lg font-semibold">태그 목록</label> */}
       </div>
-      <div className="flex flex-wrap gap-2 sm:gap-3">
-        {displayTags.map((tagCount) => (
-          <div
-            key={tagCount.tag}
-            className="px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 text-xs sm:text-sm md:text-base rounded-full bg-element2 text-text1 whitespace-nowrap"
-          >
-            {tagCount.tag} ({tagCount.count})
-          </div>
-        ))}
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+        {displayTags.map((tagCount) => {
+          const color = getTagColor(tagCount.tag);
+          return (
+            <div
+              key={tagCount.tag}
+              className="px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 text-xs sm:text-sm md:text-base rounded-full whitespace-nowrap font-bmjua"
+              style={{
+                backgroundColor: color.bg,
+                color: color.text,
+              }}
+            >
+              {tagCount.tag} ({tagCount.count})
+            </div>
+          );
+        })}
         {hasMoreTags && (
-          <div className="px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 text-xs sm:text-sm md:text-base rounded-full bg-element2 text-text1 whitespace-nowrap">
+          <div className="px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 text-xs sm:text-sm md:text-base rounded-full bg-element2 text-text1 whitespace-nowrap font-bmjua">
             ...
           </div>
         )}

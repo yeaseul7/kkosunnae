@@ -91,9 +91,9 @@ export default function PostCard({ post }: { post: PostData }) {
     <article
       key={post.id}
       onClick={() => router.push(`/read/${post.id}`)}
-      className="flex overflow-hidden flex-col bg-white rounded-md shadow-sm transition-all duration-200 cursor-pointer hover:shadow-lg hover:translate-y-1 active:translate-y-0 active:shadow-sm"
+      className="flex overflow-hidden flex-col bg-white rounded-2xl shadow-sm transition-all duration-200 cursor-pointer hover:shadow-lg hover:translate-y-1 active:translate-y-0 active:shadow-sm"
     >
-      <div className="relative w-full bg-gray-200 aspect-video">
+      <div className="relative w-full bg-gray-200 aspect-square">
         <Image
           src={thumbnailImage || defaultImage}
           alt={post.title || '게시물 이미지'}
@@ -118,7 +118,7 @@ export default function PostCard({ post }: { post: PostData }) {
             <span>·</span>
           </div>
         </div>
-        <div className="flex justify-between items-center pt-3 mt-3 border-t border-gray-100">
+        <div className="flex justify-between items-center mt-3 ">
           <UserProfile
             profileUrl={post.authorPhotoURL || ''}
             profileName={post.authorName || ''}
@@ -128,12 +128,12 @@ export default function PostCard({ post }: { post: PostData }) {
             iconSize="text-xs"
           />
 
-          <div className="flex gap-3 items-center text-gray-500">
-            <div className="flex gap-1 items-center">
+          <div className="flex gap-3 items-center">
+            <div className="flex gap-1 items-center text-[#FFB6C1]">
               <HiHeart className="w-4 h-4" />
               <span className="text-sm">{post.likes || 0}</span>
             </div>
-            <div className="flex gap-1 items-center">
+            <div className="flex gap-1 items-center text-[#87CEEB]">
               <HiChatBubbleLeft className="w-4 h-4" />
               <span className="text-sm">{commentCount}</span>
             </div>

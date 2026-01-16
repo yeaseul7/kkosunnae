@@ -1,7 +1,7 @@
 'use client';
 import { useAuth } from '@/lib/firebase/auth';
 import { firestore } from '@/lib/firebase/firebase';
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 
 import { useEffect, useState, useRef } from 'react';
@@ -33,6 +33,9 @@ export default function UserHeader() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [postsCount, setPostsCount] = useState(0);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isOwnProfile = user?.uid === userId;
@@ -60,6 +63,18 @@ export default function UserHeader() {
           setEditedDescription(userData?.description || '');
           setEditedPhotoURL(userData?.photoURL || null);
         }
+
+        // 게시글 개수 조회
+        const boardsQuery = query(
+          collection(firestore, 'boards'),
+          where('authorId', '==', userId)
+        );
+        const boardsSnapshot = await getDocs(boardsQuery);
+        setPostsCount(boardsSnapshot.size);
+
+        // 팔로워/팔로잉은 아직 구현되지 않았으므로 0으로 설정
+        setFollowersCount(0);
+        setFollowingCount(0);
       } catch (error) {
         console.error('사용자 프로필 가져오기 실패:', error);
       } finally {
@@ -158,59 +173,87 @@ export default function UserHeader() {
     );
   }
 
-  return (
-    <div>
-      <div className="flex justify-between items-center mt-16 mb-4 w-full">
-        <div className="flex flex-col items-center w-full">
-          <div className="flex gap-4 justify-start items-center w-full">
-            {isEditing ? (
-              <EditingHeader
-                currentPhotoURL={currentPhotoURL ?? null}
-                currentName={currentName}
-                fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
-                handleImageChange={handleImageChange}
-                handleImageRemove={handleImageRemove}
-                isUploading={isUploading}
-              />
-            ) : (
-              <ReasHeaderImg
-                currentPhotoURL={currentPhotoURL || ''}
-                currentName={currentName}
-              />
-            )}
+  // 숫자 포맷팅 함수 (1.2k 형식)
+  const formatNumber = (num: number): string => {
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'k';
+    }
+    return num.toString();
+  };
 
-            <div className="flex flex-col gap-2 w-full">
-              {isEditing ? (
-                <EditingHeaderText
-                  editedName={editedName}
-                  setEditedName={setEditedName}
-                  editedDescription={editedDescription}
-                  setEditedDescription={setEditedDescription}
-                  handleSave={handleSave}
-                  handleCancel={handleCancel}
-                  isSaving={isSaving}
-                  isUploading={isUploading}
-                  isOwnProfile={isOwnProfile}
-                  isEditing={isEditing}
-                  setIsEditing={setIsEditing}
-                />
-              ) : (
-                <ReadHeaderText
-                  currentName={currentName}
-                  currentDescription={currentDescription}
-                />
-              )}
-            </div>
-          </div>
-          <EditingBtn
-            handleSave={handleSave}
-            handleCancel={handleCancel}
-            isSaving={isSaving}
+  return (
+    <div className="mt-12 mb-4 w-full">
+      <div className="flex gap-4 justify-start items-start w-full">
+        {isEditing ? (
+          <EditingHeader
+            currentPhotoURL={currentPhotoURL ?? null}
+            currentName={currentName}
+            fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
+            handleImageChange={handleImageChange}
+            handleImageRemove={handleImageRemove}
             isUploading={isUploading}
-            isOwnProfile={isOwnProfile}
-            isEditing={isEditing}
-            setIsEditing={setIsEditing}
           />
+        ) : (
+          <ReasHeaderImg
+            currentPhotoURL={currentPhotoURL || ''}
+            currentName={currentName}
+          />
+        )}
+
+        <div className="flex flex-col gap-3 flex-1 w-full">
+          {isEditing ? (
+            <>
+              <EditingHeaderText
+                editedName={editedName}
+                setEditedName={setEditedName}
+                editedDescription={editedDescription}
+                setEditedDescription={setEditedDescription}
+                handleSave={handleSave}
+                handleCancel={handleCancel}
+                isSaving={isSaving}
+                isUploading={isUploading}
+                isOwnProfile={isOwnProfile}
+                isEditing={isEditing}
+                setIsEditing={setIsEditing}
+              />
+              <EditingBtn
+                handleSave={handleSave}
+                handleCancel={handleCancel}
+                isSaving={isSaving}
+                isUploading={isUploading}
+                isOwnProfile={isOwnProfile}
+                isEditing={isEditing}
+                setIsEditing={setIsEditing}
+              />
+            </>
+          ) : (
+            <>
+              <ReadHeaderText
+                currentName={currentName}
+                currentDescription={currentDescription}
+                onEditClick={() => setIsEditing(true)}
+                showEditButton={isOwnProfile}
+              />
+              
+              {/* 통계 섹션 */}
+              <div className="flex items-center gap-6 pt-2 ">
+                <div className="flex flex-col items-start">
+                  <span className="text-xl font-bold text-gray-900">{formatNumber(postsCount)}</span>
+                  <span className="text-xs text-gray-500 uppercase">Posts</span>
+                </div>
+                <div className="h-8 w-px bg-gray-300" />
+                <div className="flex flex-col items-start">
+                  <span className="text-xl font-bold text-gray-900">{formatNumber(followersCount)}</span>
+                  <span className="text-xs text-gray-500 uppercase">Followers</span>
+                </div>
+                <div className="h-8 w-px bg-gray-300" />
+                <div className="flex flex-col items-start">
+                  <span className="text-xl font-bold text-gray-900">{formatNumber(followingCount)}</span>
+                  <span className="text-xs text-gray-500 uppercase">Following</span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

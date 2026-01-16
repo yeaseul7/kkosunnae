@@ -38,7 +38,7 @@ export default function UserProfile({
       )}
       {existName && (
         <span className="text-sm text-gray-700">
-          by {profileName || '존재하지 않는 사용자'}
+          @{profileName || '존재하지 않는 사용자'}
         </span>
       )}
     </div>

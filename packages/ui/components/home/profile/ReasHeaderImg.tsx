@@ -12,17 +12,18 @@ export default function ReasHeaderImg({
   return (
     <>
       {currentPhotoURL ? (
-        <div className="relative w-16 h-16 shrink-0 aspect-square sm:w-20 sm:h-20 lg:w-28 lg:h-28">
+        <div className="relative w-24 h-24 shrink-0 aspect-square sm:w-32 sm:h-32 lg:w-40 lg:h-40">
+          <div className="absolute inset-0 rounded-full border-2 border-white shadow-[0_0_0_2px_rgba(173,216,230,0.3),0_0_20px_rgba(173,216,230,0.4),0_0_30px_rgba(135,206,250,0.2)]" />
           <Image
-            src={getOptimizedCloudinaryUrl(currentPhotoURL, 100, 100)}
+            src={getOptimizedCloudinaryUrl(currentPhotoURL, 200, 200)}
             alt={currentName || 'User'}
             fill
-            className="rounded-full object-cover transition-all duration-125 ease-in shadow-[0px_0_8px_rgba(0,0,0,0.085)] group-hover:shadow-[0px_0_12px_rgba(0,0,0,0.1)]"
+            className="rounded-full object-cover transition-all duration-125 ease-in border-2 border-white"
           />
         </div>
       ) : (
-        <div className="flex overflow-hidden justify-center items-center w-16 h-16 rounded-full shrink-0 sm:w-20 sm:h-20 lg:w-28 lg:h-28 aspect-square bg-element3">
-          <PiDogFill className="text-2xl sm:text-3xl lg:text-4xl" />
+        <div className="flex overflow-hidden justify-center items-center w-24 h-24 rounded-full shrink-0 sm:w-32 sm:h-32 lg:w-40 lg:h-40 aspect-square bg-[#F8EDE8] border-2 border-white shadow-[0_0_0_2px_rgba(173,216,230,0.3),0_0_20px_rgba(173,216,230,0.4),0_0_30px_rgba(135,206,250,0.2)]">
+          <PiDogFill className="text-3xl sm:text-4xl lg:text-5xl" />
         </div>
       )}
     </>
