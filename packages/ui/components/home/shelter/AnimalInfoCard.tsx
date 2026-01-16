@@ -83,8 +83,20 @@ export default function AnimalInfoCard({
         await deleteDoc(abandonmentDoc);
         setIsLiked(false);
       } else {
+        // popfile1부터 popfile8까지 중 첫 번째로 존재하는 이미지 찾기
+        let firstImage: string | undefined;
+        for (let i = 1; i <= 8; i++) {
+          const popfile = animalData[`popfile${i}` as keyof ShelterAnimalItem] as string | undefined;
+          if (popfile && typeof popfile === 'string' && popfile.trim() !== '') {
+            firstImage = popfile;
+            break;
+          }
+        }
+
+        // animalData 전체와 첫 번째 이미지를 저장
         await setDoc(abandonmentDoc, {
-          desertionNo: desertionNo,
+          ...animalData,
+          image: firstImage || null,
           createdAt: serverTimestamp(),
         });
         setIsLiked(true);

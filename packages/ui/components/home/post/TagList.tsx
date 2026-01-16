@@ -94,13 +94,16 @@ export default function TagList({ userId }: { userId?: string }) {
     );
   }
 
+  const displayTags = tags.slice(0, 10);
+  const hasMoreTags = tags.length > 10;
+
   return (
     <div>
       <div className="mb-3 sm:mb-4">
-        <label className="text-base sm:text-lg font-semibold">태그 목록</label>
+        {/* <label className="text-base sm:text-lg font-semibold">태그 목록</label> */}
       </div>
       <div className="flex flex-wrap gap-2 sm:gap-3">
-        {tags.map((tagCount) => (
+        {displayTags.map((tagCount) => (
           <div
             key={tagCount.tag}
             className="px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 text-xs sm:text-sm md:text-base rounded-full bg-element2 text-text1 whitespace-nowrap"
@@ -108,6 +111,11 @@ export default function TagList({ userId }: { userId?: string }) {
             {tagCount.tag} ({tagCount.count})
           </div>
         ))}
+        {hasMoreTags && (
+          <div className="px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 text-xs sm:text-sm md:text-base rounded-full bg-element2 text-text1 whitespace-nowrap">
+            ...
+          </div>
+        )}
       </div>
     </div>
   );

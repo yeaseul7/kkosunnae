@@ -49,27 +49,22 @@ export default function AbandonedCard({
 
   const thumbnailImage = useMemo(() => {
     if (!currentImageUrl) return null;
-    // Cloudinary 이미지가 아닌 경우(외부 이미지)는 최적화하지 않음
     if (currentImageUrl.includes('res.cloudinary.com')) {
       return getOptimizedCloudinaryUrl(currentImageUrl, 150, 150);
     }
-    // 외부 이미지는 그대로 사용 (Next.js Image의 unoptimized 옵션 사용)
     return currentImageUrl;
   }, [currentImageUrl]);
 
-  // 외부 이미지인지 확인 (Cloudinary가 아닌 경우)
   const isExternalImage = useMemo(() => {
     return currentImageUrl && !currentImageUrl.includes('res.cloudinary.com');
   }, [currentImageUrl]);
 
-  // 이미지 로드 실패 시 다음 이미지 시도
   const handleImageError = useCallback(() => {
     if (currentImageIndex < availableImages.length - 1) {
       setCurrentImageIndex((prev) => prev + 1);
     }
   }, [currentImageIndex, availableImages.length]);
 
-  // shelterAnimal이 변경되면 이미지 인덱스 초기화
   useEffect(() => {
     setCurrentImageIndex(0);
   }, [shelterAnimal.desertionNo]);
@@ -95,7 +90,6 @@ export default function AbandonedCard({
     return thumbnailImage || defaultImage;
   }, [availableImages.length, currentImageIndex, thumbnailImage, defaultImage]);
 
-  // 상태 뱃지 스타일 결정
   const statusBadge = useMemo(() => {
     return {
       text: shelterAnimal?.processState || '상태 미확인',
