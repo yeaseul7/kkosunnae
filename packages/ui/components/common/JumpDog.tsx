@@ -1,6 +1,5 @@
 import Lottie from 'lottie-react';
 import { RefObject } from 'react';
-import Image from 'next/image';
 
 export default function JumpDog({
   dogRef,
@@ -9,6 +8,7 @@ export default function JumpDog({
   dogRef: RefObject<HTMLDivElement>;
   animationData: object;
 }) {
+
   return (
     <>
     <div
@@ -23,6 +23,12 @@ export default function JumpDog({
         onMouseEnter={(e) => {
           e.currentTarget.classList.add('dog-jump-animation');
         }}
+        onClick={(e) => {
+          e.currentTarget.classList.add('dog-jump-animation');
+        }}
+        onTouchStart={(e) => {
+          e.currentTarget.classList.add('dog-jump-animation');
+        }}
         onAnimationEnd={(e) => {
           e.currentTarget.classList.remove('dog-jump-animation');
         }}
@@ -31,6 +37,7 @@ export default function JumpDog({
       </div>
      
     </div>
+
    </>
   );
 }
