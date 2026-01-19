@@ -321,7 +321,7 @@ export default function ShelterPosts() {
           유기동물 데이터가 없습니다.
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-2 pt-8 w-full sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center">
+        <div className="grid grid-cols-1 gap-2 pt-8 w-full px-4 sm:px-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center">
           {shelterAnimalData.map((shelterAnimal: ShelterAnimalItem) => (
             <AbandonedCard
               key={shelterAnimal.desertionNo}

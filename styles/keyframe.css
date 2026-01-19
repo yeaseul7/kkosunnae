@@ -1,0 +1,11 @@
+@keyframes dog-jump {
+    0%, 100% {
+      transform: translateY(0) ;
+    }
+    50% {
+        transform: translateY(-20px) ;
+      }
+  }
+  .dog-jump-animation {
+    animation: dog-jump 0.5s ease-in-out;
+  }

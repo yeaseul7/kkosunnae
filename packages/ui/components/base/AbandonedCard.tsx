@@ -174,7 +174,7 @@ export default function AbandonedCard({
       onClick={() => router.push(`/shelter/${shelterAnimal.desertionNo}`)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="flex overflow-hidden flex-col bg-white rounded-lg shadow-sm transition-all duration-200 cursor-pointer hover:shadow-md hover:scale-[1.02] active:scale-[0.98] w-full max-w-[260px] border border-gray-100"
+      className="flex overflow-hidden flex-col bg-white rounded-lg shadow-sm transition-all duration-200 cursor-pointer hover:shadow-md hover:scale-[1.02] active:scale-[0.98] w-full max-w-full sm:max-w-[260px] border border-gray-100"
     >
       <div className="relative w-full bg-gray-100 aspect-[4/5] overflow-hidden">
         <Image
@@ -190,13 +190,13 @@ export default function AbandonedCard({
           onError={handleImageError}
         />
       </div>
-      <div className="flex flex-col flex-1 p-4 gap-1 relative">
+      <div className="flex flex-col flex-1 p-3 sm:p-4 gap-1 relative">
         {/* 뱃지 및 지도 버튼 - 상단 일렬 배치 */}
         <div className="flex items-center gap-2 mb-2">
           {/* 상태 뱃지 */}
           {shelterAnimal?.processState && (
             <div
-              className="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+              className="px-2 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
               style={{
                 backgroundColor: statusBadge.bgColor,
                 color: statusBadge.textColor,
@@ -208,7 +208,7 @@ export default function AbandonedCard({
           {/* 공고종료일 뱃지 */}
           {noticeEndBadge && (
             <div
-              className="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+              className="px-2 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
               style={{
                 backgroundColor: noticeEndBadge.bgColor,
                 color: noticeEndBadge.textColor,
@@ -222,7 +222,7 @@ export default function AbandonedCard({
             onClick={(e) =>
               openGoogleMap(e, shelterAnimal?.happenPlace || '')
             }
-            className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-colors duration-200 ml-auto"
+            className="flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors duration-200 ml-auto"
             style={{
               backgroundColor: '#D4EDDA', // 연한 초록색
               color: '#155724', // 어두운 초록색 텍스트
@@ -300,7 +300,7 @@ export default function AbandonedCard({
         </div>
 
         <div
-          className={`absolute inset-0 flex items-center justify-center p-4 transition-opacity duration-300 ease-in-out ${
+          className={`absolute inset-0 flex items-center justify-center p-3 sm:p-4 transition-opacity duration-300 ease-in-out ${
             isLongHover ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}
         >
@@ -311,8 +311,8 @@ export default function AbandonedCard({
             }}
             className="w-full flex justify-center items-center p-2 font-bold text-white rounded-lg bg-primary2 hover:bg-primary1 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 active:translate-y-0 gap-2"
           >
-            <FaPaw /> 
-            <span className='text-sm font-semibold'>자세히 보러가기</span> 
+            <FaPaw className="text-sm sm:text-base" /> 
+            <span className='text-xs sm:text-sm font-semibold'>자세히 보러가기</span> 
           </button>
         </div>
       </div>
