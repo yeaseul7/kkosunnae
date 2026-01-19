@@ -24,9 +24,11 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
   const { user, loading } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNotificationPopOpen, setIsNotificationPopOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [unreadHistoryCount, setUnreadHistoryCount] = useState(0);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useClickOutside<HTMLDivElement>(
     userMenuRef,
@@ -38,6 +40,12 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
     notificationRef,
     () => setIsNotificationPopOpen(false),
     isNotificationPopOpen,
+  );
+
+  useClickOutside<HTMLDivElement>(
+    mobileMenuRef,
+    () => setIsMobileMenuOpen(false),
+    isMobileMenuOpen,
   );
 
   const handleNotificationClick = useCallback(() => {
@@ -68,7 +76,7 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full h-16 bg-white border-b border-gray-200">
       <div className="flex justify-between items-center px-4 mx-auto w-full max-w-7xl h-full sm:px-6">
-        <div className="flex items-center gap-10">
+        <div className="flex items-center gap-4 md:gap-10">
         <Link
           href="/"
           className="flex items-center transition-opacity hover:opacity-80"
@@ -91,8 +99,9 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
             loading="eager"
           />
         </Link>
-        <div className="flex items-center gap-5">
-        <NavLink
+        {/* 데스크탑 메뉴 */}
+        <div className="hidden md:flex items-center gap-5">
+          <NavLink
             to="/trending"
             activeClassName="active"
             isActive={() => {
@@ -118,9 +127,73 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
                 : '!text-black'
             }`}
           >
-            유기견 / 유기묘 공고
+            유기견/유기묘 공고
           </NavLink>
-       
+        </div>
+        {/* 모바일 햄버거 메뉴 */}
+        <div ref={mobileMenuRef} className="relative md:hidden">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 rounded-lg transition-colors hover:bg-gray-100"
+            aria-label="메뉴"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              {isMobileMenuOpen ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              )}
+            </svg>
+          </button>
+          {isMobileMenuOpen && (
+            <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden">
+              <NavLink
+                to="/trending"
+                activeClassName="active"
+                isActive={() => {
+                  return pathname === '/trending' || pathname.startsWith('/trending');
+                }}
+                className={`block px-4 py-3 !border-b-0 transition-colors hover:bg-gray-50 ${
+                  pathname === '/trending' || pathname.startsWith('/trending')
+                    ? '!text-primary1 bg-blue-50'
+                    : '!text-black'
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                커뮤니티
+              </NavLink>
+              <NavLink
+                to="/shelter"
+                activeClassName="active"
+                isActive={() => {
+                  return pathname === '/shelter' || pathname.startsWith('/shelter');
+                }}
+                className={`block px-4 py-3 !border-b-0 transition-colors hover:bg-gray-50 ${
+                  pathname === '/shelter' || pathname.startsWith('/shelter')
+                    ? '!text-primary1 bg-blue-50'
+                    : '!text-black'
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                유기견/유기묘 공고
+              </NavLink>
+            </div>
+          )}
         </div>
         </div>
         {visibleHeaderButtons && (

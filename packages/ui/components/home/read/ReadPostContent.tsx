@@ -110,7 +110,7 @@ export default function ReadPostContent({
         <PageTemplate visibleHeaderButtons={true} visibleHomeTab={false}>
           {loading && <Loading />}
           {error && !loading && <NotFound error={error} />}
-          <div className="w-full px-8">
+          <div className="w-full px-0 lg:px-8">
             {!loading && !error && post && (
               <div className="mx-auto w-full max-w-4xl">
                 {canGoBack && (

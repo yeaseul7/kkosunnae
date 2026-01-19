@@ -26,14 +26,14 @@ export default function EditingBtn({
       <button
         onClick={handleSave}
         disabled={isSaving || isUploading}
-        className="px-4 py-2 text-sm text-white rounded-lg bg-primary1 hover:bg-primary2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-white rounded-lg bg-primary1 hover:bg-primary2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {isSaving ? '저장 중...' : '저장'}
       </button>
       <button
         onClick={handleCancel}
         disabled={isSaving || isUploading}
-        className="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         취소
       </button>

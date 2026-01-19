@@ -24,16 +24,16 @@ export default function EditingHeaderText({
           type="text"
           value={editedName}
           onChange={(e) => setEditedName(e.target.value)}
-          className="px-3 py-2 sm:px-4 sm:py-2 flex-1 text-xl sm:text-2xl md:text-3xl font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary1 transition-all"
+          className="px-2 py-1.5 sm:px-3 sm:py-2 lg:px-4 lg:py-2 flex-1 text-base sm:text-xl lg:text-2xl font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary1 transition-all"
           placeholder="이름"
         />
       </div>
       <textarea
         value={editedDescription}
         onChange={(e) => setEditedDescription(e.target.value)}
-        className="px-3 py-2 sm:px-4 sm:py-2 w-full text-sm sm:text-base rounded-lg border border-gray-300 resize-none text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary1 transition-all"
+        className="px-2 py-1.5 sm:px-3 sm:py-2 lg:px-4 lg:py-2 w-full text-xs sm:text-sm lg:text-base rounded-lg border border-gray-300 resize-none text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary1 transition-all"
         placeholder="한 줄 소개"
-        rows={4}
+        rows={3}
       />
     </div>
   );

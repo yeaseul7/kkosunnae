@@ -97,7 +97,7 @@ export default function WriteComment({ postId }: { postId: string }) {
   const maxLength = 500;
 
   return (
-    <div className="flex flex-col p-4 px-10 w-full">
+    <div className="flex flex-col p-4 px-4 sm:px-10 w-full">
       <div className="flex flex-col gap-3 p-4 w-full bg-white rounded-xl border border-gray-200 shadow-sm transition-all focus-within:border-primary1 focus-within:shadow-md">
         <textarea
           ref={textareaRef}

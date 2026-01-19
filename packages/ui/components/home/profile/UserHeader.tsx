@@ -236,20 +236,20 @@ export default function UserHeader() {
               />
               
               {/* 통계 섹션 */}
-              <div className="flex items-center gap-6 pt-2 ">
+              <div className="flex items-center gap-3 sm:gap-6 pt-2">
                 <div className="flex flex-col items-start">
-                  <span className="text-xl font-bold text-gray-900">{formatNumber(postsCount)}</span>
-                  <span className="text-xs text-gray-500 uppercase">Posts</span>
+                  <span className="text-base sm:text-lg lg:text-xl font-bold text-gray-900">{formatNumber(postsCount)}</span>
+                  <span className="text-[10px] sm:text-xs text-gray-500 uppercase">Posts</span>
                 </div>
-                <div className="h-8 w-px bg-gray-300" />
+                <div className="h-6 sm:h-8 w-px bg-gray-300" />
                 <div className="flex flex-col items-start">
-                  <span className="text-xl font-bold text-gray-900">{formatNumber(followersCount)}</span>
-                  <span className="text-xs text-gray-500 uppercase">Followers</span>
+                  <span className="text-base sm:text-lg lg:text-xl font-bold text-gray-900">{formatNumber(followersCount)}</span>
+                  <span className="text-[10px] sm:text-xs text-gray-500 uppercase">Followers</span>
                 </div>
-                <div className="h-8 w-px bg-gray-300" />
+                <div className="h-6 sm:h-8 w-px bg-gray-300" />
                 <div className="flex flex-col items-start">
-                  <span className="text-xl font-bold text-gray-900">{formatNumber(followingCount)}</span>
-                  <span className="text-xs text-gray-500 uppercase">Following</span>
+                  <span className="text-base sm:text-lg lg:text-xl font-bold text-gray-900">{formatNumber(followingCount)}</span>
+                  <span className="text-[10px] sm:text-xs text-gray-500 uppercase">Following</span>
                 </div>
               </div>
             </>

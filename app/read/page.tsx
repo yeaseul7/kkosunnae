@@ -120,7 +120,7 @@ function ReadPageContent() {
 
               <article className="p-8 bg-white rounded-lg shadow">
                 <header className="mb-6">
-                  <h1 className="mb-4 text-3xl font-bold">{post.title}</h1>
+                  <h1 className="mb-4 text-xl font-bold sm:text-2xl lg:text-3xl">{post.title}</h1>
 
                   <div className="flex gap-4 items-center mb-4">
                     {post.authorPhotoURL ? (

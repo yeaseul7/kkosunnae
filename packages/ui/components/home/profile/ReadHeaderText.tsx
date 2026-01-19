@@ -37,21 +37,21 @@ export default function ReadHeaderText({
   return (
     <div className="flex flex-col gap-2 w-full">
       <div className="flex items-center gap-2">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+        <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-800">
           {currentName}
         </h1>
-        <span className="text-xl">🐶</span>
+        <span className="text-base sm:text-lg lg:text-xl">🐶</span>
         {showEditButton && onEditClick && (
           <button
             onClick={onEditClick}
-            className="px-3 py-1 text-sm font-medium text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
+            className="px-2 py-1 text-xs sm:text-sm font-medium text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
           >
             프로필 수정
           </button>
         )}
       </div>
       {currentDescription && (
-        <p className="text-sm sm:text-base text-gray-600 whitespace-pre-wrap leading-relaxed">
+        <p className="text-xs sm:text-sm lg:text-base text-gray-600 whitespace-pre-wrap leading-relaxed">
           {formatDescription(currentDescription)}
         </p>
       )}

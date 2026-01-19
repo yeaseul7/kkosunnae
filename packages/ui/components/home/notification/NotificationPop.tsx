@@ -60,9 +60,9 @@ export default function NotificationPop({ onClose }: NotificationPopProps) {
   };
 
   return (
-    <div className="absolute right-0 top-full mt-2 z-51 sm:mt-4">
+    <div className="fixed md:absolute right-4 md:right-0 top-[60px] md:top-full mt-0 md:mt-2 z-51 left-4 md:left-auto">
       <div
-        className="relative w-64 max-h-[80vh] overflow-y-auto bg-element1 rounded-lg shadow-[0px_0px_8px_rgba(0,0,0,0.1)] sm:w-96"
+        className="relative w-full max-h-[80vh] overflow-y-auto bg-element1 rounded-lg shadow-[0px_0px_8px_rgba(0,0,0,0.1)] md:w-96"
         ref={popupRef}
       >
         <div className="flex flex-col p-1 sm:p-2">

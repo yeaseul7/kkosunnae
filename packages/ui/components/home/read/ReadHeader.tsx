@@ -106,7 +106,7 @@ export default function ReadHeader({
 
   return (
     <header className="mb-6">
-      <h1 className="mb-4 text-3xl font-bold">{post?.title}</h1>
+      <h1 className="mb-4 text-xl font-bold sm:text-2xl lg:text-3xl">{post?.title}</h1>
 
       <div className="flex gap-4 justify-between items-center mb-4">
         <div className="flex gap-2 items-center">
