@@ -3,7 +3,7 @@ import PageTemplate from './PageTemplate';
 import Lottie from 'lottie-react';
 
 interface Notfound_ad_animalProps {
-  emptyAnimationData: any;
+  emptyAnimationData: object | null;
   error: string;
   router: AppRouterInstance;
 }

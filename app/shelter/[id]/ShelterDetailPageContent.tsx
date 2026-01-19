@@ -2,15 +2,11 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import Lottie from 'lottie-react';
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
 import Loading from '@/packages/ui/components/base/Loading';
 import { ShelterAnimalItem, ShelterAnimalData } from '@/packages/type/postType';
 import { ShelterInfoResponse, ShelterInfoItem } from '@/app/api/shelter-info/route';
-import { formatDateToKorean } from '@/packages/utils/dateFormatting';
-import { HiHeart, HiShare } from 'react-icons/hi2';
-import { FaPaw, FaLeaf } from 'react-icons/fa';
+import { FaPaw } from 'react-icons/fa';
 import { IoIosArrowBack } from 'react-icons/io';
 import Notfound_ad_animal from '@/packages/ui/components/base/Notfound_ad_animal';
 import AnimalImgCard from '@/packages/ui/components/home/shelter/AnimalImgCard';
@@ -29,7 +25,7 @@ export default function ShelterDetailPageContent({
   const [error, setError] = useState<string | null>(null);
   const [animalImgList, setAnimalImgList] = useState<string[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [emptyAnimationData, setEmptyAnimationData] = useState<any>(null);
+  const [emptyAnimationData, setEmptyAnimationData] = useState<object | null>(null);
   const [shelterInfo, setShelterInfo] = useState<ShelterInfoItem | null>(null);
 
   useEffect(() => {

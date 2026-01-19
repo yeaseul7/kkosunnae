@@ -2,7 +2,6 @@
 import { isEmptyOrWhitespace } from '@/lib/utils';
 import { PostData } from '@/packages/type/postType';
 import {
-  useClickOutside,
   useClickOutsideModal,
 } from '@/packages/utils/clickEvent';
 import {

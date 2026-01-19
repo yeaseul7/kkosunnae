@@ -1,10 +1,7 @@
 'use client';
-import { getTrendingBoardsData } from '@/lib/api/post';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import PostCard from '../../base/PostCard';
 import Loading from '../../base/Loading';
 import {
-  PostData,
   ShelterAnimalData,
   ShelterAnimalItem,
 } from '@/packages/type/postType';
@@ -12,7 +9,6 @@ import AbandonedCard from '../../base/AbandonedCard';
 import AnimalFilterHeader, { AnimalFilterState } from './AnimalFilterHeader';
 
 export default function ShelterPosts() {
-  const [posts, setPosts] = useState<PostData[]>([]);
   const [shelterAnimalData, setShelterAnimalData] = useState<
     ShelterAnimalItem[]
   >([]);
@@ -81,8 +77,6 @@ export default function ShelterPosts() {
         };
 
         const items = shelterAnimalResponse?.response?.body?.items?.item;
-        const totalCount =
-          shelterAnimalResponse?.response?.body?.totalCount || 0;
 
         if (items) {
           let itemsArray = Array.isArray(items) ? items : [items];
@@ -183,8 +177,6 @@ export default function ShelterPosts() {
         })
         .then((shelterAnimalResponse: { response: ShelterAnimalData }) => {
           const items = shelterAnimalResponse?.response?.body?.items?.item;
-          const totalCount =
-            shelterAnimalResponse?.response?.body?.totalCount || 0;
 
           if (items) {
             let itemsArray = Array.isArray(items) ? items : [items];
@@ -234,17 +226,8 @@ export default function ShelterPosts() {
   }, []);
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const postsData = await getTrendingBoardsData();
-        setPosts(postsData);
-      } catch (e) {
-        console.error('게시물 조회 중 오류 발생:', e);
-      }
-    };
-    fetchPosts();
     fetchShelterAnimalData(1, true);
-  }, []);
+  }, [fetchShelterAnimalData]);
 
   useEffect(() => {
     // 초기 로딩 중이거나 hasMore가 false이면 observer 설정하지 않음

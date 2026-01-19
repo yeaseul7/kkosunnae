@@ -14,13 +14,10 @@ export default function LoginModal({ onClose }: LoginModalProps) {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const modalRef = useRef<HTMLDivElement>(null);
   const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isGithubLoading, setIsGithubLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [emailSent, setEmailSent] = useState(false);
-  const [emailError, setEmailError] = useState('');
-  const [emailTouched, setEmailTouched] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -32,7 +29,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
-    setMessage('');
+    setMessage('Google 로그인 중...');
 
     try {
       await loginWithGoogle();
@@ -47,8 +44,8 @@ export default function LoginModal({ onClose }: LoginModalProps) {
     }
   };
   const handleGithubLogin = async () => {
-    setIsGithubLoading(true);
-    setMessage('');
+      setIsGithubLoading(true);
+      setMessage('Github 로그인 중...');
 
     try {
       await loginWithGithub();
@@ -83,8 +80,6 @@ export default function LoginModal({ onClose }: LoginModalProps) {
               onClick={() => {
                 setEmailSent(false);
                 setEmail('');
-                setEmailError('');
-                setEmailTouched(false);
                 setMessage('');
               }}
               className="px-4 py-2 w-full rounded-md bg-primary1 text-button-text hover:bg-primary2"
@@ -99,11 +94,11 @@ export default function LoginModal({ onClose }: LoginModalProps) {
             <div className="flex gap-4 justify-center my-8">
               <button
                 onClick={handleGoogleLogin}
-                disabled={isGoogleLoading || isLoading}
+                disabled={isGoogleLoading}
                 className="flex justify-center items-center"
               >
                 {isGoogleLoading ? (
-                  `${authMode === 'login' ? '로그인' : '회원가입'} 중...`
+                  message
                 ) : (
                   <div className="p-2 rounded-full border border-border3 hover:bg-gray-50">
                     <FcGoogle className="text-2xl" />
@@ -112,11 +107,11 @@ export default function LoginModal({ onClose }: LoginModalProps) {
               </button>
               <button
                 onClick={handleGithubLogin}
-                disabled={isGithubLoading || isLoading}
+                disabled={isGithubLoading}
                 className="flex justify-center items-center"
               >
                 {isGithubLoading ? (
-                  `${authMode === 'login' ? '로그인' : '회원가입'} 중...`
+                  message
                 ) : (
                   <div className="p-2 rounded-full border border-border3 hover:bg-gray-50">
                     <FaGithub className="text-2xl" />
@@ -131,9 +126,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
                   className="pl-2 text-primary1 hover:text-primary2"
                   onClick={() => {
                     setAuthMode('register');
-                    setEmailError('');
                     setMessage('');
-                    setEmailTouched(false);
                   }}
                 >
                   회원가입하기
@@ -146,9 +139,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
                   className="pl-2 text-primary1 hover:text-primary2"
                   onClick={() => {
                     setAuthMode('login');
-                    setEmailError('');
                     setMessage('');
-                    setEmailTouched(false);
                   }}
                 >
                   로그인하기

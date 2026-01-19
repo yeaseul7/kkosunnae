@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { MdArrowDropDown } from 'react-icons/md';
 import Image from 'next/image';
 
@@ -40,34 +40,35 @@ interface AnimalFilterHeaderProps {
 
 export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFilterHeaderProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const isInitialMount = useRef(true);
 
-  // filters가 변경되면 날짜 입력 필드도 업데이트
-  useEffect(() => {
+  const derivedStartDate = useMemo(() => {
     if (filters.bgnde && filters.bgnde.length === 8) {
-      const formatted = `${filters.bgnde.substring(0, 4)}-${filters.bgnde.substring(4, 6)}-${filters.bgnde.substring(6, 8)}`;
-      if (startDate !== formatted) {
-        setStartDate(formatted);
-      }
-    } else if (!filters.bgnde && startDate) {
-      setStartDate('');
+      return `${filters.bgnde.substring(0, 4)}-${filters.bgnde.substring(4, 6)}-${filters.bgnde.substring(6, 8)}`;
     }
-  }, [filters.bgnde, startDate]);
+    return '';
+  }, [filters.bgnde]);
 
-  useEffect(() => {
+  const derivedEndDate = useMemo(() => {
     if (filters.endde && filters.endde.length === 8) {
-      const formatted = `${filters.endde.substring(0, 4)}-${filters.endde.substring(4, 6)}-${filters.endde.substring(6, 8)}`;
-      if (endDate !== formatted) {
-        setEndDate(formatted);
-      }
-    } else if (!filters.endde && endDate) {
-      setEndDate('');
+      return `${filters.endde.substring(0, 4)}-${filters.endde.substring(4, 6)}-${filters.endde.substring(6, 8)}`;
     }
-  }, [filters.endde, endDate]);
+    return '';
+  }, [filters.endde]);
 
+  const [startDate, setStartDate] = useState<string>(derivedStartDate);
+  const [endDate, setEndDate] = useState<string>(derivedEndDate);
+  const [prevBgnde, setPrevBgnde] = useState(filters.bgnde);
+  const [prevEndde, setPrevEndde] = useState(filters.endde);
+
+  // Sync local state when filters change externally (e.g., reset button)
+  if (filters.bgnde !== prevBgnde) {
+    setPrevBgnde(filters.bgnde);
+    setStartDate(derivedStartDate);
+  }
+  if (filters.endde !== prevEndde) {
+    setPrevEndde(filters.endde);
+    setEndDate(derivedEndDate);
+  }
 
   const handleFilterChange = (key: keyof AnimalFilterState, value: string | null) => {
     const newFilters = { ...filters, [key]: value };
@@ -114,45 +115,45 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
   };
 
   return (
-    <div className="w-full pb-4 pt-10 px-4 bg-white">
-      <div className="flex flex-col gap-4 w-full max-w-7xl mx-auto">
+    <div className="w-full pb-3 pt-6 px-3 sm:pb-4 sm:pt-10 sm:px-4 bg-white">
+      <div className="flex flex-col gap-3 sm:gap-4 w-full max-w-7xl mx-auto">
         {/* 검색창 */}
         <div className="relative w-full">
-          <div className="flex items-center px-4 w-full h-12 bg-white border border-gray-300 rounded-full shadow-sm focus-within:border-primary1 focus-within:ring-2 focus-within:ring-primary1/20 transition-all">
+          <div className="flex items-center px-3 sm:px-4 w-full h-10 sm:h-12 bg-white border border-gray-300 rounded-full shadow-sm focus-within:border-primary1 focus-within:ring-2 focus-within:ring-primary1/20 transition-all">
             <Image
               src="/static/svg/icon-search-3.svg"
               alt="Search"
-              width={20}
-              height={20}
-              className="mr-3 text-gray-400 shrink-0"
+              width={18}
+              height={18}
+              className="mr-2 sm:mr-3 text-gray-400 shrink-0 sm:w-5 sm:h-5"
             />
             <input
               type="text"
               value={filters.searchQuery}
               onChange={handleSearchChange}
-              placeholder="동물등록번호, 구조위치, 보호소명 검색"
-              className="flex-1 w-full text-sm placeholder-gray-400 text-gray-900 bg-transparent border-none outline-none"
+              placeholder="동물등록번호, 구조위치, 보호소명"
+              className="flex-1 w-full text-xs sm:text-sm placeholder-gray-400 text-gray-900 bg-transparent border-none outline-none"
             />
           </div>
         </div>
 
         {/* 필터 옵션 */}
-        <div className="flex flex-wrap gap-3 items-center">
+        <div className="flex flex-wrap gap-2 sm:gap-3 items-start">
           {/* 성별 필터 */}
           <div className="relative z-50">
             <button
               onClick={() => setOpenDropdown(openDropdown === 'sexCd' ? null : 'sexCd')}
-              className="flex justify-between items-center px-4 py-2 min-w-[100px] text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
+              className="flex justify-between items-center px-3 sm:px-4 py-1.5 sm:py-2 min-w-[80px] sm:min-w-[100px] text-xs sm:text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
             >
               <span>성별: {getFilterLabel('sexCd')}</span>
-              <MdArrowDropDown className={`w-5 h-5 transition-transform ${openDropdown === 'sexCd' ? 'rotate-180' : ''}`} />
+              <MdArrowDropDown className={`w-4 h-4 sm:w-5 sm:h-5 ml-1 transition-transform ${openDropdown === 'sexCd' ? 'rotate-180' : ''}`} />
             </button>
             {openDropdown === 'sexCd' && (
-              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[100px] bg-white rounded-full shadow-lg border border-gray-200">
+              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[80px] sm:min-w-[100px] bg-white rounded-2xl shadow-lg border border-gray-200">
                 {sexOptions.map((option) => (
                   <li
                     key={option.value || 'all'}
-                    className={`p-2 cursor-pointer rounded-md transition-colors ${
+                    className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${
                       filters.sexCd === option.value
                         ? 'bg-primary1 text-white'
                         : 'hover:bg-gray-100 hover:text-primary1'
@@ -170,17 +171,17 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
           <div className="relative z-50">
             <button
               onClick={() => setOpenDropdown(openDropdown === 'state' ? null : 'state')}
-              className="flex justify-between items-center px-4 py-2 min-w-[100px] text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
+              className="flex justify-between items-center px-3 sm:px-4 py-1.5 sm:py-2 min-w-[80px] sm:min-w-[100px] text-xs sm:text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
             >
               <span>상태: {getFilterLabel('state')}</span>
-              <MdArrowDropDown className={`w-5 h-5 transition-transform ${openDropdown === 'state' ? 'rotate-180' : ''}`} />
+              <MdArrowDropDown className={`w-4 h-4 sm:w-5 sm:h-5 ml-1 transition-transform ${openDropdown === 'state' ? 'rotate-180' : ''}`} />
             </button>
             {openDropdown === 'state' && (
-              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[100px] bg-white rounded-full shadow-lg border border-gray-200">
+              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[80px] sm:min-w-[100px] bg-white rounded-2xl shadow-lg border border-gray-200">
                 {stateOptions.map((option) => (
                   <li
                     key={option.value || 'all'}
-                    className={`p-2 cursor-pointer rounded-md transition-colors ${
+                    className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${
                       filters.state === option.value
                         ? 'bg-primary1 text-white'
                         : 'hover:bg-gray-100 hover:text-primary1'
@@ -198,17 +199,17 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
           <div className="relative z-50">
             <button
               onClick={() => setOpenDropdown(openDropdown === 'upKindCd' ? null : 'upKindCd')}
-              className="flex justify-between items-center px-4 py-2 min-w-[100px] text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
+              className="flex justify-between items-center px-3 sm:px-4 py-1.5 sm:py-2 min-w-[80px] sm:min-w-[100px] text-xs sm:text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
             >
               <span>축종: {getFilterLabel('upKindCd')}</span>
-              <MdArrowDropDown className={`w-5 h-5 transition-transform ${openDropdown === 'upKindCd' ? 'rotate-180' : ''}`} />
+              <MdArrowDropDown className={`w-4 h-4 sm:w-5 sm:h-5 ml-1 transition-transform ${openDropdown === 'upKindCd' ? 'rotate-180' : ''}`} />
             </button>
             {openDropdown === 'upKindCd' && (
-              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[100px] bg-white rounded-full shadow-lg border border-gray-200">
+              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[80px] sm:min-w-[100px] bg-white rounded-2xl shadow-lg border border-gray-200">
                 {upKindOptions.map((option) => (
                   <li
                     key={option.value || 'all'}
-                    className={`p-2 cursor-pointer rounded-md transition-colors ${
+                    className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${
                       filters.upKindCd === option.value
                         ? 'bg-primary1 text-white'
                         : 'hover:bg-gray-100 hover:text-primary1'
@@ -223,24 +224,24 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
           </div>
 
           {/* 접수일 필터 */}
-          <div className="flex items-center gap-2 px-4 py-1 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1 text-xs sm:text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-2xl sm:rounded-full shadow-sm">
             <label className="text-xs text-gray-500 whitespace-nowrap shrink-0">접수일:</label>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
               <input
                 type="date"
                 value={startDate}
                 onChange={handleStartDateChange}
                 onBlur={handleStartDateBlur}
-                className="w-[140px] px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary1/20 focus:border-primary1 transition-all"
+                className="w-full sm:w-[110px] md:w-[140px] px-2 py-1 text-xs sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary1/20 focus:border-primary1 transition-all"
                 placeholder="시작일"
               />
-              <span className="text-gray-400 shrink-0">~</span>
+              <span className="hidden sm:inline text-gray-400 shrink-0">~</span>
               <input
                 type="date"
                 value={endDate}
                 onChange={handleEndDateChange}
                 onBlur={handleEndDateBlur}
-                className="w-[140px] px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary1/20 focus:border-primary1 transition-all"
+                className="w-full sm:w-[110px] md:w-[140px] px-2 py-1 text-xs sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary1/20 focus:border-primary1 transition-all"
                 placeholder="종료일"
               />
             </div>
@@ -255,7 +256,7 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
                 setStartDate('');
                 setEndDate('');
               }}
-              className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+              className="w-full sm:w-auto px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
             >
               필터 초기화
             </button>

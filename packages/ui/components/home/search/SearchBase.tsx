@@ -5,7 +5,6 @@ import Search from '../../common/Search';
 import { getBoardsDataBySearch } from '@/lib/api/post';
 import Loading from '../../base/Loading';
 import { PostData } from '@/packages/type/postType';
-import PostCard from '../../base/PostCard';
 import SearchResult from './SearchResult';
 
 export default function SearchBase() {

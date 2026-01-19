@@ -57,7 +57,7 @@ export default function AnimalInfoCard({
     };
 
     checkAbandonment();
-  }, [desertionNo, user?.uid]);
+  }, [desertionNo, user]);
 
   const handleLike = async () => {
     if (!user) {
@@ -132,6 +132,7 @@ export default function AnimalInfoCard({
           }
         } catch (err) {
           prompt('공유 링크를 복사하세요:', url);
+          console.error('클립보드 복사 실패:', err);
         } finally {
           document.body.removeChild(textarea);
         }

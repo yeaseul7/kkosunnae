@@ -5,7 +5,6 @@ interface EditingBtnProps {
   isUploading: boolean;
   isOwnProfile: boolean;
   isEditing: boolean;
-  setIsEditing: (value: boolean) => void;
 }
 export default function EditingBtn({
   handleSave,
@@ -14,7 +13,6 @@ export default function EditingBtn({
   isUploading,
   isOwnProfile,
   isEditing,
-  setIsEditing,
 }: EditingBtnProps) {
   // 편집 모드일 때만 표시 (저장/취소 버튼)
   if (!isEditing || !isOwnProfile) {

@@ -1,9 +1,7 @@
-import { menuButton } from '@/lib/styles/element';
 import { Editor, useEditorState } from '@tiptap/react';
 import { useMemo } from 'react';
 import {
   HiBars3,
-  HiCodeBracket,
   HiH1,
   HiH2,
   HiH3,

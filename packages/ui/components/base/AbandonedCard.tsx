@@ -1,19 +1,11 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { collection, getDocs } from 'firebase/firestore';
-import { firestore } from '@/lib/firebase/firebase';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { HiHeart } from 'react-icons/hi2';
-import { HiChatBubbleLeft } from 'react-icons/hi2';
 import { HiMapPin } from 'react-icons/hi2';
-import { PostData, ShelterAnimalItem } from '@/packages/type/postType';
-import {
-  formatDate,
-  formatDateToKorean,
-} from '@/packages/utils/dateFormatting';
+import { ShelterAnimalItem } from '@/packages/type/postType';
+import { formatDateToKorean } from '@/packages/utils/dateFormatting';
 import getOptimizedCloudinaryUrl from '@/packages/utils/optimization';
-import UserProfile from '../common/UserProfile';
 import { FaPaw } from 'react-icons/fa';
 
 export default function AbandonedCard({
@@ -25,6 +17,12 @@ export default function AbandonedCard({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLongHover, setIsLongHover] = useState(false);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [prevDesertionNo, setPrevDesertionNo] = useState(shelterAnimal.desertionNo);
+
+  if (shelterAnimal.desertionNo !== prevDesertionNo) {
+    setPrevDesertionNo(shelterAnimal.desertionNo);
+    setCurrentImageIndex(0);
+  }
 
   const availableImages = useMemo(() => {
     const images: string[] = [];
@@ -63,10 +61,6 @@ export default function AbandonedCard({
     }
   }, [currentImageIndex, availableImages.length]);
 
-  useEffect(() => {
-    setCurrentImageIndex(0);
-  }, [shelterAnimal.desertionNo]);
-
   const defaultImage = useMemo(() => {
     if (shelterAnimal.upKindNm === '417000') {
       return '/static/images/defaultDogImg.png';
@@ -75,7 +69,7 @@ export default function AbandonedCard({
       return '/static/images/defaultCatImg.png';
     }
     return '/static/images/defaultDogImg.png';
-  }, []);
+  }, [shelterAnimal.upKindNm, shelterAnimal.kindCd]);
 
   // 이미지가 없거나 모든 이미지가 실패한 경우 기본 이미지 사용
   const displayImage = useMemo(() => {
@@ -94,7 +88,7 @@ export default function AbandonedCard({
       bgColor: '#FFE5D9', // 연한 복숭아/주황색
       textColor: '#8B4513', // 어두운 갈색 텍스트
     };
-  }, [shelterAnimal?.processState]);
+  }, [shelterAnimal]);
 
   const noticeEndBadge = useMemo(() => {
     if (!shelterAnimal?.noticeEdt) return null;
@@ -144,7 +138,7 @@ export default function AbandonedCard({
         textColor: '#1E3A5F', // 어두운 파랑 텍스트
       };
     }
-  }, [shelterAnimal?.noticeEdt]);
+  }, [shelterAnimal]);
   const openGoogleMap = useCallback((e: React.MouseEvent, address: string) => {
     e.stopPropagation(); 
     const encodedAddress = encodeURIComponent(address);

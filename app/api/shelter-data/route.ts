@@ -1,3 +1,4 @@
+import { ShelterAnimalItem } from '@/packages/type/postType';
 import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE_URL = 'https://apis.data.go.kr/1543061/abandonmentPublicService_v2';
@@ -127,13 +128,12 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
 
-    // 검색어 필터링 (rfidCd, happenPlace, careAddr, careNm)
     if (params.searchQuery && data?.response?.body?.items?.item) {
       const searchLower = params.searchQuery.toLowerCase();
       const items = data.response.body.items.item;
       const itemsArray = Array.isArray(items) ? items : [items];
       
-      const filteredItems = itemsArray.filter((item: any) => {
+      const filteredItems = itemsArray.filter((item: ShelterAnimalItem) => {
         const rfidCd = item.rfidCd?.toLowerCase() || '';
         const happenPlace = item.happenPlace?.toLowerCase() || '';
         const careAddr = item.careAddr?.toLowerCase() || '';

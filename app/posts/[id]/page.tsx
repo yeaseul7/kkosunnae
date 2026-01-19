@@ -1,6 +1,5 @@
 'use client';
 
-import DecorateHr from '@/packages/ui/components/base/DecorateHr';
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
 import PostScrollList from '@/packages/ui/components/home/post/PostScrollList';
 import TagList from '@/packages/ui/components/home/post/TagList';

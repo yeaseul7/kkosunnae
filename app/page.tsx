@@ -1,6 +1,5 @@
 'use client';
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
-import { app } from '@/lib/firebase/firebase';
 import { usePathname } from 'next/navigation';
 import TrendingPosts from '@/packages/ui/components/home/trending/TrendingPosts';
 import RecentPosts from '@/packages/ui/components/home/recent/RecentPosts';

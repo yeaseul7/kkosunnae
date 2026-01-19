@@ -1,8 +1,5 @@
 import { ShelterAnimalItem } from '@/packages/type/postType';
-import { formatDateToKorean } from '@/packages/utils/dateFormatting';
 import Image from 'next/image';
-import { FaLeaf, FaPaw } from 'react-icons/fa';
-import { HiHeart, HiShare } from 'react-icons/hi2';
 
 interface AnimalImgCardProps {
   mainImage: string;

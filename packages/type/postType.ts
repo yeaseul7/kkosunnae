@@ -105,4 +105,4 @@ export interface AbandonmentPublicV2Response {
   body?: ShelterAnimalBody;
 }
 
-export interface ShelterAnimalData extends AbandonmentPublicV2Response {}
+export type ShelterAnimalData = AbandonmentPublicV2Response;

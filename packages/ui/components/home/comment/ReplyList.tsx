@@ -20,10 +20,6 @@ export default function ReplyList({
   const containerRef = useRef<HTMLDivElement>(null);
   const [replies, setReplies] = useState<ReplyData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [isReplyWriting, setIsReplyWriting] = useState(false);
-  const [isReplyListOpen, setIsReplyListOpen] = useState(false);
-  const [replyCount, setReplyCount] = useState<number>(0);
   useEffect(() => {
     const fetchReplies = async () => {
       if (!postId || !commentId) {
@@ -60,7 +56,15 @@ export default function ReplyList({
     fetchReplies();
   }, [postId, commentId]);
 
-  useClickOutside(containerRef, () => onReplyListClosed(), isReplyListOpen);
+  useClickOutside(containerRef, () => onReplyListClosed());
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-8 text-gray-500">
+        대댓글을 불러오는 중...
+      </div>
+    );
+  }
 
   return (
     <div

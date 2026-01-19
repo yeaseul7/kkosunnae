@@ -41,20 +41,7 @@ export default function ReadPostContent({
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const hasVisitedBefore =
-        sessionStorage.getItem('hasVisitedSite') === 'true';
-
-      const referrer = document.referrer;
-      const currentOrigin = window.location.origin;
-      const hasReferrer = Boolean(
-        referrer && referrer.length > 0 && referrer.startsWith(currentOrigin),
-      );
-
-      if (!hasVisitedBefore) {
-        sessionStorage.setItem('hasVisitedSite', 'true');
-      }
-
-      setCanGoBack(hasReferrer);
+      setCanGoBack(window.history.length > 1);
     }
   }, []);
 

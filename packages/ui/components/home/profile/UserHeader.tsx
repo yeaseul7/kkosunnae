@@ -223,7 +223,6 @@ export default function UserHeader() {
                 isUploading={isUploading}
                 isOwnProfile={isOwnProfile}
                 isEditing={isEditing}
-                setIsEditing={setIsEditing}
               />
             </>
           ) : (
