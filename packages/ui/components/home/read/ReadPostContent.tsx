@@ -112,11 +112,11 @@ export default function ReadPostContent({
           {error && !loading && <NotFound error={error} />}
           <div className="w-full px-8">
             {!loading && !error && post && (
-              <>
+              <div className="mx-auto w-full max-w-4xl">
                 {canGoBack && (
                   <button
                     onClick={() => router.back()}
-                    className="flex gap-2 items-center my-4 text-gray-600 sm:my-6 hover:text-gray-800"
+                    className="flex gap-2 items-center px-4 my-4 text-gray-600 sm:px-6 sm:my-6 lg:px-8 hover:text-gray-800"
                   >
                     <IoIosArrowBack />
                     뒤로가기
@@ -124,10 +124,10 @@ export default function ReadPostContent({
                 )}
 
                 <div className="relative w-full">
-                  <article className="px-4 py-2 w-full bg-white sm:p-6 lg:p-8">
+                  <article className="px-4 py-0 w-full bg-white sm:px-6 sm:py-2 lg:px-8 lg:py-3">
                     <ReadHeader post={post} isEditing={false} />
 
-                    <div className="max-w-none prose prose-sm sm:prose-base lg:prose-lg">
+                    <div className="max-w-none prose prose-sm sm:prose-base lg:prose-lg [&_img]:mx-auto [&_img]:block">
                       {editor && (
                         <EditorContent editor={editor} className="tiptap" />
                       )}
@@ -136,7 +136,7 @@ export default function ReadPostContent({
                   </article>
                 </div>
                 <ReadFooter post={post} postId={postId} />
-              </>
+              </div>
             )}
           </div>
         </PageTemplate>

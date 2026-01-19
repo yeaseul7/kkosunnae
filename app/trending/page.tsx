@@ -1,3 +1,4 @@
+import PageFooter from '@/packages/ui/components/base/PageFooter';
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
 import TrendingPosts from '@/packages/ui/components/home/trending/TrendingPosts';
 
@@ -8,6 +9,7 @@ export default function Trending() {
         <PageTemplate>
           <TrendingPosts />
         </PageTemplate>
+        <PageFooter />
       </main>
     </div>
   );

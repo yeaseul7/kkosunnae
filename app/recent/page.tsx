@@ -1,3 +1,4 @@
+import PageFooter from '@/packages/ui/components/base/PageFooter';
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
 import RecentPosts from '@/packages/ui/components/home/recent/RecentPosts';
 
@@ -8,6 +9,7 @@ export default function Recent() {
         <PageTemplate>
           <RecentPosts />
         </PageTemplate>
+        <PageFooter />
       </main>
     </div>
   );

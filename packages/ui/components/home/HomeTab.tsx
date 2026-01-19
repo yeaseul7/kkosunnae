@@ -8,10 +8,9 @@ import { GoClock, GoTrophy } from 'react-icons/go';
 export default function HomeTab() {
   const pathname = usePathname();
   const router = useRouter();
-  const [animationData, setAnimationData] = useState<any>(null);
+  const [animationData, setAnimationData] = useState<object | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const dogRef = useRef<HTMLDivElement>(null);
-  const [direction, setDirection] = useState<1 | -1>(1);
   const directionRef = useRef<1 | -1>(1);
 
   const isTrendingActive = pathname === '/' || pathname.startsWith('/trending');
@@ -34,10 +33,7 @@ export default function HomeTab() {
     const speed = 1;
     const dogWidth = 100;
     
-    // 초기 방향 설정 (오른쪽으로 시작하므로 Lottie가 오른쪽을 향하도록)
-    // Lottie가 기본적으로 왼쪽을 향하고 있다면 -1, 오른쪽을 향하고 있다면 1
     directionRef.current = -1;
-    setDirection(-1);
     dog.style.transform = `scaleX(-1)`; 
 
     const updateContainerWidth = () => {
@@ -52,13 +48,11 @@ export default function HomeTab() {
       if (position >= containerWidth - dogWidth) {
         currentDirection = -1;
         directionRef.current = 1; // 왼쪽으로 갈 예정이므로 정상 방향 (Lottie가 왼쪽을 향함)
-        setDirection(1);
         position = Math.min(position, containerWidth - dogWidth); 
       } 
       else if (position <= 0) {
         currentDirection = 1;
         directionRef.current = -1; // 오른쪽으로 갈 예정이므로 뒤집기 (Lottie가 오른쪽을 향하도록)
-        setDirection(-1);
         position = Math.max(position, 0); 
       }
 

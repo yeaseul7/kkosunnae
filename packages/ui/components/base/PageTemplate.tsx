@@ -20,7 +20,7 @@ export default function PageTemplate({
   // const isShelterPage = pathname === '/shelter' || pathname.startsWith('/shelter');
 
   return (
-    <div className="flex flex-col items-center w-full">
+    <div className="flex flex-col items-center w-full pb-10">
       <div className="w-full">
         <Header visibleHeaderButtons={visibleHeaderButtons} />
       </div>

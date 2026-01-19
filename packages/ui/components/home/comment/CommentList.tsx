@@ -7,8 +7,15 @@ import { CommentData } from '@/packages/type/commentType';
 import { useRouter } from 'next/navigation';
 import UserProfile from '../../common/UserProfile';
 import { useUserProfiles } from '@/hooks/useUserProfile';
+import { HiChatBubbleLeft } from 'react-icons/hi2';
 
-export default function CommentList({ postId }: { postId: string }) {
+export default function CommentList({ 
+  postId, 
+  postAuthorId 
+}: { 
+  postId: string;
+  postAuthorId?: string;
+}) {
   const router = useRouter();
   const [comments, setComments] = useState<CommentData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,11 +92,11 @@ export default function CommentList({ postId }: { postId: string }) {
 
     return comment;
   });
-  console.log(enrichedComments);
-
   return (
     <div className="flex flex-col gap-4 p-4 px-4 w-full sm:px-6 md:px-10">
-      <div className="text-sm text-gray-500">댓글 {comments.length}개</div>
+      <div className="flex gap-2 items-center text-primary1">
+      <HiChatBubbleLeft className="w-5 h-5" /><div className="text-sm text-gray-500">댓글 {comments.length}</div>
+      </div>
       {enrichedComments.map((comment, index) => {
         const authorInfo = comment.authorId
           ? authorInfoMap.get(comment.authorId)
@@ -116,8 +123,8 @@ export default function CommentList({ postId }: { postId: string }) {
                   <UserProfile
                     profileUrl={displayPhotoURL || ''}
                     profileName={displayName || ''}
-                    imgSize={40}
-                    sizeClass="w-10 h-10"
+                    imgSize={50}
+                    sizeClass="w-12 h-12"
                     existName={false}
                     iconSize="text-lg"
                   />
@@ -134,6 +141,7 @@ export default function CommentList({ postId }: { postId: string }) {
                   } as CommentData
                 }
                 postId={postId}
+                postAuthorId={postAuthorId}
                 isLoadingAuthorInfo={
                   comment.authorId
                     ? !authorInfoMap.has(comment.authorId)

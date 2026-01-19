@@ -198,7 +198,7 @@ export default function CommentFooter({
   }
 
   return (
-    <div className="flex flex-col gap-2 mt-4">
+    <div className="flex flex-col gap-2 mx-4 mt-2">
       <div className="flex gap-2 justify-between items-center w-full">
         <div>
           {replyCount > 0 ? (
@@ -215,7 +215,7 @@ export default function CommentFooter({
               className="flex gap-1 items-center text-xs text-primary1"
             >
               <BsPlusSquare className="w-3 h-3" />
-              대댓글 작성
+              답글 달기
             </button>
           )}
         </div>

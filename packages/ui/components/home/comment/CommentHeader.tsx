@@ -79,9 +79,9 @@ export default function CommentHeader({
         <span className="text-sm font-semibold text-gray-900">
           {authorName}
         </span>
-        <span className="text-xs text-gray-500">{formatDate(createdAt)}</span>
       </div>
       <div className="flex gap-2 items-center">
+        <span className="text-xs text-gray-500">{formatDate(createdAt)}</span>
         {isMine && (
           <>
             <button
