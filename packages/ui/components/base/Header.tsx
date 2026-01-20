@@ -102,13 +102,13 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
         {/* 데스크탑 메뉴 */}
         <div className="hidden md:flex items-center gap-5">
           <NavLink
-            to="/trending"
+            to="/"
             activeClassName="active"
             isActive={() => {
-              return pathname === '/trending' || pathname.startsWith('/trending');
+              return pathname === '/';
             }}
             className={`!border-b-0 !p-0 ${
-              pathname === '/trending' || pathname.startsWith('/trending')
+              pathname === '/'
                 ? '!text-primary1'
                 : '!text-black'
             }`}
@@ -163,13 +163,13 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
           {isMobileMenuOpen && (
             <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden">
               <NavLink
-                to="/trending"
+                to="/"
                 activeClassName="active"
                 isActive={() => {
-                  return pathname === '/trending' || pathname.startsWith('/trending');
+                  return pathname === '/';
                 }}
                 className={`block px-4 py-3 !border-b-0 transition-colors hover:bg-gray-50 ${
-                  pathname === '/trending' || pathname.startsWith('/trending')
+                  pathname === '/'
                     ? '!text-primary1 bg-blue-50'
                     : '!text-black'
                 }`}
