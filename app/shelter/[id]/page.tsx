@@ -41,48 +41,63 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id: desertionNo } = await params;
 
+  console.log('=== 메타데이터 생성 시작 ===');
+  console.log('desertionNo:', desertionNo);
+  console.log('baseUrl:', baseUrl);
+
   try {
     const animalData = await fetchAnimalData(desertionNo);
+    
+    console.log('animalData:', animalData ? '데이터 있음' : '데이터 없음');
 
     if (animalData) {
-      const title = `${animalData.kindFullNm || animalData.kindNm || '유기동물'} | 꼬순내`;
+      const kindName = animalData.kindFullNm || animalData.kindNm || '유기동물';
+      const title = `${kindName} | 꼬순내`;
       const description = animalData.specialMark
-        ? `${animalData.kindFullNm || animalData.kindNm || '유기동물'} - ${animalData.specialMark.substring(0, 120)}`
-        : `${animalData.kindFullNm || animalData.kindNm || '유기동물'} 입양 정보를 확인해보세요.`;
+        ? `${kindName} - ${animalData.specialMark.substring(0, 120)}`
+        : `${kindName} 입양 정보를 확인해보세요.`;
 
       // 이미지 URL 처리
-      let imageUrl = animalData.popfile1 || animalData.popfile2 || animalData.popfile3;
+      let imageUrl = animalData.popfile || animalData.popfile1 || animalData.popfile2 || animalData.popfile3;
+      
+      console.log('원본 이미지 URL:', imageUrl);
+      
       if (imageUrl) {
-        if (imageUrl.startsWith('/')) {
+        // 이미 절대 경로인 경우
+        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+          // 그대로 사용
+        } else if (imageUrl.startsWith('/')) {
           imageUrl = `${baseUrl}${imageUrl}`;
-        } else if (!imageUrl.startsWith('http')) {
+        } else {
           imageUrl = `${baseUrl}/${imageUrl}`;
         }
       } else {
         imageUrl = `${baseUrl}/static/images/defaultDogImg.png`;
       }
 
-      const url = `${baseUrl}/shelter/${desertionNo}`;
+      console.log('최종 이미지 URL:', imageUrl);
 
-      return {
+      const pageUrl = `${baseUrl}/shelter/${desertionNo}`;
+
+      const metadata: Metadata = {
         title,
         description,
         metadataBase: new URL(baseUrl),
         openGraph: {
           title,
           description,
-          url,
+          url: pageUrl,
           siteName: '꼬순내',
           images: [
             {
               url: imageUrl,
               width: 1200,
               height: 630,
-              alt: animalData.kindFullNm || animalData.kindNm || '유기동물',
+              alt: kindName,
             },
           ],
           locale: 'ko_KR',
-          type: 'article',
+          type: 'website',
         },
         twitter: {
           card: 'summary_large_image',
@@ -91,6 +106,9 @@ export async function generateMetadata({
           images: [imageUrl],
         },
       };
+
+      console.log('생성된 메타데이터:', JSON.stringify(metadata, null, 2));
+      return metadata;
     }
   } catch (error) {
     console.error('메타데이터 생성 중 오류:', error);
