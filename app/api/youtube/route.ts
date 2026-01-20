@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     url.searchParams.append('part', 'snippet,statistics,contentDetails');
     url.searchParams.append('chart', 'mostPopular');
     url.searchParams.append('regionCode', regionCode);
-    url.searchParams.append('maxResults', '20'); // 20개 가져오기
+    url.searchParams.append('maxResults', '100'); // 20개 가져오기
     url.searchParams.append('videoCategoryId', '15'); // 특정 카테고리만 원할 경우 활성화
     url.searchParams.append('key', API_KEY);
 
@@ -54,7 +54,6 @@ export async function GET(request: Request) {
 
     const data = await response.json();
     
-    // 20개 중 랜덤으로 requestedCount개 선택
     const randomItems = getRandomItems(data.items || [], requestedCount);
     
     return NextResponse.json({
