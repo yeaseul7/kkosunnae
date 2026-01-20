@@ -53,9 +53,23 @@ export async function generateMetadata({
     if (animalData) {
       const kindName = animalData.kindFullNm || animalData.kindNm || '유기동물';
       const title = `${kindName} | 꼬순내`;
-      const description = animalData.specialMark
-        ? `${kindName} - ${animalData.specialMark.substring(0, 120)}`
-        : `${kindName} 입양 정보를 확인해보세요.`;
+      
+      // 더 상세한 설명 생성
+      let description = '';
+      if (animalData.specialMark) {
+        description = `${kindName} - ${animalData.specialMark.substring(0, 150)}`;
+      } else {
+        const infoList = [];
+        if (animalData.sexCd === 'F') infoList.push('암컷');
+        if (animalData.sexCd === 'M') infoList.push('수컷');
+        if (animalData.age) infoList.push(`${animalData.age}`);
+        if (animalData.weight) infoList.push(`${animalData.weight}kg`);
+        if (animalData.colorCd) infoList.push(animalData.colorCd);
+        
+        description = infoList.length > 0 
+          ? `${kindName} - ${infoList.join(' / ')} - 입양 정보를 확인해보세요.`
+          : `${kindName} 입양 정보를 확인해보세요.`;
+      }
 
       // 이미지 URL 처리
       let imageUrl = animalData.popfile || animalData.popfile1 || animalData.popfile2 || animalData.popfile3;
@@ -63,13 +77,16 @@ export async function generateMetadata({
       console.log('원본 이미지 URL:', imageUrl);
       
       if (imageUrl) {
-        // 이미 절대 경로인 경우
-        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-          // 그대로 사용
-        } else if (imageUrl.startsWith('/')) {
-          imageUrl = `${baseUrl}${imageUrl}`;
-        } else {
-          imageUrl = `${baseUrl}/${imageUrl}`;
+        // HTTP를 HTTPS로 변경 (openapi.animal.go.kr는 HTTPS 지원)
+        if (imageUrl.startsWith('http://')) {
+          imageUrl = imageUrl.replace('http://', 'https://');
+        }
+        // 이미 http:// 또는 https://로 시작하면 그대로 사용
+        // 그렇지 않으면 상대 경로로 판단하여 baseUrl 추가
+        else if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+          imageUrl = imageUrl.startsWith('/') 
+            ? `${baseUrl}${imageUrl}` 
+            : `${baseUrl}/${imageUrl}`;
         }
       } else {
         imageUrl = `${baseUrl}/static/images/defaultDogImg.png`;
@@ -83,6 +100,9 @@ export async function generateMetadata({
         title,
         description,
         metadataBase: new URL(baseUrl),
+        alternates: {
+          canonical: pageUrl,
+        },
         openGraph: {
           title,
           description,
@@ -94,6 +114,7 @@ export async function generateMetadata({
               width: 1200,
               height: 630,
               alt: kindName,
+              type: 'image/jpeg',
             },
           ],
           locale: 'ko_KR',
@@ -104,6 +125,15 @@ export async function generateMetadata({
           title,
           description,
           images: [imageUrl],
+          creator: '@kkosunnae',
+          site: '@kkosunnae',
+        },
+        other: {
+          // 추가 메타 태그 (일부 플랫폼 호환성)
+          'og:image': imageUrl,
+          'og:image:width': '1200',
+          'og:image:height': '630',
+          'og:image:alt': kindName,
         },
       };
 
