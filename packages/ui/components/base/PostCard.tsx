@@ -103,12 +103,11 @@ export default function PostCard({ post }: { post: PostData }) {
           priority={true}
         />
       </div>
-      <div className="flex flex-col flex-1 p-3">
-        <h2 className="mb-2 text-base font-semibold text-gray-900 line-clamp-2">
+      <div className="flex flex-col flex-1 p-2">
+        <h2 className="mb-1.5 text-base font-semibold text-gray-900 line-clamp-2">
           {post.title}
         </h2>
-
-        <p className="mb-3 text-xs text-gray-600 line-clamp-2">
+        <p className="mb-2 text-xs text-gray-600 line-clamp-2">
           {extractText(post.content)}
         </p>
 
@@ -118,24 +117,24 @@ export default function PostCard({ post }: { post: PostData }) {
             <span>·</span>
           </div>
         </div>
-        <div className="flex justify-between items-center mt-3 ">
+        <div className="flex justify-between items-center mt-2">
           <UserProfile
             profileUrl={post.authorPhotoURL || ''}
             profileName={post.authorName || ''}
-            imgSize={24}
-            sizeClass="w-6 h-6"
+            imgSize={20}
+            sizeClass="w-5 h-5"
             existName={true}
             iconSize="text-xs"
           />
 
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-2 items-center">
             <div className="flex gap-1 items-center text-[#FFB6C1]">
-              <HiHeart className="w-4 h-4" />
-              <span className="text-sm">{post.likes || 0}</span>
+              <HiHeart className="w-3.5 h-3.5" />
+              <span className="text-xs">{post.likes || 0}</span>
             </div>
             <div className="flex gap-1 items-center text-[#87CEEB]">
-              <HiChatBubbleLeft className="w-4 h-4" />
-              <span className="text-sm">{commentCount}</span>
+              <HiChatBubbleLeft className="w-3.5 h-3.5" />
+              <span className="text-xs">{commentCount}</span>
             </div>
           </div>
         </div>

@@ -8,28 +8,39 @@ const baseUrl =
 
 async function fetchAnimalData(desertionNo: string) {
   try {
+    console.log('[fetchAnimalData] 시작 - desertionNo:', desertionNo);
+    
     const params = new URLSearchParams();
     params.append('desertion_no', desertionNo);
     params.append('numOfRows', '1');
 
-    const response = await fetch(`${baseUrl}/api/shelter-data?${params.toString()}`, {
+    const apiUrl = `${baseUrl}/api/shelter-data?${params.toString()}`;
+
+    const response = await fetch(apiUrl, {
       cache: 'no-store',
     });
     
+    
     if (!response.ok) {
+      console.error('[fetchAnimalData] Response not OK');
       return null;
     }
 
     const shelterAnimalResponse = await response.json();
+    
     const items = shelterAnimalResponse?.response?.body?.items?.item;
     
     if (items) {
       const itemsArray = Array.isArray(items) ? items : [items];
-      return itemsArray.length > 0 ? itemsArray[0] : null;
+      
+      if (itemsArray.length > 0) {
+        return itemsArray[0];
+      }
     }
+    
     return null;
   } catch (error) {
-    console.error('동물 정보 조회 중 오류 발생:', error);
+    console.error('[fetchAnimalData] 에러:', error);
     return null;
   }
 }
@@ -41,20 +52,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id: desertionNo } = await params;
 
-  console.log('=== 메타데이터 생성 시작 ===');
-  console.log('desertionNo:', desertionNo);
-  console.log('baseUrl:', baseUrl);
-
   try {
     const animalData = await fetchAnimalData(desertionNo);
     
-    console.log('animalData:', animalData ? '데이터 있음' : '데이터 없음');
-
     if (animalData) {
       const kindName = animalData.kindFullNm || animalData.kindNm || '유기동물';
       const title = `${kindName} | 꼬순내`;
       
-      // 더 상세한 설명 생성
       let description = '';
       if (animalData.specialMark) {
         description = `${kindName} - ${animalData.specialMark.substring(0, 150)}`;
@@ -71,28 +75,15 @@ export async function generateMetadata({
           : `${kindName} 입양 정보를 확인해보세요.`;
       }
 
-      // 이미지 URL 처리
       let imageUrl = animalData.popfile || animalData.popfile1 || animalData.popfile2 || animalData.popfile3;
       
-      console.log('원본 이미지 URL:', imageUrl);
       
-      if (imageUrl) {
-        // HTTP를 HTTPS로 변경 (openapi.animal.go.kr는 HTTPS 지원)
-        if (imageUrl.startsWith('http://')) {
-          imageUrl = imageUrl.replace('http://', 'https://');
-        }
-        // 이미 http:// 또는 https://로 시작하면 그대로 사용
-        // 그렇지 않으면 상대 경로로 판단하여 baseUrl 추가
-        else if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-          imageUrl = imageUrl.startsWith('/') 
-            ? `${baseUrl}${imageUrl}` 
-            : `${baseUrl}/${imageUrl}`;
-        }
-      } else {
+      if (!imageUrl) {
         imageUrl = `${baseUrl}/static/images/defaultDogImg.png`;
+      } else if (imageUrl.startsWith('http://')) {
+        imageUrl = imageUrl.replace('http://', 'https://');
       }
 
-      console.log('최종 이미지 URL:', imageUrl);
 
       const pageUrl = `${baseUrl}/shelter/${desertionNo}`;
 
@@ -129,7 +120,6 @@ export async function generateMetadata({
           site: '@kkosunnae',
         },
         other: {
-          // 추가 메타 태그 (일부 플랫폼 호환성)
           'og:image': imageUrl,
           'og:image:width': '1200',
           'og:image:height': '630',
@@ -137,7 +127,6 @@ export async function generateMetadata({
         },
       };
 
-      console.log('생성된 메타데이터:', JSON.stringify(metadata, null, 2));
       return metadata;
     }
   } catch (error) {

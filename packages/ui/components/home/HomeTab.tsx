@@ -7,9 +7,8 @@ import JumpDog from '../common/JumpDog';
 interface HomeTabProps {
   mode: 'trending' | 'recent';
   setMode: (mode: 'trending' | 'recent') => void;
-  isMarginTop?: boolean;
 }
-export default function HomeTab({ mode, setMode, isMarginTop = true }: HomeTabProps) {
+export default function HomeTab({ mode, setMode }: HomeTabProps) {
   const [animationData, setAnimationData] = useState<object | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const dogRef = useRef<HTMLDivElement>(null);
@@ -77,7 +76,7 @@ export default function HomeTab({ mode, setMode, isMarginTop = true }: HomeTabPr
   };
 
   return (
-    <div className={`flex flex-col justify-center items-center ${isMarginTop ? 'mt-8' : ''} w-full mb-4`}>
+    <div className="flex flex-col justify-center items-center mt-8 w-full mb-4">
         <div className="relative flex justify-center items-center w-full">
           <div 
             ref={containerRef}
@@ -89,7 +88,7 @@ export default function HomeTab({ mode, setMode, isMarginTop = true }: HomeTabPr
             )}
           </div>
         
-        <div className="relative flex bg-gray-200 rounded-full p-1 min-w-[280px] z-10">
+        <div className="relative flex bg-gray-200 rounded-full p-1 w-full max-w-[320px] sm:min-w-[280px] z-10 mx-4 sm:mx-0">
           <div
             className={`absolute top-1 bottom-1 rounded-full bg-white transition-all duration-300 ease-in-out ${
               isTrendingActive ? 'left-1 right-1/2' : 'left-1/2 right-1'
@@ -98,7 +97,7 @@ export default function HomeTab({ mode, setMode, isMarginTop = true }: HomeTabPr
           
           <button
             onClick={handleTrendingClick}
-            className={`relative z-10 flex gap-2 items-center justify-center flex-1 px-8 py-2 rounded-full text-sm font-semibold transition-colors duration-300 whitespace-nowrap cursor-pointer ${
+            className={`relative z-10 flex gap-1 sm:gap-2 items-center justify-center flex-1 px-3 sm:px-8 py-2 rounded-full text-xs sm:text-sm font-semibold transition-colors duration-300 whitespace-nowrap cursor-pointer ${
               isTrendingActive ? 'text-primary1' : 'text-gray-600'
             }`}
           >
@@ -108,7 +107,7 @@ export default function HomeTab({ mode, setMode, isMarginTop = true }: HomeTabPr
           
           <button
             onClick={handleRecentClick}
-            className={`relative z-10 flex gap-2 items-center justify-center flex-1 px-8 py-2 rounded-full text-sm font-semibold transition-colors duration-300 whitespace-nowrap cursor-pointer ${
+            className={`relative z-10 flex gap-1 sm:gap-2 items-center justify-center flex-1 px-3 sm:px-8 py-2 rounded-full text-xs sm:text-sm font-semibold transition-colors duration-300 whitespace-nowrap cursor-pointer ${
               isRecentActive ? 'text-primary1' : 'text-gray-600'
             }`}
           >

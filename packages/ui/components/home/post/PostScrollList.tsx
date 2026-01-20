@@ -10,8 +10,11 @@ import { enrichPostsWithAuthorInfo } from '@/lib/api/post';
 
 export default function PostScrollList({ userId }: { userId?: string }) {
   const { user } = useAuth();
-  const [posts, setPosts] = useState<PostData[]>([]);
+  const [allPosts, setAllPosts] = useState<PostData[]>([]); // 전체 게시물
+  const [displayedPosts, setDisplayedPosts] = useState<PostData[]>([]); // 표시되는 게시물
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [displayCount, setDisplayCount] = useState(6); // 처음 6개 표시
 
   const targetUserId = userId || user?.uid;
 
@@ -41,7 +44,8 @@ export default function PostScrollList({ userId }: { userId?: string }) {
 
         // 작성자 정보 추가
         const postsWithAuthorInfo = await enrichPostsWithAuthorInfo(postsList);
-        setPosts(postsWithAuthorInfo);
+        setAllPosts(postsWithAuthorInfo);
+        setDisplayedPosts(postsWithAuthorInfo.slice(0, 6)); // 처음 6개만 표시
       } catch (error) {
         console.error('게시물 조회 중 오류 발생:', error);
       } finally {
@@ -51,6 +55,20 @@ export default function PostScrollList({ userId }: { userId?: string }) {
 
     fetchUserPosts();
   }, [targetUserId]);
+
+  const handleLoadMore = () => {
+    setLoadingMore(true);
+    
+    // 다음 12개 추가
+    setTimeout(() => {
+      const nextCount = displayCount + 12;
+      setDisplayedPosts(allPosts.slice(0, nextCount));
+      setDisplayCount(nextCount);
+      setLoadingMore(false);
+    }, 300); // 부드러운 로딩 효과
+  };
+
+  const hasMore = displayedPosts.length < allPosts.length;
 
   if (loading) {
     return <Loading />;
@@ -64,7 +82,7 @@ export default function PostScrollList({ userId }: { userId?: string }) {
     );
   }
 
-  if (posts.length === 0) {
+  if (allPosts.length === 0) {
     return (
       <div className="py-12 text-center text-gray-500">
         작성한 게시물이 없습니다.
@@ -73,10 +91,34 @@ export default function PostScrollList({ userId }: { userId?: string }) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 pt-8 w-full md:grid-cols-2 lg:grid-cols-3">
-      {posts.map((post) => (
-        <PostCard key={post.id} post={post} />
-      ))}
+    <div className="w-full">
+      <div className="grid grid-cols-1 gap-6 pt-8 w-full md:grid-cols-2 lg:grid-cols-3">
+        {displayedPosts.map((post) => (
+          <PostCard key={post.id} post={post} />
+        ))}
+      </div>
+
+      {/* 더보기 버튼 */}
+      {hasMore && (
+        <div className="flex justify-center mt-8 mb-4">
+          <button
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+            className="text-blue-600 hover:text-blue-800 font-semibold 
+                       transition-colors duration-200
+                       disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loadingMore ? (
+              <span className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                로딩중...
+              </span>
+            ) : (
+              `더보기 (${allPosts.length - displayedPosts.length}개 더 있음)`
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
