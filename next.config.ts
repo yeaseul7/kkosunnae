@@ -48,6 +48,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'openapi.animal.go.kr',
       },
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.ytimg.com',
+      },
     ],
   },
 };

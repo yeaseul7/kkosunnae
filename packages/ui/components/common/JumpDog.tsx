@@ -16,6 +16,7 @@ export default function JumpDog({
       className="absolute left-0 z-[1] transition-transform duration-0 top-10"
       style={{
         width: '100px',
+        top: '45px',
       }}
     >
       <div

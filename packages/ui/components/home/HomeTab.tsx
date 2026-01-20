@@ -1,20 +1,22 @@
 'use client';
 
-import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import { GoClock, GoTrophy } from 'react-icons/go';
 import JumpDog from '../common/JumpDog';
 
-export default function HomeTab() {
-  const pathname = usePathname();
-  const router = useRouter();
+interface HomeTabProps {
+  mode: 'trending' | 'recent';
+  setMode: (mode: 'trending' | 'recent') => void;
+  isMarginTop?: boolean;
+}
+export default function HomeTab({ mode, setMode, isMarginTop = true }: HomeTabProps) {
   const [animationData, setAnimationData] = useState<object | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const dogRef = useRef<HTMLDivElement>(null);
   const directionRef = useRef<1 | -1>(1);
 
-  const isTrendingActive = pathname === '/' || pathname.startsWith('/trending');
-  const isRecentActive = pathname.startsWith('/recent');
+  const isTrendingActive = mode === 'trending';
+  const isRecentActive = mode === 'recent';
 
   useEffect(() => {
     fetch('/static/lottie/Moody_Dog.json')
@@ -67,20 +69,20 @@ export default function HomeTab() {
   }, [animationData]);
 
   const handleTrendingClick = () => {
-    router.push('/trending');
+    setMode('trending');
   };
 
   const handleRecentClick = () => {
-    router.push('/recent');
+    setMode('recent');
   };
 
   return (
-    <div className="flex flex-col justify-center items-center mt-8 w-full mb-2">
+    <div className={`flex flex-col justify-center items-center ${isMarginTop ? 'mt-8' : ''} w-full mb-4`}>
         <div className="relative flex justify-center items-center w-full">
           <div 
             ref={containerRef}
             className="absolute inset-0 flex justify-center items-center w-full overflow-hidden"
-            style={{ height: '95px' }}
+            style={{ height: '92px' }}
           >
             {animationData && (
               <JumpDog dogRef={dogRef as React.RefObject<HTMLDivElement>} animationData={animationData} />
