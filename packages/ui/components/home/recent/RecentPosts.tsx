@@ -76,7 +76,7 @@ export default function RecentPosts() {
                 로딩중...
               </span>
             ) : (
-              `더보기 (${allPosts.length - displayedPosts.length}개 더 있음)`
+              `더보기`
             )}
           </button>
         </div>
