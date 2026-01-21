@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: '%s',
     default: '꼬순내',
   },
-  description: '반려동물의 발자국 저장소',
+  description: '꼬순내는 전국의 유기동물|유기견|유기묘 등의 정보를 제공하며 예비 반려인과 반려인이 소통할 수 있는 커뮤니티를 제공합니다. 다양한 정보를 주고 받으며 새로운 가족을 만나보세요.',
   icons: {
     icon: '/static/images/logo.png',
     apple: '/static/images/logo.png',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: '꼬순내',
-    description: '반려동물의 발자국 저장소',
+    description: '꼬순내는 전국의 유기동물|유기견|유기묘 등의 정보를 제공하며 예비 반려인과 반려인이 소통할 수 있는 커뮤니티를 제공합니다. 다양한 정보를 주고 받으며 새로운 가족을 만나보세요.',
     url: 'https://kkosunnae.com',
     siteName: 'kkosunnae',
     locale: 'ko_KR',
