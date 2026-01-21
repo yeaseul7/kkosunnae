@@ -5,8 +5,11 @@ import { firestore } from '@/lib/firebase/firebase';
 
 const baseUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
-  'https://www.kkosunnae.com';
+  (process.env.VERCEL_ENV === 'production'
+    ? 'https://www.kkosunnae.com'
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : 'https://www.kkosunnae.com');
 
 // Timestamp를 Date로 변환하는 헬퍼 함수
 function getDateFromTimestamp(timestamp: unknown): Date {
@@ -80,8 +83,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const lastModified = post.updatedAt
         ? getDateFromTimestamp(post.updatedAt)
         : post.createdAt
-        ? getDateFromTimestamp(post.createdAt)
-        : new Date();
+          ? getDateFromTimestamp(post.createdAt)
+          : new Date();
 
       return {
         url: `${baseUrl}/read/${post.id}`,
@@ -98,8 +101,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         const lastModified = userData.updatedAt
           ? getDateFromTimestamp(userData.updatedAt)
           : userData.createdAt
-          ? getDateFromTimestamp(userData.createdAt)
-          : new Date();
+            ? getDateFromTimestamp(userData.createdAt)
+            : new Date();
 
         return {
           url: `${baseUrl}/posts/${userDoc.id}`,
