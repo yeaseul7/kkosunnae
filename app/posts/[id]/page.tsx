@@ -19,24 +19,22 @@ export default function PostsListPage() {
   const isOwnProfile = user?.uid === userId;
 
   return (
-    <div className="w-full min-h-screen font-sans bg-white">
-      <main className="flex flex-col justify-between items-center w-full min-h-screen bg-whitesm:items-start">
-        <PageTemplate visibleHomeTab={false}>
-          <div className="flex flex-col gap-4 px-4 mx-auto w-full max-w-4xl sm:px-6 lg:px-8">
-            <UserHeader />
-            <ProfileSwitchTag category={category} setCategory={setCategory} isOwnProfile={isOwnProfile} />
-            {category === 'posts' && (
-              <>
-                <TagList userId={userId} />
-                <PostScrollList userId={userId} />
-              </>
-            )}
-            {category === 'shelter' && isOwnProfile && (
-              <LikedAnimalList userId={userId} />
-            )}
-          </div>
-        </PageTemplate>
-      </main>
-    </div>
+    <main className="page-container-full">
+      <PageTemplate visibleHomeTab={false}>
+        <div className="flex flex-col gap-4 px-4 mx-auto w-full max-w-4xl sm:px-6 lg:px-8">
+          <UserHeader />
+          <ProfileSwitchTag category={category} setCategory={setCategory} isOwnProfile={isOwnProfile} />
+          {category === 'posts' && (
+            <>
+              <TagList userId={userId} />
+              <PostScrollList userId={userId} />
+            </>
+          )}
+          {category === 'shelter' && isOwnProfile && (
+            <LikedAnimalList userId={userId} />
+          )}
+        </div>
+      </PageTemplate>
+    </main>
   );
 }

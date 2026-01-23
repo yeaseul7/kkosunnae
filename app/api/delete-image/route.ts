@@ -13,11 +13,9 @@ function extractPublicId(url: string): string | null {
     const urlObj = new URL(url);
     const pathParts = urlObj.pathname.split('/');
 
-    // 'upload' 다음의 경로를 찾음
     const uploadIndex = pathParts.indexOf('upload');
     if (uploadIndex === -1) return null;
 
-    // upload 다음 부분이 version인지 확인 (v로 시작하는 경우)
     let publicIdStartIndex = uploadIndex + 1;
     if (
       publicIdStartIndex < pathParts.length &&
@@ -26,11 +24,9 @@ function extractPublicId(url: string): string | null {
       publicIdStartIndex++;
     }
 
-    // 나머지 경로를 합쳐서 public_id 생성
     const publicIdParts = pathParts.slice(publicIdStartIndex);
     if (publicIdParts.length === 0) return null;
 
-    // 마지막 부분의 확장자 제거
     const lastPart = publicIdParts[publicIdParts.length - 1];
     const publicId = publicIdParts
       .slice(0, -1)
@@ -64,7 +60,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Cloudinary에서 이미지 삭제
     const result = await cloudinary.uploader.destroy(publicId, {
       resource_type: 'image',
     });

@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import ReadPostContent from '@/packages/ui/components/home/read/ReadPostContent';
 import { getPostById } from '@/lib/api/post';
+import PageTemplate from '@/packages/ui/components/base/PageTemplate';
+import PageFooter from '@/packages/ui/components/base/PageFooter';
 
 function extractText(html: string | undefined): string {
   if (!html) return '';
@@ -123,5 +125,12 @@ export default async function ReadPostPage({
   const { id: postId } = await params;
   const post = await getPostById(postId);
 
-  return <ReadPostContent postId={postId} initialPost={post} />;
+  return (
+    <main className="page-container-full">
+      <PageTemplate visibleHeaderButtons={true} visibleHomeTab={false}>
+        <ReadPostContent postId={postId} initialPost={post} />
+      </PageTemplate>
+      <PageFooter />
+    </main>
+  );
 }

@@ -27,8 +27,6 @@ export default function WriteContainer({ className }: WriteContainerProps) {
       return;
     }
 
-    console.log('게시물 생성 시도 - 사용자:', user.uid, user.email);
-
     try {
       const postDataToSave = {
         ...postData,
@@ -38,13 +36,10 @@ export default function WriteContainer({ className }: WriteContainerProps) {
         updatedAt: serverTimestamp(),
       };
 
-      console.log('저장할 데이터:', postDataToSave);
-
       const docRef = await addDoc(
         collection(firestore, 'boards'),
         postDataToSave,
       );
-      console.log('게시물 생성 완료! 문서 ID: ', docRef.id);
       alert('게시물이 성공적으로 생성되었습니다!');
       router.push(`/read/${docRef.id}`);
     } catch (e) {
@@ -66,6 +61,7 @@ export default function WriteContainer({ className }: WriteContainerProps) {
       }
     }
   }, [postData, writeCategory, user, router]);
+
   return (
     <div
       className={`grid w-full h-full min-h-0 grid-cols-1 lg:grid-cols-[7fr_3fr] gap-4 ${className || ''}`}

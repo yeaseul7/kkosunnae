@@ -90,45 +90,42 @@ export default function ReadPostContent({
 
     fetchPost();
   }, [postId, editor, initialPost]);
+  if (loading) {
+    return <Loading />;
+  }
+  if (error) {
+    return <NotFound error={error} />;
+  }
 
   return (
-    <div className="w-full min-h-screen font-sans bg-white">
-      <main className="flex flex-col justify-between items-center w-full min-h-screen bg-whitesm:items-start">
-        <PageTemplate visibleHeaderButtons={true} visibleHomeTab={false}>
-          {loading && <Loading />}
-          {error && !loading && <NotFound error={error} />}
-          <div className="w-full px-0 lg:px-8">
-            {!loading && !error && post && (
-              <div className="mx-auto w-full max-w-4xl">
-                {canGoBack && (
-                  <button
-                    onClick={() => router.back()}
-                    className="flex gap-2 items-center px-4 my-4 text-gray-600 sm:px-6 sm:my-6 lg:px-8 hover:text-gray-800"
-                  >
-                    <IoIosArrowBack />
-                    뒤로가기
-                  </button>
+    <div className="w-full px-0 lg:px-8">
+      {!loading && !error && post && (
+        <div className="mx-auto w-full max-w-4xl">
+          {canGoBack && (
+            <button
+              onClick={() => router.back()}
+              className="flex gap-2 items-center px-4 my-4 text-gray-600 sm:px-6 sm:my-6 lg:px-8 hover:text-gray-800"
+            >
+              <IoIosArrowBack />
+              뒤로가기
+            </button>
+          )}
+
+          <div className="relative w-full">
+            <article className="px-4 py-0 w-full sm:px-6 sm:py-2 lg:px-8 lg:py-3">
+              <ReadHeader post={post} isEditing={false} />
+
+              <div className="max-w-none prose prose-sm sm:prose-base lg:prose-lg [&_img]:mx-auto [&_img]:block">
+                {editor && (
+                  <EditorContent editor={editor} className="tiptap" />
                 )}
-
-                <div className="relative w-full">
-                  <article className="px-4 py-0 w-full bg-white sm:px-6 sm:py-2 lg:px-8 lg:py-3">
-                    <ReadHeader post={post} isEditing={false} />
-
-                    <div className="max-w-none prose prose-sm sm:prose-base lg:prose-lg [&_img]:mx-auto [&_img]:block">
-                      {editor && (
-                        <EditorContent editor={editor} className="tiptap" />
-                      )}
-                    </div>
-                    <Liked />
-                  </article>
-                </div>
-                <ReadFooter post={post} postId={postId} />
               </div>
-            )}
+              <Liked />
+            </article>
           </div>
-        </PageTemplate>
-        <PageFooter />
-      </main>
+          <ReadFooter post={post} postId={postId} />
+        </div>
+      )}
     </div>
   );
 }

@@ -38,12 +38,8 @@ export default function HomeTab({ mode, setMode }: HomeTabProps) {
     directionRef.current = -1;
     dog.style.transform = `scaleX(-1)`;
 
-    const updateContainerWidth = () => {
-      return container.offsetWidth;
-    };
-
     const animate = () => {
-      const containerWidth = updateContainerWidth();
+      const containerWidth = container.offsetWidth;
 
       position += speed * currentDirection;
 

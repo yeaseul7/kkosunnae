@@ -10,17 +10,15 @@ import { useState } from 'react';
 export default function Home() {
   const [mode, setMode] = useState<'trending' | 'adoption'>('trending');
   return (
-    <div className="w-full min-h-screen font-sans bg-white">
-      <main className="flex flex-col justify-between items-center w-full min-h-screen bg-whitesm:items-start">
-        <PageTemplate visibleHomeTab={false}>
-          <div className="w-full">
-            <HomeTab mode={mode} setMode={setMode} />
-            {mode === 'trending' ? <TrendingPosts /> : <RecentPosts />}
-          </div>
-          <YoutubeList />
-        </PageTemplate>
-        <PageFooter />
-      </main>
-    </div>
+    <main className="page-container-full">
+      <PageTemplate visibleHomeTab={false}>
+        <div className="w-full">
+          <HomeTab mode={mode} setMode={setMode} />
+          {mode === 'trending' ? <TrendingPosts /> : <RecentPosts />}
+        </div>
+        <YoutubeList />
+      </PageTemplate>
+      <PageFooter />
+    </main>
   );
 }

@@ -1,5 +1,5 @@
+'use client';
 import { useParams, useRouter } from 'next/navigation';
-import DecorateHr from '../../base/DecorateHr';
 import TagInput from '../write/TagInput';
 import WriteBody from '../write/WriteBody';
 import WriteFooter from '../write/WriteFooter';
@@ -11,6 +11,7 @@ import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
 import Loading from '@/packages/ui/components/base/Loading';
 import NotFound from '@/packages/ui/components/base/NotFound';
+import WriteNotice from '../write/wrtieNotice';
 
 export default function EditContainer({ className }: { className?: string }) {
   const params = useParams();
@@ -35,7 +36,11 @@ export default function EditContainer({ className }: { className?: string }) {
 
         if (docSnap.exists()) {
           const data = docSnap.data() as PostData;
-          setPost(data);
+          setPost({ ...data, id: docSnap.id });
+          // 카테고리 초기값 설정
+          if (data.category) {
+            setWriteCategory(data.category as 'adoption' | 'pet-life');
+          }
         } else {
           setError('게시물을 찾을 수 없습니다.');
         }
@@ -105,28 +110,38 @@ export default function EditContainer({ className }: { className?: string }) {
   }
 
   return (
-    <div className={`flex flex-col w-full h-full ${className || ''}`}>
-      <div className="flex flex-col w-full h-full">
-        <WriteHeader
-          postData={post}
-          setPostData={setPost as Dispatch<SetStateAction<PostData>>}
-          writeCategory={post.category as 'adoption' | 'pet-life'}
-          setWriteCategory={setWriteCategory as Dispatch<SetStateAction<'adoption' | 'pet-life'>>}
-        />
-        <TagInput
-          postData={post}
-          setPostData={setPost as Dispatch<SetStateAction<PostData | null>>}
-        />
-        <DecorateHr />
-        <div className="flex-1 w-full min-h-0">
-          <WriteBody
-            postData={post}
-            setPostData={setPost as Dispatch<SetStateAction<PostData | null>>}
-          />
+    <div
+      className={`grid w-full h-full min-h-0 grid-cols-1 lg:grid-cols-[7fr_3fr] gap-4 ${className || ''}`}
+    >
+      <div className="flex flex-col w-full h-full min-h-0">
+        <div className="flex flex-col flex-1 min-h-0 p-4 sm:p-6 lg:p-8 bg-white rounded-2xl"
+          style={{ boxShadow: '0 0 6px 0 rgba(0, 0, 0, 0.05)' }}
+        >
+          <div className="shrink-0 mb-4">
+            <WriteHeader
+              postData={post}
+              setPostData={setPost as Dispatch<SetStateAction<PostData>>}
+              writeCategory={writeCategory}
+              setWriteCategory={setWriteCategory as Dispatch<SetStateAction<'adoption' | 'pet-life'>>}
+            />
+          </div>
+
+          <div className="flex-1 min-h-0">
+            <WriteBody postData={post} setPostData={setPost as Dispatch<SetStateAction<PostData | null>>} />
+          </div>
+          <div className="shrink-0 mt-4">
+            <TagInput
+              postData={post}
+              setPostData={setPost as Dispatch<SetStateAction<PostData | null>>}
+            />
+          </div>
         </div>
-        <div className="flex justify-end items-center mt-4 w-full shrink-0">
+        <div className="flex justify-end items-center w-full shrink-0 mt-4">
           <WriteFooter posting={updatePost} />
         </div>
+      </div>
+      <div className="min-h-0 px-4 sm:px-6 lg:px-8">
+        <WriteNotice />
       </div>
     </div>
   );

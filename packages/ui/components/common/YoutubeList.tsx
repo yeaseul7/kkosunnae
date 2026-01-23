@@ -97,7 +97,6 @@ export default function YoutubeList() {
             rel="noopener noreferrer"
             className="group block"
           >
-            {/* 썸네일 영역 */}
             <div className="relative overflow-hidden rounded-xl mb-3">
               <Image
                 src={video.snippet.thumbnails.medium.url}
@@ -107,20 +106,17 @@ export default function YoutubeList() {
                 className="w-full aspect-video object-cover"
               />
 
-              {/* 플레이 버튼 오버레이 */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <div className="w-14 h-14 bg-white/95 rounded-full flex items-center justify-center shadow-lg">
                   <div className="w-0 h-0 border-l-[14px] border-l-[#3ea6ff] border-t-[9px] border-t-transparent border-b-[9px] border-b-transparent ml-1"></div>
                 </div>
               </div>
 
-              {/* 동영상 길이 */}
               <div className="absolute bottom-2 right-2 bg-black/90 text-white text-xs font-semibold px-1.5 py-0.5 rounded">
                 {formatDuration(video.contentDetails.duration)}
               </div>
             </div>
 
-            {/* 정보 영역 */}
             <div>
               <h3 className="font-semibold text-base mb-2 line-clamp-2 text-gray-900 leading-snug group-hover:text-gray-700">
                 {video.snippet.title}

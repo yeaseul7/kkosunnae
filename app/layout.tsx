@@ -55,7 +55,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased w-full min-h-screen font-sans bg-white`}
       >
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-9P3M59NTFM"

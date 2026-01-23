@@ -11,11 +11,9 @@ const baseUrl =
       ? `https://${process.env.VERCEL_URL}`
       : 'https://www.kkosunnae.com');
 
-// Timestamp를 Date로 변환하는 헬퍼 함수
 function getDateFromTimestamp(timestamp: unknown): Date {
   if (!timestamp) return new Date();
 
-  // Firestore Timestamp 객체 (seconds 속성이 있는 경우)
   if (
     typeof timestamp === 'object' &&
     timestamp !== null &&
@@ -24,7 +22,6 @@ function getDateFromTimestamp(timestamp: unknown): Date {
     return new Date((timestamp as { seconds: number }).seconds * 1000);
   }
 
-  // Firestore Timestamp 객체 (toDate 메서드가 있는 경우)
   if (
     typeof timestamp === 'object' &&
     timestamp !== null &&
@@ -34,7 +31,6 @@ function getDateFromTimestamp(timestamp: unknown): Date {
     return (timestamp as { toDate: () => Date }).toDate();
   }
 
-  // Date 객체
   if (
     typeof timestamp === 'object' &&
     timestamp !== null &&
@@ -47,7 +43,6 @@ function getDateFromTimestamp(timestamp: unknown): Date {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // 정적 페이지들
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
@@ -69,7 +64,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // 동적 게시물 및 사용자 페이지들
   let dynamicPages: MetadataRoute.Sitemap = [];
 
   try {
@@ -78,7 +72,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       getDocs(collection(firestore, 'users')),
     ]);
 
-    // 게시물 페이지
     const postPages: MetadataRoute.Sitemap = posts.map((post) => {
       const lastModified = post.updatedAt
         ? getDateFromTimestamp(post.updatedAt)
@@ -94,7 +87,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       };
     });
 
-    // 사용자 프로필 페이지
     const userPages: MetadataRoute.Sitemap = usersSnapshot.docs.map(
       (userDoc) => {
         const userData = userDoc.data();

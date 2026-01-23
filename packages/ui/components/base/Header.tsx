@@ -85,10 +85,10 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
               loading="eager"
             />
             <Image
-              src="/static/images/logorow-xl.png"
+              src="/static/images/logo1.png"
               alt="Logo"
-              width={180}
-              height={180}
+              width={120}
+              height={120}
               className="hidden md:block"
               style={{ width: 'auto', height: 'auto' }}
               loading="eager"
