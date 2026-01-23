@@ -28,21 +28,15 @@ export default function WriteNotice() {
                         따뜻한 공동체를 위해 비속어나 비방 섞인 글은 지양해 주세요.
                     </p>
                 </div>
-                <div className="flex gap-2 items-start">
-                    <span className="text-primary1 font-bold text-sm shrink-0">04.</span>
-                    <p className="text-sm text-gray-700">
-                        임시저장 기능은 로그인 상태에서만 지원됩니다.
-                    </p>
-                </div>
             </div>
 
-            <div className="bg-white rounded-lg p-4 mt-2">
+            {/* <div className="bg-white rounded-lg p-4 mt-2">
                 <p className="text-sm text-gray-500 mb-1">도움이 필요하신가요?</p>
                 <div className="flex items-center gap-1">
                     <span className="text-sm font-bold text-gray-900">커뮤니티 이용 규칙 보기</span>
                     <HiArrowRight className="w-4 h-4 text-gray-900" />
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 }

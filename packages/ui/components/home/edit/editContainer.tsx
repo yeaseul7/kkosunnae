@@ -20,7 +20,7 @@ export default function EditContainer({ className }: { className?: string }) {
   const [post, setPost] = useState<PostData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [writeCategory, setWriteCategory] = useState<'adoption' | 'pet-life'>('adoption');
   useEffect(() => {
     const fetchPost = async () => {
       if (!postId) {
@@ -69,6 +69,7 @@ export default function EditContainer({ className }: { className?: string }) {
         title: post.title,
         content: post.content,
         tags: post.tags,
+        category: writeCategory,
         updatedAt: serverTimestamp(),
       });
       alert('게시물이 성공적으로 수정되었습니다!');
@@ -80,16 +81,15 @@ export default function EditContainer({ className }: { className?: string }) {
       if (error.code === 'permission-denied') {
         alert(
           '권한이 없습니다. Firestore 보안 규칙을 확인해주세요.\n\n' +
-            'Firebase 콘솔 > Firestore Database > 규칙에서 boards 컬렉션에 대한 업데이트 권한이 설정되어 있는지 확인하세요.\n\n' +
-            '예시 규칙:\n' +
-            'match /boards/{document=**} {\n' +
-            '  allow update: if request.auth != null && request.auth.uid == resource.data.authorId;\n' +
-            '}',
+          'Firebase 콘솔 > Firestore Database > 규칙에서 boards 컬렉션에 대한 업데이트 권한이 설정되어 있는지 확인하세요.\n\n' +
+          '예시 규칙:\n' +
+          'match /boards/{document=**} {\n' +
+          '  allow update: if request.auth != null && request.auth.uid == resource.data.authorId;\n' +
+          '}',
         );
       } else {
         alert(
-          `게시물 수정 중 오류가 발생했습니다: ${
-            error.message || '알 수 없는 오류'
+          `게시물 수정 중 오류가 발생했습니다: ${error.message || '알 수 없는 오류'
           }`,
         );
       }
@@ -110,6 +110,8 @@ export default function EditContainer({ className }: { className?: string }) {
         <WriteHeader
           postData={post}
           setPostData={setPost as Dispatch<SetStateAction<PostData>>}
+          writeCategory={post.category as 'adoption' | 'pet-life'}
+          setWriteCategory={setWriteCategory as Dispatch<SetStateAction<'adoption' | 'pet-life'>>}
         />
         <TagInput
           postData={post}
