@@ -3,7 +3,7 @@
 @font-face {
   font-family: 'Cafe24SsurroundAir';
   src: url('/static/font/Cafe24SsurroundAir-v1.1/webfont/Cafe24SsurroundAir-v1.1.woff2') format('woff2'),
-       url('/static/font/Cafe24SsurroundAir-v1.1/webfont/Cafe24SsurroundAir-v1.1.woff') format('woff');
+    url('/static/font/Cafe24SsurroundAir-v1.1/webfont/Cafe24SsurroundAir-v1.1.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -19,7 +19,7 @@
   /* --color-foreground: var(--foreground); */
   --font-sans: 'Cafe24SsurroundAir', sans-serif;
   --font-mono: var(--font-geist-mono);
-  
+
   /* Theme colors from tailwind.config.js */
   --color-page1: #F8F9FA;
   --color-page2: #FFFFFF;
@@ -42,17 +42,18 @@
   --color-border2: #ADB5BD;
   --color-border3: #DEE2E6;
   --color-border4: #F1F3F5;
-  --color-primary1: #1257b8;
-  --color-primary2: #19299d;
+  --color-primary1: #6b85e3;
+  --color-primary2: #576dbd;
+  --color-lightBlue: #f9fcfe;
   --color-destructive1: #FF6B6B;
   --color-destructive2: #FF8787;
   --color-button-text: #FFFFFF;
-  --color-slight-layer: rgba(0,0,0,0.05);
-  --color-opaque-layer: rgba(249,249,249,0.85);
+  --color-slight-layer: rgba(0, 0, 0, 0.05);
+  --color-opaque-layer: rgba(249, 249, 249, 0.85);
   --color-editor-footer: #FFFFFF;
   --color-prism-bg: #fbfcfd;
   --color-prism-default-text: #24292e;
-  --color-prism-selection-bg: rgba(0,0,0,0.15);
+  --color-prism-selection-bg: rgba(0, 0, 0, 0.15);
   --color-prism-code-block-bg: #fbfcfd;
   --color-prism-code-1: #969896;
   --color-prism-code-2: #24292e;
@@ -69,8 +70,8 @@
   --color-teal-2: #96F2D7;
   --color-teal-3: #63E6BE;
   --color-teal-4: #38D9A9;
-  --color-teal-5: #19299d;
-  --color-teal-6: #1257b8;
+  --color-teal-5: #576dbd;
+  --color-teal-6: #6b85e3;
   --color-teal-7: #0CA678;
   --color-teal-8: #099268;
   --color-teal-9: #087F5B;
@@ -105,7 +106,8 @@
 } */
 
 body {
-  background: #fafafa; /* 항상 밝은 배경색 사용 */
+  background: #fafafa;
+  /* 항상 밝은 배경색 사용 */
   /* color: var(--foreground); */
   font-family: 'Cafe24SsurroundAir', sans-serif;
 }
@@ -129,7 +131,7 @@ body {
 
 .tiptap {
   outline: none;
-  
+
   p {
     @apply first:mt-0 last:mb-0 text-base leading-relaxed;
   }

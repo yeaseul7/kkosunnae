@@ -9,7 +9,7 @@ export default function Search({
 }) {
   return (
     <div className="relative w-full max-w-2xl">
-      <div className="flex items-center px-4 w-full h-12 bg-white border border-gray-300 rounded-md shadow-sm focus-within:border-[#1257b8] focus-within:ring-1 focus-within:ring-[#1257b8] transition-all">
+      <div className="flex items-center px-4 w-full h-12 bg-white border border-gray-300 rounded-md shadow-sm focus-within:border-[#6b85e3] focus-within:ring-1 focus-within:ring-[#6b85e3] transition-all">
         <Image
           src="/static/svg/icon-search-3.svg"
           alt="Search"

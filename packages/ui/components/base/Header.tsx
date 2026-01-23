@@ -1,18 +1,20 @@
 'use client';
 
-import Link from 'next/link';
 import Image from 'next/image';
 import RoundButton from '../common/RoundButton';
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { useClickOutside } from '@/packages/utils/clickEvent';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import LoginModal from '../auth/LoginModal';
 import HeaderUserIcon from './HeaderUserIcon';
 import HeaderUserMenu from './HeaderUserMenu';
 import { useAuth } from '@/lib/firebase/auth';
 import NotificationPop from '../home/notification/NotificationPop';
 import { getUnreadHistoryCount } from '@/lib/api/hisotry';
+import Link from 'next/link';
 import NavLink from '../common/NavLink';
+import { usePathname } from 'next/navigation';
+import { RiPencilFill } from 'react-icons/ri';
 
 interface HeaderProps {
   visibleHeaderButtons?: boolean;
@@ -28,7 +30,6 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
   const [unreadHistoryCount, setUnreadHistoryCount] = useState(0);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useClickOutside<HTMLDivElement>(
     userMenuRef,
@@ -40,12 +41,6 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
     notificationRef,
     () => setIsNotificationPopOpen(false),
     isNotificationPopOpen,
-  );
-
-  useClickOutside<HTMLDivElement>(
-    mobileMenuRef,
-    () => setIsMobileMenuOpen(false),
-    isMobileMenuOpen,
   );
 
   const handleNotificationClick = useCallback(() => {
@@ -74,127 +69,81 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
   }, [user]);
 
   return (
-    <header className="sticky top-0 z-50 w-full h-16 bg-white border-b border-gray-200">
-      <div className="flex justify-between items-center px-4 mx-auto w-full max-w-7xl h-full sm:px-6">
+    <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200">
+      <div className="flex justify-between items-center px-4 mx-auto w-full max-w-7xl h-16 sm:px-6">
         <div className="flex items-center gap-4 md:gap-10">
-        <Link
-          href="/"
-          className="flex items-center transition-opacity hover:opacity-80"
-        >
-          <Image
-            src="/static/images/logoicon.png"
-            alt="Logo"
-            width={30}
-            height={30}
-            className="block md:hidden"
-            loading="eager"
-          />
-          <Image
-            src="/static/images/logorow-xl.png"
-            alt="Logo"
-            width={180}
-            height={180}
-            className="hidden md:block"
-            style={{ width: 'auto', height: 'auto' }}
-            loading="eager"
-          />
-        </Link>
-        {/* 데스크탑 메뉴 */}
-        <div className="hidden md:flex items-center gap-5">
-          <NavLink
-            to="/"
-            activeClassName="active"
-            isActive={() => {
-              return pathname === '/';
-            }}
-            className={`!border-b-0 !p-0 ${
-              pathname === '/'
-                ? '!text-primary1'
-                : '!text-black'
-            }`}
+          <Link
+            href="/"
+            className="flex items-center transition-opacity hover:opacity-80"
           >
-            커뮤니티
-          </NavLink>
-          <NavLink
-            to="/shelter"
-            activeClassName="active"
-            isActive={() => {
-              return pathname === '/shelter' || pathname.startsWith('/shelter');
-            }}
-            className={`!border-b-0 !p-0 ${
-              pathname === '/shelter' || pathname.startsWith('/shelter')
-                ? '!text-primary1'
-                : '!text-black'
-            }`}
-          >
-            유기견/유기묘 공고
-          </NavLink>
-        </div>
-        {/* 모바일 햄버거 메뉴 */}
-        <div ref={mobileMenuRef} className="relative md:hidden">
+            <Image
+              src="/static/images/logoicon.png"
+              alt="Logo"
+              width={30}
+              height={30}
+              className="block md:hidden"
+              loading="eager"
+            />
+            <Image
+              src="/static/images/logorow-xl.png"
+              alt="Logo"
+              width={180}
+              height={180}
+              className="hidden md:block"
+              style={{ width: 'auto', height: 'auto' }}
+              loading="eager"
+            />
+          </Link>
+
+          {/* 데스크탑 메뉴 */}
+          <div className="hidden md:flex items-center gap-4 lg:gap-6">
+            <NavLink
+              to="/"
+              activeClassName="active"
+              isActive={() => pathname === '/'}
+              className={`!border-b-0 !p-0 text-sm lg:text-base transition-colors ${pathname === '/' ? '!text-primary1 font-semibold' : '!text-gray-700 hover:!text-primary1'
+                }`}
+            >
+              이야기 창구
+            </NavLink>
+            <NavLink
+              to="/shelter"
+              activeClassName="active"
+              isActive={() => pathname === '/shelter' || pathname.startsWith('/shelter')}
+              className={`!border-b-0 !p-0 text-sm lg:text-base transition-colors ${pathname === '/shelter' || pathname.startsWith('/shelter')
+                ? '!text-primary1 font-semibold'
+                : '!text-gray-700 hover:!text-primary1'
+                }`}
+            >
+              입양 공고
+            </NavLink>
+            <NavLink
+              to="/animalShelter"
+              activeClassName="active"
+              isActive={() => pathname === '/animalShelter' || pathname.startsWith('/animalShelter')}
+              className={`!border-b-0 !p-0 text-sm lg:text-base transition-colors ${pathname === '/animalShelter' || pathname.startsWith('/animalShelter')
+                ? '!text-primary1 font-semibold'
+                : '!text-gray-700 hover:!text-primary1'
+                }`}
+            >
+              보호소
+            </NavLink>
+          </div>
+
+          {/* 모바일 햄버거 버튼 */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 rounded-lg transition-colors hover:bg-gray-100"
+            className="md:hidden p-2 rounded-lg transition-colors hover:bg-gray-100"
             aria-label="메뉴"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isMobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               )}
             </svg>
           </button>
-          {isMobileMenuOpen && (
-            <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden">
-              <NavLink
-                to="/"
-                activeClassName="active"
-                isActive={() => {
-                  return pathname === '/';
-                }}
-                className={`block px-4 py-3 !border-b-0 transition-colors hover:bg-gray-50 ${
-                  pathname === '/'
-                    ? '!text-primary1 bg-blue-50'
-                    : '!text-black'
-                }`}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                커뮤니티
-              </NavLink>
-              <NavLink
-                to="/shelter"
-                activeClassName="active"
-                isActive={() => {
-                  return pathname === '/shelter' || pathname.startsWith('/shelter');
-                }}
-                className={`block px-4 py-3 !border-b-0 transition-colors hover:bg-gray-50 ${
-                  pathname === '/shelter' || pathname.startsWith('/shelter')
-                    ? '!text-primary1 bg-blue-50'
-                    : '!text-black'
-                }`}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                유기견/유기묘 공고
-              </NavLink>
-            </div>
-          )}
-        </div>
         </div>
         {visibleHeaderButtons && (
           <div className="flex gap-1 items-center sm:gap-2">
@@ -245,8 +194,13 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
                   >
                     <RoundButton
                       onClick={writeArticle}
-                      className="hidden sm:flex"
+                      className="hidden sm:flex items-center gap-2"
+                      bgcolor="bg-primary1"
+                      hoverColor="hover:bg-primary2"
+                      borderColor="border-primary1"
+                      textColor="text-white"
                     >
+                      <RiPencilFill />
                       글쓰기
                     </RoundButton>
                     <HeaderUserIcon
@@ -268,6 +222,50 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
           </div>
         )}
       </div>
+
+      {/* 모바일 메뉴 - 헤더 하단에 자연스럽게 확장 */}
+      <div
+        className={`md:hidden border-t border-gray-200 bg-white transition-all duration-300 ease-in-out overflow-hidden ${isMobileMenuOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+      >
+        <div className="px-4 py-2 max-w-7xl mx-auto">
+          <NavLink
+            to="/"
+            activeClassName="active"
+            isActive={() => pathname === '/'}
+            className={`block px-4 py-3 !border-b-0 text-sm transition-colors hover:bg-gray-50 rounded-lg ${pathname === '/' ? '!text-primary1 bg-blue-50 font-semibold' : '!text-gray-700'
+              }`}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            이야기 창구
+          </NavLink>
+          <NavLink
+            to="/shelter"
+            activeClassName="active"
+            isActive={() => pathname === '/shelter' || pathname.startsWith('/shelter')}
+            className={`block px-4 py-3 !border-b-0 text-sm transition-colors hover:bg-gray-50 rounded-lg ${pathname === '/shelter' || pathname.startsWith('/shelter')
+              ? '!text-primary1 bg-blue-50 font-semibold'
+              : '!text-gray-700'
+              }`}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            입양 공고
+          </NavLink>
+          <NavLink
+            to="/animalShelter"
+            activeClassName="active"
+            isActive={() => pathname === '/animalShelter' || pathname.startsWith('/animalShelter')}
+            className={`block px-4 py-3 !border-b-0 text-sm transition-colors hover:bg-gray-50 rounded-lg ${pathname === '/animalShelter' || pathname.startsWith('/animalShelter')
+              ? '!text-primary1 bg-blue-50 font-semibold'
+              : '!text-gray-700'
+              }`}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            보호소
+          </NavLink>
+        </div>
+      </div>
+
       {isLoginModalOpen && (
         <LoginModal onClose={() => setIsLoginModalOpen(false)} />
       )}

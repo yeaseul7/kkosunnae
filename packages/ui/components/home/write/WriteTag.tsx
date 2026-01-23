@@ -53,8 +53,8 @@ export default function WriteTag({ editor }: { editor: Editor }) {
   }, []);
 
   return (
-    <div className="flex gap-2 items-center">
-      <div className="flex gap-2 items-center h-fit">
+    <div className="flex gap-2 items-center overflow-x-auto w-full">
+      <div className="flex gap-2 items-center h-fit min-w-max">
         {typeof editor.commands.setTextAlign === 'function' && (
           <>
             <button

@@ -58,7 +58,7 @@ export default function PostScrollList({ userId }: { userId?: string }) {
 
   const handleLoadMore = () => {
     setLoadingMore(true);
-    
+
     // 다음 12개 추가
     setTimeout(() => {
       const nextCount = displayCount + 12;
@@ -104,7 +104,7 @@ export default function PostScrollList({ userId }: { userId?: string }) {
           <button
             onClick={handleLoadMore}
             disabled={loadingMore}
-            className="text-blue-600 hover:text-blue-800 font-semibold 
+            className="text-primary1 hover:text-primary2 font-semibold 
                        transition-colors duration-200
                        disabled:opacity-50 disabled:cursor-not-allowed"
           >

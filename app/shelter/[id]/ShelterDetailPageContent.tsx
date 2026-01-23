@@ -11,6 +11,7 @@ import { IoIosArrowBack } from 'react-icons/io';
 import Notfound_ad_animal from '@/packages/ui/components/base/Notfound_ad_animal';
 import AnimalImgCard from '@/packages/ui/components/home/shelter/AnimalImgCard';
 import AnimalInfoCard from '@/packages/ui/components/home/shelter/AnimalInfoCard';
+import AnimalNotice from '@/packages/ui/components/common/AnimalNotice';
 
 interface ShelterDetailPageContentProps {
   desertionNo: string;
@@ -108,7 +109,7 @@ export default function ShelterDetailPageContent({
 
         const shelterInfoResponse = (await response.json()) as ShelterInfoResponse;
         const items = shelterInfoResponse?.response?.body?.items?.item;
-        
+
         if (items) {
           // item이 배열인 경우 첫 번째 항목, 단일 객체인 경우 그대로 사용
           const item = Array.isArray(items) ? items[0] : items;
@@ -178,8 +179,8 @@ export default function ShelterDetailPageContent({
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen font-sans bg-white">
-      <main className="flex flex-col justify-between items-center w-full max-w-6xl min-h-screen bg-whitesm:items-start">
+    <div className="w-full min-h-screen font-sans bg-white">
+      <main className="flex flex-col justify-between items-center w-full min-h-screen bg-whitesm:items-start">
         <PageTemplate visibleHomeTab={false}>
           <div className="flex flex-col gap-6 px-4 mx-auto w-full max-w-6xl sm:px-6 lg:px-8 py-8">
             <button
@@ -208,97 +209,11 @@ export default function ShelterDetailPageContent({
                   desertionNo={desertionNo}
                 />
 
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 flex flex-col gap-4">
-                  <div className="flex items-center gap-2">
-                    <FaPaw className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-bold text-gray-900">입양 문의</h3>
-                  </div>
-                  <p className="text-sm text-gray-700">
-                    입양 문의는 전화 문의를 통해 진행해주세요.
-                  </p>
-                  
-                  {shelterInfo && (
-                    <div className="flex flex-col gap-3 mt-2">
-                      <div className="bg-white rounded-lg p-4 border border-gray-200">
-                        <h4 className="text-sm font-semibold text-gray-900 mb-3">운영 시간</h4>
-                        <div className="flex flex-col gap-2 text-sm">
-                          {shelterInfo.weekOprStime && shelterInfo.weekOprEtime && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-600 min-w-[80px]">평일 운영:</span>
-                              <span className="text-gray-900">
-                                {shelterInfo.weekOprStime} ~ {shelterInfo.weekOprEtime}
-                              </span>
-                            </div>
-                          )}
-                          {shelterInfo.weekCellStime && shelterInfo.weekCellEtime && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-600 min-w-[80px]">평일 분양:</span>
-                              <span className="text-gray-900">
-                                {shelterInfo.weekCellStime} ~ {shelterInfo.weekCellEtime}
-                              </span>
-                            </div>
-                          )}
-                          {shelterInfo.weekendOprStime && shelterInfo.weekendOprEtime && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-600 min-w-[80px]">주말 운영:</span>
-                              <span className="text-gray-900">
-                                {shelterInfo.weekendOprStime} ~ {shelterInfo.weekendOprEtime}
-                              </span>
-                            </div>
-                          )}
-                          {shelterInfo.weekendCellStime && shelterInfo.weekendCellEtime && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-600 min-w-[80px]">주말 분양:</span>
-                              <span className="text-gray-900">
-                                {shelterInfo.weekendCellStime} ~ {shelterInfo.weekendCellEtime}
-                              </span>
-                            </div>
-                          )}
-                          {shelterInfo.closeDay && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-600 min-w-[80px]">휴무일:</span>
-                              <span className="text-gray-900">
-                                {shelterInfo.closeDay === '0' ? '없음' : 
-                                 shelterInfo.closeDay === '1' ? '월요일' :
-                                 shelterInfo.closeDay === '2' ? '화요일' :
-                                 shelterInfo.closeDay === '3' ? '수요일' :
-                                 shelterInfo.closeDay === '4' ? '목요일' :
-                                 shelterInfo.closeDay === '5' ? '금요일' :
-                                 shelterInfo.closeDay === '6' ? '토요일' :
-                                 shelterInfo.closeDay === '7' ? '일요일' :
-                                 shelterInfo.closeDay}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                  
-                      </div>
-                      
-                      {(shelterInfo.careTel || animalData?.careTel) && (
-                        <div className="bg-white rounded-lg p-4 border border-gray-200">
-                          <div className="flex flex-col gap-2">
-                            {shelterInfo.careTel && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-semibold text-gray-600">전화번호 1:</span>
-                                <span className="text-sm text-gray-900">{shelterInfo.careTel}</span>
-                              </div>
-                            )}
-                            {animalData?.careTel && animalData.careTel !== shelterInfo.careTel && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-semibold text-gray-600">전화번호 2:</span>
-                                <span className="text-sm text-gray-900">{animalData.careTel}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <AnimalNotice shelterInfo={shelterInfo} animalData={animalData} />
               </div>
             </div>
 
-         
+
           </div>
         </PageTemplate>
       </main>

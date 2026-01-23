@@ -24,7 +24,7 @@ export default function NotFound({ error }: { error: string }) {
       {canGoBack && (
         <button
           onClick={() => router.back()}
-          className="flex gap-2 items-center px-4 py-2 mt-4 text-white bg-blue-500 rounded"
+          className="flex gap-2 items-center px-4 py-2 mt-4 text-white bg-primary1 rounded"
         >
           뒤로가기
         </button>

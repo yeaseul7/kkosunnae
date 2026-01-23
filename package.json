@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/navermaps": "^3.9.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

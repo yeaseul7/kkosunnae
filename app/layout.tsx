@@ -4,6 +4,7 @@ import Script from 'next/script';
 import './globals.css';
 import '@/styles/keyframe.css';
 import { AuthProvider } from '@/lib/firebase/auth';
+import LocationDataProvider from '@/packages/ui/components/base/LocationDataProvider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -68,7 +69,16 @@ export default function RootLayout({
             gtag('config', 'G-9P3M59NTFM');
           `}
         </Script>
-        <AuthProvider>{children}</AuthProvider>
+        {process.env.NEXT_PUBLIC_NAVER_MAP && (
+          <Script
+            src={`https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${process.env.NEXT_PUBLIC_NAVER_MAP}`}
+            strategy="afterInteractive"
+          />
+        )}
+        <AuthProvider>
+          <LocationDataProvider />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

@@ -148,7 +148,11 @@ export async function getRecentBoardsData(
   limitCount: number = 20,
 ): Promise<PostData[]> {
   const boardsCol = collection(firestore, 'boards');
-  const q = query(boardsCol, orderBy('createdAt', 'desc'), limit(limitCount));
+  const q = query(
+    boardsCol,
+    where('category', '==', 'adoption'),
+    limit(limitCount)
+  );
   const boardsSnapshot = await getDocs(q);
   const boardsList = boardsSnapshot.docs.map((doc) => ({
     id: doc.id,
@@ -162,82 +166,60 @@ export async function getTrendingBoardsData(
   limitCount: number = 20,
 ): Promise<PostData[]> {
   try {
-    // 최근 한 달 전 날짜 계산
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-    const oneMonthAgoTimestamp = Timestamp.fromDate(oneMonthAgo);
-
     const boardsCol = collection(firestore, 'boards');
-    const q = query(
+
+    const qPetLife = query(
       boardsCol,
-      where('createdAt', '>=', oneMonthAgoTimestamp),
-      orderBy('createdAt', 'desc'),
-      limit(Math.min(limitCount * 5, 100)),
+      where('category', '==', 'pet-life'),
+      limit(limitCount * 2),
     );
-    const boardsSnapshot = await getDocs(q);
-    const boardsList = boardsSnapshot.docs.map((doc) => ({
+
+    // category 필드가 없는 게시물을 가져오기 위해 모든 게시물을 가져온 후 필터링
+    // (Firestore에서는 필드가 없는 문서를 직접 쿼리할 수 없음)
+    const qAll = query(
+      boardsCol,
+      orderBy('createdAt', 'desc'),
+      limit(limitCount * 3),
+    );
+
+    const [petLifeSnapshot, allSnapshot] = await Promise.all([
+      getDocs(qPetLife),
+      getDocs(qAll),
+    ]);
+
+    // pet-life 카테고리 게시물
+    const petLifePosts = petLifeSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     })) as PostData[];
 
-    const BATCH_SIZE = 20;
-    const postsWithCommentCount: Array<{
-      post: PostData;
-      commentCount: number;
-      engagementScore: number;
-    }> = [];
+    // category가 없거나 undefined인 게시물 필터링
+    const allPosts = allSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as PostData[];
 
-    for (let i = 0; i < boardsList.length; i += BATCH_SIZE) {
-      const batch = boardsList.slice(i, i + BATCH_SIZE);
-      const batchResults = await Promise.all(
-        batch.map(async (post) => {
-          try {
-            const commentsCollection = collection(
-              firestore,
-              'boards',
-              post.id,
-              'comments',
-            );
-            const commentsSnapshot = await getDocs(commentsCollection);
-            const commentCount = commentsSnapshot.size;
+    const noCategoryPosts = allPosts.filter(
+      (post) => !post.category || post.category === undefined
+    );
 
-            // 각 댓글의 repliesCount 합산
-            let totalRepliesCount = 0;
-            commentsSnapshot.forEach((commentDoc) => {
-              const commentData = commentDoc.data();
-              totalRepliesCount += commentData.repliesCount || 0;
-            });
+    // 두 배열을 합치고 중복 제거 (id 기준)
+    const allFilteredPosts = [...petLifePosts, ...noCategoryPosts];
+    const uniquePostsMap = new Map<string, PostData>();
+    allFilteredPosts.forEach((post) => {
+      if (!uniquePostsMap.has(post.id)) {
+        uniquePostsMap.set(post.id, post);
+      }
+    });
 
-            const totalCommentCount = commentCount + totalRepliesCount;
-            const likes = post.likes || 0;
-            const engagementScore = likes + totalCommentCount;
-
-            return {
-              post,
-              commentCount: totalCommentCount,
-              engagementScore,
-            };
-          } catch (error) {
-            console.error(
-              `게시물 ${post.id}의 댓글 개수 가져오기 실패:`,
-              error,
-            );
-            return {
-              post,
-              commentCount: 0,
-              engagementScore: post.likes || 0,
-            };
-          }
-        }),
-      );
-      postsWithCommentCount.push(...batchResults);
-    }
-
-    postsWithCommentCount.sort((a, b) => b.engagementScore - a.engagementScore);
-
-    const sortedPosts = postsWithCommentCount
-      .slice(0, limitCount)
-      .map((item) => item.post);
+    // 최신순으로 정렬 (createdAt 기준)
+    const sortedPosts = Array.from(uniquePostsMap.values())
+      .sort((a, b) => {
+        const aTime = a.createdAt?.toMillis() || 0;
+        const bTime = b.createdAt?.toMillis() || 0;
+        return bTime - aTime;
+      })
+      .slice(0, limitCount);
 
     return await enrichPostsWithAuthorInfo(sortedPosts);
   } catch (error) {

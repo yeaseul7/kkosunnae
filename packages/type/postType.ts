@@ -12,6 +12,7 @@ export interface PostData {
   updatedAt: Timestamp | null;
   thumbnail?: string | null; // 대표 이미지 (콘텐츠의 첫 번째 이미지)
   likes: number;
+  category?: 'adoption' | 'pet-life'; // 카테고리: 입양 후기 또는 반려 생활
 }
 
 // 공공데이터포털 유기동물 API 응답 타입

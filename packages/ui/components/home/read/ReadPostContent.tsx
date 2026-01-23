@@ -92,8 +92,8 @@ export default function ReadPostContent({
   }, [postId, editor, initialPost]);
 
   return (
-    <div className="flex justify-center items-center min-h-screen font-sans bg-white">
-      <main className="flex flex-col justify-between items-center w-full max-w-6xl min-h-screen bg-whitesm:items-start">
+    <div className="w-full min-h-screen font-sans bg-white">
+      <main className="flex flex-col justify-between items-center w-full min-h-screen bg-whitesm:items-start">
         <PageTemplate visibleHeaderButtons={true} visibleHomeTab={false}>
           {loading && <Loading />}
           {error && !loading && <NotFound error={error} />}

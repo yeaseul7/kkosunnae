@@ -3,13 +3,16 @@ import WriteContainer from '@/packages/ui/components/home/write/WriteContainer';
 
 export default function WritePage() {
   return (
-    <div className="flex justify-center items-center h-screen font-sans bg-white">
-      <main className="flex flex-col items-center px-4 py-4 w-full max-w-6xl h-full bg-whitesm:items-start">
+    <div className="w-full h-screen font-sans bg-white overflow-hidden">
+      <main className="flex flex-col items-center w-full h-full bg-whitesm:items-start">
         <PageTemplate
           visibleHomeTab={false}
           visibleHeaderButtons={false}
-        ></PageTemplate>
-        <WriteContainer className="flex-1 p-4 w-full" />
+        >
+          <div className="flex flex-col w-full h-full min-h-0">
+            <WriteContainer className="flex-1 min-h-0 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8 w-full" />
+          </div>
+        </PageTemplate>
       </main>
     </div>
   );

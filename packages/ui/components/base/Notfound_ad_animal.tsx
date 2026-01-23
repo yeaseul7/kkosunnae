@@ -14,8 +14,8 @@ export default function Notfound_ad_animal({
   router,
 }: Notfound_ad_animalProps) {
   return (
-    <div className="flex justify-center items-center min-h-screen font-sans bg-white">
-      <main className="flex flex-col justify-between items-center w-full max-w-6xl min-h-screen bg-whitesm:items-start">
+    <div className="w-full min-h-screen font-sans bg-white">
+      <main className="flex flex-col justify-between items-center w-full min-h-screen bg-whitesm:items-start">
         <PageTemplate visibleHomeTab={false}>
           <div className="flex flex-col items-center justify-center gap-4 py-12 w-full">
             {emptyAnimationData && (

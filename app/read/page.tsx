@@ -99,7 +99,7 @@ function ReadPageContent() {
               {canGoBack && (
                 <button
                   onClick={() => router.back()}
-                  className="px-4 py-2 mt-4 text-white bg-blue-500 rounded"
+                  className="px-4 py-2 mt-4 text-white bg-primary1 rounded"
                 >
                   뒤로가기
                 </button>

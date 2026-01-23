@@ -8,7 +8,7 @@ export default function WriteFooter({
 }) {
   const router = useRouter();
   return (
-    <div className="flex justify-between items-center pt-4 w-full border-t border-gray-200">
+    <div className="flex justify-between items-center py-4 w-full ">
       <div className="flex justify-between items-center w-full">
         <button
           className="flex justify-center items-center p-2 font-bold rounded-xs hover:bg-gray-200"

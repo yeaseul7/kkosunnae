@@ -34,13 +34,14 @@ module.exports = {
         border2: '#ADB5BD',
         border3: '#DEE2E6',
         border4: '#F1F3F5',
-        primary1: '#1257b8',
-        primary2: '#19299d',
+        primary1: '#6b85e3',
+        primary2: '#576dbd',
+        lightBlue: '#f9fcfe',
         destructive1: '#FF6B6B',
         destructive2: '#FF8787',
         'button-text': '#FFFFFF',
         'slight-layer': 'rgba(0,0,0,0.05)',
-        'opaque-layer': 'rgba(249,249,249,0.85)',
+        'opaque-layer': 'rgba(115, 85, 85, 0.85)',
         'editor-footer': '#FFFFFF',
         'prism-bg': '#fbfcfd',
         'prism-default-text': '#24292e',
@@ -63,8 +64,8 @@ module.exports = {
           2: '#96F2D7',
           3: '#63E6BE',
           4: '#38D9A9',
-          5: '#19299d',
-          6: '#1257b8',
+          5: '#576dbd',
+          6: '#6b85e3',
           7: '#0CA678',
           8: '#099268',
           9: '#087F5B',
@@ -108,6 +109,21 @@ module.exports = {
         large: '1024px',
         medium: '768px',
         small: '576px',
+      },
+      keyframes: {
+        slideDown: {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(-10px)'
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          },
+        },
+      },
+      animation: {
+        slideDown: 'slideDown 0.2s ease-out',
       },
     },
   },

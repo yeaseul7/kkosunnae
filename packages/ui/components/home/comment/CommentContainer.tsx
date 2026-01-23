@@ -18,11 +18,10 @@ export default function CommentContainer({
 
   return (
     <div className="flex flex-col flex-1 gap-2">
-      <div className={`p-3 rounded-2xl rounded-tl-none border ${
-        isPostAuthor 
-          ? 'bg-purple-50 border-purple-100' 
+      <div className={`p-3 rounded-2xl rounded-tl-none border ${isPostAuthor
+          ? 'bg-purple-50 border-purple-100'
           : 'bg-blue-50 border-blue-100'
-      }`}>
+        }`}>
         <div className="flex gap-2 items-center mb-4">
           <CommentHeader
             commentData={commentData}

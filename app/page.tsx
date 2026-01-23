@@ -8,10 +8,10 @@ import HomeTab from '@/packages/ui/components/home/HomeTab';
 import { useState } from 'react';
 
 export default function Home() {
-  const [mode, setMode] = useState<'trending' | 'recent'>('trending');
+  const [mode, setMode] = useState<'trending' | 'adoption'>('trending');
   return (
-    <div className="flex justify-center items-center min-h-screen font-sans bg-white">
-      <main className="flex flex-col justify-between items-center w-full max-w-6xl min-h-screen bg-whitesm:items-start">
+    <div className="w-full min-h-screen font-sans bg-white">
+      <main className="flex flex-col justify-between items-center w-full min-h-screen bg-whitesm:items-start">
         <PageTemplate visibleHomeTab={false}>
           <div className="w-full">
             <HomeTab mode={mode} setMode={setMode} />

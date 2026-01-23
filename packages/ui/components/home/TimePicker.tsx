@@ -22,7 +22,7 @@ export default function TimePicker() {
           {Object.entries(timeframeMap).map(([key, value]) => (
             <li
               key={key}
-              className="p-2 cursor-pointer hover:bg-gray-100 hover:text-[#1257b8] transition-colors"
+              className="p-2 cursor-pointer hover:bg-gray-100 hover:text-[#6b85e3] transition-colors"
               onClick={() => {
                 setSelectedTimeframe(key);
                 setIsOpenLocal(false);

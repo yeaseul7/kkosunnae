@@ -13,18 +13,18 @@ export default function ReadHeaderText({
   // 이메일 링크를 파란색으로 변환하는 함수
   const formatDescription = (text: string) => {
     if (!text) return null;
-    
+
     // 이메일 패턴 찾기
     const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi;
     const parts = text.split(emailRegex);
-    
+
     return parts.map((part, index) => {
       if (emailRegex.test(part)) {
         return (
           <a
             key={index}
             href={`mailto:${part}`}
-            className="text-blue-600 underline hover:text-blue-800"
+            className="text-primary1 underline hover:text-primary2"
           >
             {part}
           </a>
