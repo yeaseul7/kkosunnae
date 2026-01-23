@@ -115,7 +115,7 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
   };
 
   return (
-    <div className="w-full pb-3 pt-6 px-3 sm:pb-4 sm:pt-10 sm:px-4 bg-white">
+    <div className="w-full pb-3 pt-6 px-3 sm:pb-4 sm:pt-10 sm:px-4 ">
       <div className="flex flex-col gap-3 sm:gap-4 w-full max-w-7xl mx-auto">
         {/* 검색창 */}
         <div className="relative w-full">
@@ -153,11 +153,10 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
                 {sexOptions.map((option) => (
                   <li
                     key={option.value || 'all'}
-                    className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${
-                      filters.sexCd === option.value
+                    className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${filters.sexCd === option.value
                         ? 'bg-primary1 text-white'
                         : 'hover:bg-gray-100 hover:text-primary1'
-                    }`}
+                      }`}
                     onClick={() => handleFilterChange('sexCd', option.value)}
                   >
                     {option.label}
@@ -181,11 +180,10 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
                 {stateOptions.map((option) => (
                   <li
                     key={option.value || 'all'}
-                    className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${
-                      filters.state === option.value
+                    className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${filters.state === option.value
                         ? 'bg-primary1 text-white'
                         : 'hover:bg-gray-100 hover:text-primary1'
-                    }`}
+                      }`}
                     onClick={() => handleFilterChange('state', option.value)}
                   >
                     {option.label}
@@ -209,11 +207,10 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
                 {upKindOptions.map((option) => (
                   <li
                     key={option.value || 'all'}
-                    className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${
-                      filters.upKindCd === option.value
+                    className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${filters.upKindCd === option.value
                         ? 'bg-primary1 text-white'
                         : 'hover:bg-gray-100 hover:text-primary1'
-                    }`}
+                      }`}
                     onClick={() => handleFilterChange('upKindCd', option.value)}
                   >
                     {option.label}
