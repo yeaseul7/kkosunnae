@@ -25,11 +25,11 @@ export function extractFirstImage(html: string | undefined): string | null {
 
 /**
  * baseUrl을 가져옵니다.
- * 환경 변수 우선순위: NEXT_PUBLIC_SITE_URL > VERCEL_URL > localhost
+ * 환경 변수 우선순위: NEXT_PUBLIC_BASE_URL > VERCEL_URL > localhost
  */
 export function getBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL;
+  if (process.env.NEXT_PUBLIC_BASE_URL) {
+    return process.env.NEXT_PUBLIC_BASE_URL;
   }
 
   if (process.env.VERCEL_URL) {
@@ -40,6 +40,19 @@ export function getBaseUrl(): string {
 }
 
 
+
+function isUnsupportedImageUrl(imageUrl: string): boolean {
+  if (imageUrl.startsWith('http://')) {
+    return true;
+  }
+
+  if (imageUrl.includes('openapi.animal.go.kr')) {
+    return true;
+  }
+
+  return false;
+}
+
 export function normalizeImageUrl(
   imageUrl: string | null | undefined,
   baseUrl: string,
@@ -49,16 +62,20 @@ export function normalizeImageUrl(
     return `${baseUrl}${defaultImagePath}`;
   }
 
+  if (isUnsupportedImageUrl(imageUrl)) {
+    return `${baseUrl}${defaultImagePath}`;
+  }
+
   if (imageUrl.startsWith('/')) {
     return `${baseUrl}${imageUrl}`;
   }
 
-  if (imageUrl.startsWith('http://')) {
-    return imageUrl.replace('http://', 'https://');
+  if (imageUrl.startsWith('https://')) {
+    return imageUrl;
   }
 
-  if (imageUrl.startsWith('http')) {
-    return imageUrl;
+  if (imageUrl.startsWith('http://')) {
+    return imageUrl.replace('http://', 'https://');
   }
 
   return `${baseUrl}/${imageUrl}`;

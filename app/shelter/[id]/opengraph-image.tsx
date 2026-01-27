@@ -9,7 +9,7 @@ export const size = {
 export const contentType = 'image/png';
 
 const baseUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
+  process.env.NEXT_PUBLIC_BASE_URL ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
   'http://localhost:3001';
 
@@ -22,14 +22,14 @@ async function fetchAnimalData(desertionNo: string) {
     const response = await fetch(`${baseUrl}/api/shelter-data?${params.toString()}`, {
       cache: 'no-store',
     });
-    
+
     if (!response.ok) {
       return null;
     }
 
     const shelterAnimalResponse = await response.json();
     const items = shelterAnimalResponse?.response?.body?.items?.item;
-    
+
     if (items) {
       const itemsArray = Array.isArray(items) ? items : [items];
       return itemsArray.length > 0 ? itemsArray[0] : null;
@@ -118,7 +118,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             {kindName}
           </div>
           <div style={{ fontSize: 30 }}>
-            {animalData.sexCd === 'F' ? '암컷' : animalData.sexCd === 'M' ? '수컷' : ''} 
+            {animalData.sexCd === 'F' ? '암컷' : animalData.sexCd === 'M' ? '수컷' : ''}
             {animalData.age ? ` / ${animalData.age}` : ''}
             {animalData.weight ? ` / ${animalData.weight}kg` : ''}
           </div>
