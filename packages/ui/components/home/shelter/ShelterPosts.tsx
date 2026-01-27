@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import Loading from '../../base/Loading';
 import { ShelterAnimalItem } from '@/packages/type/postType';
 import AbandonedCard from '../../base/AbandonedCard';
+import AbandonedCardSkeleton from '../../base/AbandonedCardSkeleton';
 import AnimalFilterHeader, { AnimalFilterState } from './AnimalFilterHeader';
 import { fetchShelterAnimalData } from '@/lib/api/shelter';
 
@@ -224,23 +224,33 @@ export default function ShelterPosts() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-2 pt-8 w-full px-4 sm:px-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center">
-          {shelterAnimalData.map((shelterAnimal: ShelterAnimalItem) => (
-            <AbandonedCard
-              key={shelterAnimal.desertionNo}
-              shelterAnimal={shelterAnimal}
-            />
-          ))}
+          {loading ? (
+            Array.from({ length: 12 }).map((_, index) => (
+              <AbandonedCardSkeleton key={`skeleton-${index}`} />
+            ))
+          ) : (
+            <>
+              {shelterAnimalData.map((shelterAnimal: ShelterAnimalItem) => (
+                <AbandonedCard
+                  key={shelterAnimal.desertionNo}
+                  shelterAnimal={shelterAnimal}
+                />
+              ))}
+              {isLoadingMore && (
+                Array.from({ length: 12 }).map((_, index) => (
+                  <AbandonedCardSkeleton key={`skeleton-more-${index}`} />
+                ))
+              )}
+            </>
+          )}
         </div>
       )}
-      {loading && <Loading />}
-      {hasMore && (
+      {hasMore && !loading && (
         <div
           ref={observerTarget}
           className="h-32 flex justify-center items-center py-12"
           data-testid="infinite-scroll-trigger"
-        >
-          {isLoadingMore && <Loading />}
-        </div>
+        />
       )}
       {!hasMore && shelterAnimalData.length > 0 && (
         <div className="text-center text-gray-500 py-8">

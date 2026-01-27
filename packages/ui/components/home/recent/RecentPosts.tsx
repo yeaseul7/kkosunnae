@@ -3,7 +3,7 @@ import { getRecentBoardsData } from '@/lib/api/post';
 import { useEffect, useState } from 'react';
 
 import PostCard from '../../base/PostCard';
-import Loading from '../../base/Loading';
+import PostCardSkeleton from '../../base/PostCardSkeleton';
 import { PostData } from '@/packages/type/postType';
 
 export default function RecentPosts() {
@@ -41,11 +41,7 @@ export default function RecentPosts() {
 
   const hasMore = displayedPosts.length < allPosts.length;
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (allPosts.length === 0) {
+  if (allPosts.length === 0 && !loading) {
     return (
       <div className="py-12 text-center text-gray-500">게시물이 없습니다.</div>
     );
@@ -54,9 +50,22 @@ export default function RecentPosts() {
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 gap-4 px-4 pt-8 w-full sm:px-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {displayedPosts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
+        {loading ? (
+          Array.from({ length: 12 }).map((_, index) => (
+            <PostCardSkeleton key={`skeleton-${index}`} />
+          ))
+        ) : (
+          <>
+            {displayedPosts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+            {loadingMore && (
+              Array.from({ length: 12 }).map((_, index) => (
+                <PostCardSkeleton key={`skeleton-more-${index}`} />
+              ))
+            )}
+          </>
+        )}
       </div>
 
       {hasMore && (

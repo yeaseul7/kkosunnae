@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 import Script from 'next/script';
 import './globals.css';
 import '@/styles/keyframe.css';
@@ -14,6 +15,24 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+});
+
+const cafe24SsurroundAir = localFont({
+  src: [
+    {
+      path: '../../static/font/Cafe24SsurroundAir-v1.1/webfont/Cafe24SsurroundAir-v1.1.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../static/font/Cafe24SsurroundAir-v1.1/webfont/Cafe24SsurroundAir-v1.1.woff',
+      weight: '400',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-cafe24',
+  display: 'swap',
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -55,7 +74,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased w-full min-h-screen font-sans bg-white`}
+        className={`${geistSans.variable} ${geistMono.variable} ${cafe24SsurroundAir.variable} antialiased w-full min-h-screen font-sans bg-white`}
       >
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-9P3M59NTFM"

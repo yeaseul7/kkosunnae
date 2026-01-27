@@ -8,6 +8,7 @@ import { MdMap } from 'react-icons/md';
 import { sidoLocation } from '@/static/data/sidoLocation';
 import { IoCall, IoLocationSharp } from 'react-icons/io5';
 import { useRouter } from 'next/navigation';
+import ShelterCardSkeleton from '../../base/ShelterCardSkeleton';
 
 
 export default function ShelterPosts() {
@@ -16,12 +17,14 @@ export default function ShelterPosts() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [shelters, setShelters] = useState<ShelterInfoItem[]>([]);
+    const [sheltersLoading, setSheltersLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedSido, setSelectedSido] = useState<string>('전체');
+    const [selectedSido, setSelectedSido] = useState<string>('서울');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
     const fetchShelterInfo = useCallback(async (sidoCd?: string) => {
+        setSheltersLoading(true);
         try {
             let targetSidoCd: string | null = null;
 
@@ -57,9 +60,14 @@ export default function ShelterPosts() {
                     : [data.response.body.items.item];
                 setShelters(items);
                 console.log('보호소 정보 가져오기 성공:', items.length, '개');
+            } else {
+                setShelters([]);
             }
         } catch (err) {
             console.error('보호소 정보 조회 오류:', err);
+            setShelters([]);
+        } finally {
+            setSheltersLoading(false);
         }
     }, []);
 
@@ -74,11 +82,11 @@ export default function ShelterPosts() {
                     locationData = JSON.parse(storedLocation);
                 }
 
+                const DEFAULT_SEOUL_LATITUDE = 37.5665;
+                const DEFAULT_SEOUL_LONGITUDE = 126.9780;
+
                 if (storedMatchedAddress) {
                     const matchedAddress = JSON.parse(storedMatchedAddress);
-                    // 서울의 기본 좌표 (서울시청 기준)
-                    const DEFAULT_SEOUL_LATITUDE = 37.5665;
-                    const DEFAULT_SEOUL_LONGITUDE = 126.9780;
 
                     setAddress({
                         roadAddress: '',
@@ -95,6 +103,23 @@ export default function ShelterPosts() {
                     if (matchedAddress.sidoName) {
                         const shortName = getShortSidoName(matchedAddress.sidoName);
                         setSelectedSido(shortName);
+                    }
+                } else {
+                    // 저장된 주소가 없으면 서울을 기본값으로 설정
+                    const seoulSido = sidoLocation.items.find(item => item.SIDO_NAME === '서울특별시');
+                    if (seoulSido) {
+                        setAddress({
+                            roadAddress: '',
+                            jibunAddress: '',
+                            level1: '서울특별시',
+                            level2: '',
+                            level3: '',
+                            sidoCd: seoulSido.SIDO_CD,
+                            sidoName: seoulSido.SIDO_NAME,
+                            latitude: locationData?.latitude ?? DEFAULT_SEOUL_LATITUDE,
+                            longitude: locationData?.longitude ?? DEFAULT_SEOUL_LONGITUDE,
+                        });
+                        setSelectedSido('서울');
                     }
                 }
 
@@ -292,7 +317,11 @@ export default function ShelterPosts() {
                     </div>
 
                     <div className="space-y-4 mb-6">
-                        {paginatedShelters.length > 0 ? (
+                        {sheltersLoading ? (
+                            Array.from({ length: 10 }).map((_, index) => (
+                                <ShelterCardSkeleton key={`skeleton-${index}`} />
+                            ))
+                        ) : paginatedShelters.length > 0 ? (
                             paginatedShelters.map((shelter, index) => (
                                 <div
                                     key={shelter.careRegNo || index}

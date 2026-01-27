@@ -11,7 +11,13 @@ import { formatDate } from '@/packages/utils/dateFormatting';
 import getOptimizedCloudinaryUrl from '@/packages/utils/optimization';
 import UserProfile from '../common/UserProfile';
 
-export default function PostCard({ post }: { post: PostData }) {
+interface PostCardProps {
+  post: PostData;
+  highPriority?: boolean;
+  highQuality?: boolean;
+}
+
+export default function PostCard({ post, highPriority = false, highQuality = false }: PostCardProps) {
   const router = useRouter();
   const [commentCount, setCommentCount] = useState<number>(0);
 
@@ -43,8 +49,9 @@ export default function PostCard({ post }: { post: PostData }) {
 
   const thumbnailImage = useMemo(() => {
     if (!rawThumbnailImage) return null;
-    return getOptimizedCloudinaryUrl(rawThumbnailImage, 300, 300);
-  }, [rawThumbnailImage]);
+    const imageSize = highQuality ? 600 : 300;
+    return getOptimizedCloudinaryUrl(rawThumbnailImage, imageSize, imageSize);
+  }, [rawThumbnailImage, highQuality]);
 
   const defaultImage = useMemo(() => {
     if (!post.tags || post.tags.length === 0) {
@@ -93,14 +100,17 @@ export default function PostCard({ post }: { post: PostData }) {
       onClick={() => router.push(`/read/${post.id}`)}
       className="flex overflow-hidden flex-col bg-white rounded-2xl shadow-sm transition-all duration-200 cursor-pointer hover:shadow-lg hover:translate-y-1 active:translate-y-0 active:shadow-sm"
     >
-      <div className="relative w-full bg-gray-200 aspect-square">
+      <div className="relative w-full bg-gray-200 aspect-square overflow-hidden">
         <Image
           src={thumbnailImage || defaultImage}
           alt={post.title || '게시물 이미지'}
-          fill
-          className="object-cover"
+          width={400}
+          height={400}
+          className="object-cover w-full h-full"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          priority={true}
+          priority={highPriority}
+          fetchPriority={highPriority ? 'high' : 'auto'}
+          quality={highQuality ? 90 : 75}
         />
       </div>
       <div className="flex flex-col flex-1 p-2">

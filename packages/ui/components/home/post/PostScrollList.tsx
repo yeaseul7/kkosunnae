@@ -4,7 +4,7 @@ import { firestore } from '@/lib/firebase/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import PostCard from '../../base/PostCard';
-import Loading from '../../base/Loading';
+import PostCardSkeleton from '../../base/PostCardSkeleton';
 import { PostData } from '@/packages/type/postType';
 import { enrichPostsWithAuthorInfo } from '@/lib/api/post';
 
@@ -59,22 +59,17 @@ export default function PostScrollList({ userId }: { userId?: string }) {
   const handleLoadMore = () => {
     setLoadingMore(true);
 
-    // 다음 12개 추가
     setTimeout(() => {
       const nextCount = displayCount + 12;
       setDisplayedPosts(allPosts.slice(0, nextCount));
       setDisplayCount(nextCount);
       setLoadingMore(false);
-    }, 300); // 부드러운 로딩 효과
+    }, 300);
   };
 
   const hasMore = displayedPosts.length < allPosts.length;
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (!targetUserId) {
+  if (!targetUserId && !loading) {
     return (
       <div className="py-12 text-center text-gray-500">
         사용자 정보를 불러올 수 없습니다.
@@ -82,7 +77,7 @@ export default function PostScrollList({ userId }: { userId?: string }) {
     );
   }
 
-  if (allPosts.length === 0) {
+  if (allPosts.length === 0 && !loading) {
     return (
       <div className="py-12 text-center text-gray-500">
         작성한 게시물이 없습니다.
@@ -93,9 +88,24 @@ export default function PostScrollList({ userId }: { userId?: string }) {
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 gap-6 pt-8 w-full md:grid-cols-2 lg:grid-cols-3">
-        {displayedPosts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
+        {loading ? (
+          // 초기 로딩 중에는 모든 Skeleton 표시
+          Array.from({ length: 6 }).map((_, index) => (
+            <PostCardSkeleton key={`skeleton-${index}`} />
+          ))
+        ) : (
+          <>
+            {displayedPosts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+            {loadingMore && (
+              // 더보기 로딩 중에는 추가 Skeleton 표시
+              Array.from({ length: 12 }).map((_, index) => (
+                <PostCardSkeleton key={`skeleton-more-${index}`} />
+              ))
+            )}
+          </>
+        )}
       </div>
 
       {/* 더보기 버튼 */}
