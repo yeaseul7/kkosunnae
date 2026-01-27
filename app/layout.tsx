@@ -64,9 +64,6 @@ export const metadata: Metadata = {
       },
     ],
   },
-  other: {
-    'preload-font': '/static/font/Cafe24SsurroundAir-v1.1/webfont/Cafe24SsurroundAir-v1.1.woff2',
-  },
 };
 
 export default function RootLayout({

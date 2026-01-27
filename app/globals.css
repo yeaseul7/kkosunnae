@@ -1,14 +1,5 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: 'Cafe24SsurroundAir';
-  src: url('/static/font/Cafe24SsurroundAir-v1.1/webfont/Cafe24SsurroundAir-v1.1.woff2') format('woff2'),
-    url('/static/font/Cafe24SsurroundAir-v1.1/webfont/Cafe24SsurroundAir-v1.1.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   --background: #ffffff;
   /* --foreground: #171717; */
@@ -17,7 +8,7 @@
 @theme inline {
   --color-background: var(--background);
   /* --color-foreground: var(--foreground); */
-  --font-sans: 'Cafe24SsurroundAir', sans-serif;
+  --font-sans: var(--font-cafe24), sans-serif;
   --font-mono: var(--font-geist-mono);
 
   /* Theme colors from tailwind.config.js */
@@ -109,7 +100,7 @@ body {
   background: #fafafa;
   /* 항상 밝은 배경색 사용 */
   /* color: var(--foreground); */
-  font-family: 'Cafe24SsurroundAir', sans-serif;
+  font-family: var(--font-cafe24), sans-serif;
 }
 
 /* TipTap Placeholder styles */
