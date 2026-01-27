@@ -20,12 +20,12 @@ const geistMono = Geist_Mono({
 const cafe24SsurroundAir = localFont({
   src: [
     {
-      path: '../../static/font/Cafe24SsurroundAir-v1.1/webfont/Cafe24SsurroundAir-v1.1.woff2',
+      path: '../public/static/font/Cafe24SsurroundAir-v1.1/webfont/Cafe24SsurroundAir-v1.1.woff2',
       weight: '400',
       style: 'normal',
     },
     {
-      path: '../../static/font/Cafe24SsurroundAir-v1.1/webfont/Cafe24SsurroundAir-v1.1.woff',
+      path: '../public/static/font/Cafe24SsurroundAir-v1.1/webfont/Cafe24SsurroundAir-v1.1.woff',
       weight: '400',
       style: 'normal',
     },
@@ -63,6 +63,9 @@ export const metadata: Metadata = {
         alt: '꼬순내 로고',
       },
     ],
+  },
+  other: {
+    'preload-font': '/static/font/Cafe24SsurroundAir-v1.1/webfont/Cafe24SsurroundAir-v1.1.woff2',
   },
 };
 
