@@ -2,29 +2,13 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import MapComponent from './MapComponent';
-import { ShelterInfoItem } from '@/packages/type/shelterTyps';
+import { Address, ShelterInfoItem } from '@/packages/type/shelterTyps';
 import Image from 'next/image';
 import { MdMap } from 'react-icons/md';
 import { sidoLocation } from '@/static/data/sidoLocation';
 import { IoCall, IoLocationSharp } from 'react-icons/io5';
 import { useRouter } from 'next/navigation';
 
-interface Location {
-    latitude: number;
-    longitude: number;
-}
-
-interface Address {
-    roadAddress: string;
-    jibunAddress: string;
-    level1: string; // 시/도
-    level2: string; // 시/군/구
-    level3: string; // 읍/면/동
-    sidoCd?: string; // 매칭된 시도 코드
-    sidoName?: string; // 매칭된 시도 이름
-    latitude?: number; // 위도
-    longitude?: number; // 경도
-}
 
 export default function ShelterPosts() {
     const router = useRouter();
@@ -39,28 +23,22 @@ export default function ShelterPosts() {
 
     const fetchShelterInfo = useCallback(async (sidoCd?: string) => {
         try {
-            // sidoCd가 명시적으로 전달되지 않았을 때만 localStorage에서 가져옴
-            // 빈 문자열('')이 전달되면 전체 조회로 처리
             let targetSidoCd: string | null = null;
 
             if (sidoCd === undefined) {
-                // 인자가 전달되지 않은 경우에만 localStorage 사용
                 const storedMatchedAddress = localStorage.getItem('matched_address');
                 if (storedMatchedAddress) {
                     const matchedAddress = JSON.parse(storedMatchedAddress);
                     targetSidoCd = matchedAddress.sidoCd;
                 }
             } else if (sidoCd !== '') {
-                // 빈 문자열이 아닌 경우에만 사용
                 targetSidoCd = sidoCd;
             }
-            // sidoCd가 빈 문자열('')이면 targetSidoCd는 null로 유지되어 전체 조회
-
-            console.log('targetSidoCd', targetSidoCd);
 
             if (targetSidoCd === null && sidoCd === undefined) {
-                console.log('시도 코드가 없어 보호소 정보를 가져올 수 없습니다.');
-                return;
+                const seoulSido = sidoLocation.items.find(item => item.SIDO_NAME === '서울특별시');
+                targetSidoCd = seoulSido?.SIDO_CD || '6110000';
+                console.log('시도 코드가 없어 기본값(서울)을 사용합니다:', targetSidoCd);
             }
 
             const response = await fetch(
@@ -91,13 +69,17 @@ export default function ShelterPosts() {
                 const storedMatchedAddress = localStorage.getItem('matched_address');
                 const storedLocation = localStorage.getItem('location');
 
-                let locationData: Location | null = null;
+                let locationData: { latitude?: number; longitude?: number } | null = null;
                 if (storedLocation) {
                     locationData = JSON.parse(storedLocation);
                 }
 
                 if (storedMatchedAddress) {
                     const matchedAddress = JSON.parse(storedMatchedAddress);
+                    // 서울의 기본 좌표 (서울시청 기준)
+                    const DEFAULT_SEOUL_LATITUDE = 37.5665;
+                    const DEFAULT_SEOUL_LONGITUDE = 126.9780;
+
                     setAddress({
                         roadAddress: '',
                         jibunAddress: '',
@@ -106,8 +88,8 @@ export default function ShelterPosts() {
                         level3: '',
                         sidoCd: matchedAddress.sidoCd,
                         sidoName: matchedAddress.sidoName,
-                        latitude: locationData?.latitude,
-                        longitude: locationData?.longitude,
+                        latitude: locationData?.latitude ?? DEFAULT_SEOUL_LATITUDE,
+                        longitude: locationData?.longitude ?? DEFAULT_SEOUL_LONGITUDE,
                     });
                     // 현재 바인딩된 지역으로 초기 선택 설정
                     if (matchedAddress.sidoName) {
@@ -135,10 +117,8 @@ export default function ShelterPosts() {
         setCurrentPage(1);
 
         if (sidoName === '전체') {
-            // 전체 선택 시 빈 문자열을 명시적으로 전달하여 전체 조회
             fetchShelterInfo('');
         } else {
-            // 특정 시도 선택 시 해당 시도 코드로 필터링
             const sidoItem = sidoLocation.items.find(item => {
                 const shortName = getShortSidoName(item.SIDO_NAME);
                 return shortName === sidoName;
@@ -149,7 +129,6 @@ export default function ShelterPosts() {
         }
     };
 
-    // 시도명을 짧게 표시
     const getShortSidoName = (sidoName: string): string => {
         const shortNames: Record<string, string> = {
             '서울특별시': '서울',
@@ -173,7 +152,6 @@ export default function ShelterPosts() {
         return shortNames[sidoName] || sidoName.replace(/특별시|광역시|특별자치시|도/g, '').replace(/특별자치도/g, '');
     };
 
-    // 필터링된 보호소 목록
     const filteredShelters = useMemo(() => {
         return shelters.filter(shelter => {
             const matchesSearch = searchQuery === '' ||
@@ -183,7 +161,6 @@ export default function ShelterPosts() {
         });
     }, [shelters, searchQuery]);
 
-    // 페이지네이션
     const totalPages = Math.ceil(filteredShelters.length / itemsPerPage);
     const paginatedShelters = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
@@ -248,7 +225,6 @@ export default function ShelterPosts() {
                             }
                             onSidoSelect={(sidoCd) => {
                                 if (sidoCd === '') {
-                                    // 빈 문자열이면 "전체" 선택
                                     handleSidoSelect('전체');
                                 } else {
                                     const sidoItem = sidoLocation.items.find(item => item.SIDO_CD === sidoCd);
@@ -315,7 +291,6 @@ export default function ShelterPosts() {
                         </div>
                     </div>
 
-                    {/* 보호소 목록 */}
                     <div className="space-y-4 mb-6">
                         {paginatedShelters.length > 0 ? (
                             paginatedShelters.map((shelter, index) => (
@@ -363,7 +338,6 @@ export default function ShelterPosts() {
                         )}
                     </div>
 
-                    {/* 페이지네이션 */}
                     {totalPages > 1 && (
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">

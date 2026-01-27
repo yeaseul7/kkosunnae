@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { sidoLocation } from '@/static/data/sidoLocation';
 
 interface SidoItem {
   SIDO_CD: string;
@@ -27,21 +28,18 @@ export default function LocationDataProvider() {
         const storedData = localStorage.getItem('sido_data');
         const storedTimestamp = localStorage.getItem('sido_data_timestamp');
 
-        // 1시간 이내 데이터가 있으면 재요청하지 않음
         if (storedData && storedTimestamp) {
           const timestamp = parseInt(storedTimestamp);
           const now = Date.now();
-          const oneHour = 60 * 60 * 1000; // 1시간
+          const oneHour = 60 * 60 * 1000;
 
           if (now - timestamp < oneHour) {
             console.log('시도 코드 데이터가 최근에 저장되어 있습니다. (1시간 이내)');
-            // 시도 코드는 있지만 주소 매칭이 안 되어있을 수 있으므로 주소 매칭 시도
-            await fetchAndMatchAddress();
+            // await fetchAndMatchAddress();
             return;
           }
         }
 
-        // API 호출
         const response = await fetch(
           `/api/sido?pageNo=1&numOfRows=1000`
         );
@@ -52,43 +50,37 @@ export default function LocationDataProvider() {
 
         const data = (await response.json()) as SidoApiResponse;
 
-        // API 응답 에러 확인
         if (data.resultCode && data.resultCode !== '00' && data.resultCode !== '0') {
           console.error('시도 코드 API 오류:', data.resultMsg);
           return;
         }
 
         if (data.items && data.items.length > 0) {
-          // localStorage에 저장
           localStorage.setItem('sido_data', JSON.stringify(data.items));
           localStorage.setItem('sido_data_timestamp', Date.now().toString());
           console.log('시도 코드 데이터가 localStorage에 저장되었습니다.', data.items.length, '개');
 
-          // 주소 매칭 시도
           await fetchAndMatchAddress();
         }
       } catch (err) {
         console.error('시도 코드 조회 오류:', err);
-        // 에러가 발생해도 앱은 계속 동작하도록 함
       }
     };
 
     const fetchAndMatchAddress = async () => {
       try {
-        // 위치 정보 가져오기
         if (!navigator.geolocation) {
           console.log('Geolocation이 지원되지 않습니다.');
           return;
         }
 
-        // 이미 매칭된 주소가 있고 1시간 이내면 재요청하지 않음
         const storedMatchedAddress = localStorage.getItem('matched_address');
         const matchedAddressTimestamp = localStorage.getItem('matched_address_timestamp');
 
         if (storedMatchedAddress && matchedAddressTimestamp) {
           const timestamp = parseInt(matchedAddressTimestamp);
           const now = Date.now();
-          const oneHour = 60 * 60 * 1000; // 1시간
+          const oneHour = 60 * 60 * 1000;
 
           if (now - timestamp < oneHour) {
             console.log('매칭된 주소 데이터가 최근에 저장되어 있습니다. (1시간 이내)');
@@ -101,7 +93,6 @@ export default function LocationDataProvider() {
             const longitude = position.coords.longitude;
             const latitude = position.coords.latitude;
 
-            // 위치 정보를 localStorage에 저장
             const location = {
               latitude: latitude,
               longitude: longitude,
@@ -125,26 +116,45 @@ export default function LocationDataProvider() {
               const level1 = result.structure?.level1 || '';
 
               if (!level1) {
-                console.log('level1 정보가 없습니다.');
+                console.log('level1 정보가 없습니다. 기본값(서울)을 사용합니다.');
+                const seoulSido = sidoLocation.items.find(item => item.SIDO_NAME === '서울특별시');
+                if (seoulSido) {
+                  const defaultAddress: MatchedAddress = {
+                    level1: '서울특별시',
+                    sidoCd: seoulSido.SIDO_CD,
+                    sidoName: seoulSido.SIDO_NAME,
+                  };
+                  localStorage.setItem('matched_address', JSON.stringify(defaultAddress));
+                  localStorage.setItem('matched_address_timestamp', Date.now().toString());
+                  console.log('기본값(서울) 주소 정보 저장:', defaultAddress);
+                }
                 return;
               }
 
-              // localStorage에서 sido_data 가져오기
               const storedSidoData = localStorage.getItem('sido_data');
               if (!storedSidoData) {
-                console.log('sido_data가 localStorage에 없습니다.');
+                console.log('sido_data가 localStorage에 없습니다. 기본값(서울)을 사용합니다.');
+                const seoulSido = sidoLocation.items.find(item => item.SIDO_NAME === '서울특별시');
+                if (seoulSido) {
+                  const defaultAddress: MatchedAddress = {
+                    level1: level1 || '서울특별시',
+                    sidoCd: seoulSido.SIDO_CD,
+                    sidoName: seoulSido.SIDO_NAME,
+                  };
+                  localStorage.setItem('matched_address', JSON.stringify(defaultAddress));
+                  localStorage.setItem('matched_address_timestamp', Date.now().toString());
+                  console.log('기본값(서울) 주소 정보 저장:', defaultAddress);
+                }
                 return;
               }
 
               try {
                 const sidoData: SidoItem[] = JSON.parse(storedSidoData);
 
-                // level1과 SIDO_NAME 매칭
                 const matchedSido = sidoData.find((item) => {
                   const sidoName = item.SIDO_NAME.trim();
                   const level1Trimmed = level1.trim();
 
-                  // 정확히 일치하거나, level1이 sidoName을 포함하는 경우
                   return (
                     sidoName === level1Trimmed ||
                     level1Trimmed.includes(sidoName) ||
@@ -153,7 +163,6 @@ export default function LocationDataProvider() {
                 });
 
                 if (matchedSido) {
-                  // 매칭된 주소 정보를 localStorage에 저장
                   const matchedAddress: MatchedAddress = {
                     level1: level1,
                     sidoCd: matchedSido.SIDO_CD,
@@ -163,7 +172,18 @@ export default function LocationDataProvider() {
                   localStorage.setItem('matched_address_timestamp', Date.now().toString());
                   console.log('주소 매칭 성공 및 localStorage 저장:', matchedAddress);
                 } else {
-                  console.log('시도 코드 매칭 실패. level1:', level1);
+                  console.log('시도 코드 매칭 실패. level1:', level1, '기본값(서울)을 사용합니다.');
+                  const seoulSido = sidoLocation.items.find(item => item.SIDO_NAME === '서울특별시');
+                  if (seoulSido) {
+                    const defaultAddress: MatchedAddress = {
+                      level1: level1,
+                      sidoCd: seoulSido.SIDO_CD,
+                      sidoName: seoulSido.SIDO_NAME,
+                    };
+                    localStorage.setItem('matched_address', JSON.stringify(defaultAddress));
+                    localStorage.setItem('matched_address_timestamp', Date.now().toString());
+                    console.log('기본값(서울) 주소 정보 저장:', defaultAddress);
+                  }
                 }
               } catch (parseError) {
                 console.error('sido_data 파싱 오류:', parseError);
@@ -171,7 +191,18 @@ export default function LocationDataProvider() {
             }
           },
           (error) => {
-            console.log('위치 정보를 가져올 수 없습니다:', error.message);
+            console.log('위치 정보를 가져올 수 없습니다:', error.message, '기본값(서울)을 사용합니다.');
+            const seoulSido = sidoLocation.items.find(item => item.SIDO_NAME === '서울특별시');
+            if (seoulSido) {
+              const defaultAddress: MatchedAddress = {
+                level1: '서울특별시',
+                sidoCd: seoulSido.SIDO_CD,
+                sidoName: seoulSido.SIDO_NAME,
+              };
+              localStorage.setItem('matched_address', JSON.stringify(defaultAddress));
+              localStorage.setItem('matched_address_timestamp', Date.now().toString());
+              console.log('기본값(서울) 주소 정보 저장:', defaultAddress);
+            }
           },
           {
             enableHighAccuracy: true,
@@ -180,13 +211,23 @@ export default function LocationDataProvider() {
           }
         );
       } catch (err) {
-        console.error('주소 매칭 오류:', err);
+        console.error('주소 매칭 오류:', err, '기본값(서울)을 사용합니다.');
+        const seoulSido = sidoLocation.items.find(item => item.SIDO_NAME === '서울특별시');
+        if (seoulSido) {
+          const defaultAddress: MatchedAddress = {
+            level1: '서울특별시',
+            sidoCd: seoulSido.SIDO_CD,
+            sidoName: seoulSido.SIDO_NAME,
+          };
+          localStorage.setItem('matched_address', JSON.stringify(defaultAddress));
+          localStorage.setItem('matched_address_timestamp', Date.now().toString());
+          console.log('기본값(서울) 주소 정보 저장:', defaultAddress);
+        }
       }
     };
 
     fetchAndStoreSidoData();
   }, []);
 
-  // 이 컴포넌트는 UI를 렌더링하지 않음
   return null;
 }
