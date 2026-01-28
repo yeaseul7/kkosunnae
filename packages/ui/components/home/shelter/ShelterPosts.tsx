@@ -21,6 +21,7 @@ export default function ShelterPosts() {
     searchQuery: '',
     bgnde: null,
     endde: null,
+    upr_cd: null,
   });
   const filtersRef = useRef<AnimalFilterState>(filters);
   const isLoadingMoreRef = useRef(false);

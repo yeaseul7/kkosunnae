@@ -25,6 +25,7 @@ export default function ShelterPostsClient({ initialData }: ShelterPostsClientPr
     searchQuery: '',
     bgnde: null,
     endde: null,
+    upr_cd: null,
   });
   const filtersRef = useRef<AnimalFilterState>(filters);
   const isLoadingMoreRef = useRef(false);

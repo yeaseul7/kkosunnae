@@ -7,6 +7,7 @@ export interface AnimalFilterState {
   searchQuery: string;
   bgnde: string | null;
   endde: string | null;
+  upr_cd: string | null; // 시도 코드
 }
 
 export interface FetchShelterAnimalDataResult {
@@ -28,6 +29,7 @@ export async function fetchShelterAnimalData(
   if (filters.bgnde) params.append('bgnde', filters.bgnde);
   if (filters.endde) params.append('endde', filters.endde);
   if (filters.searchQuery) params.append('searchQuery', filters.searchQuery);
+  if (filters.upr_cd) params.append('upr_cd', filters.upr_cd);
 
   const response = await fetch(`/api/shelter-data?${params.toString()}`);
   if (!response.ok) {

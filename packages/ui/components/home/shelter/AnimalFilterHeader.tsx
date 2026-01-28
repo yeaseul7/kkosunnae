@@ -1,7 +1,13 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { MdArrowDropDown } from 'react-icons/md';
 import Image from 'next/image';
+import { getShortSidoName } from '@/packages/utils/locationUtils';
+
+interface SidoItem {
+  SIDO_CD: string;
+  SIDO_NAME: string;
+}
 
 
 const sexOptions = [
@@ -25,12 +31,13 @@ const upKindOptions = [
 ];
 
 export interface AnimalFilterState {
-  sexCd: string | null; // F, M, Q, null
-  state: string | null; // notice, protect, null
-  upKindCd: string | null; // 417000, 422400, 429900, null
-  searchQuery: string; // rfidCd, happenPlace, careNm 검색용
-  bgnde: string | null; // 접수일 시작일 (YYYYMMDD)
-  endde: string | null; // 접수일 종료일 (YYYYMMDD)
+  sexCd: string | null;
+  state: string | null;
+  upKindCd: string | null;
+  searchQuery: string;
+  bgnde: string | null;
+  endde: string | null;
+  upr_cd: string | null;
 }
 
 interface AnimalFilterHeaderProps {
@@ -40,6 +47,22 @@ interface AnimalFilterHeaderProps {
 
 export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFilterHeaderProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [sidoList, setSidoList] = useState<SidoItem[]>([]);
+
+  useEffect(() => {
+    const loadSidoList = () => {
+      const storedSidoData = localStorage.getItem('sido_data');
+      if (storedSidoData) {
+        try {
+          const sidoData: SidoItem[] = JSON.parse(storedSidoData);
+          setSidoList(sidoData);
+        } catch (err) {
+          console.error('시도 데이터 파싱 오류:', err);
+        }
+      }
+    };
+    loadSidoList();
+  }, []);
 
   const derivedStartDate = useMemo(() => {
     if (filters.bgnde && filters.bgnde.length === 8) {
@@ -154,8 +177,8 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
                   <li
                     key={option.value || 'all'}
                     className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${filters.sexCd === option.value
-                        ? 'bg-primary1 text-white'
-                        : 'hover:bg-gray-100 hover:text-primary1'
+                      ? 'bg-primary1 text-white'
+                      : 'hover:bg-gray-100 hover:text-primary1'
                       }`}
                     onClick={() => handleFilterChange('sexCd', option.value)}
                   >
@@ -181,8 +204,8 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
                   <li
                     key={option.value || 'all'}
                     className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${filters.state === option.value
-                        ? 'bg-primary1 text-white'
-                        : 'hover:bg-gray-100 hover:text-primary1'
+                      ? 'bg-primary1 text-white'
+                      : 'hover:bg-gray-100 hover:text-primary1'
                       }`}
                     onClick={() => handleFilterChange('state', option.value)}
                   >
@@ -208,8 +231,8 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
                   <li
                     key={option.value || 'all'}
                     className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${filters.upKindCd === option.value
-                        ? 'bg-primary1 text-white'
-                        : 'hover:bg-gray-100 hover:text-primary1'
+                      ? 'bg-primary1 text-white'
+                      : 'hover:bg-gray-100 hover:text-primary1'
                       }`}
                     onClick={() => handleFilterChange('upKindCd', option.value)}
                   >
@@ -245,10 +268,10 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
           </div>
 
           {/* 필터 초기화 버튼 */}
-          {(filters.sexCd !== null || filters.state !== null || filters.upKindCd !== null || filters.searchQuery || filters.bgnde || filters.endde) && (
+          {(filters.sexCd !== null || filters.state !== null || filters.upKindCd !== null || filters.searchQuery || filters.bgnde || filters.endde || filters.upr_cd) && (
             <button
               onClick={() => {
-                const resetFilters = { sexCd: null, state: null, upKindCd: null, searchQuery: '', bgnde: null, endde: null };
+                const resetFilters = { sexCd: null, state: null, upKindCd: null, searchQuery: '', bgnde: null, endde: null, upr_cd: null };
                 onFilterChange(resetFilters);
                 setStartDate('');
                 setEndDate('');
@@ -259,6 +282,33 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
             </button>
           )}
         </div>
+
+        {/* 시도 필터 버튼들 */}
+        {sidoList.length > 0 && (
+          <div className="flex flex-wrap justify-start gap-2 mt-2">
+            <button
+              onClick={() => handleFilterChange('upr_cd', null)}
+              className={`px-3 py-1.5 rounded-full border transition-colors duration-200 text-xs sm:text-sm ${!filters.upr_cd
+                ? 'bg-primary1 text-white border-primary1'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+                }`}
+            >
+              전체
+            </button>
+            {sidoList.map((sido) => (
+              <button
+                key={sido.SIDO_CD}
+                onClick={() => handleFilterChange('upr_cd', sido.SIDO_CD)}
+                className={`px-3 py-1.5 rounded-full border transition-colors duration-200 text-xs sm:text-sm ${filters.upr_cd === sido.SIDO_CD
+                  ? 'bg-primary1 text-white border-primary1'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+                  }`}
+              >
+                {getShortSidoName(sido.SIDO_NAME)}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
