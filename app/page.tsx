@@ -1,11 +1,19 @@
 'use client';
-import PageTemplate from '@/packages/ui/components/base/PageTemplate';
 import { useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import PageFooter from '@/packages/ui/components/base/PageFooter';
 import HomeTabSkeleton from '@/packages/ui/components/base/HomeTabSkeleton';
 import PostCardSkeleton from '@/packages/ui/components/base/PostCardSkeleton';
 import YoutubeCardSkeleton from '@/packages/ui/components/base/YoutubeCardSkeleton';
+
+const PageTemplate = dynamic(
+  () => import('@/packages/ui/components/base/PageTemplate'),
+  { ssr: true }
+);
+
+const PageFooter = dynamic(
+  () => import('@/packages/ui/components/base/PageFooter'),
+  { ssr: true }
+);
 
 const HomeTab = dynamic(
   () => import('@/packages/ui/components/home/HomeTab'),

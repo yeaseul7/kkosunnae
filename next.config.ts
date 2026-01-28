@@ -47,6 +47,14 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'http',
+        hostname: 'www.animal.go.kr',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.animal.go.kr',
+      },
+      {
+        protocol: 'http',
         hostname: 'openapi.animal.go.kr',
       },
       {
@@ -62,8 +70,8 @@ const nextConfig: NextConfig = {
         hostname: '**.ytimg.com',
       },
     ],
+    minimumCacheTTL: 60 * 60 * 24,
   },
-  // 번들 최적화 설정
   experimental: {
     optimizePackageImports: [
       'react-icons',

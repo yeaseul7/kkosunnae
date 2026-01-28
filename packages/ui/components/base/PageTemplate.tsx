@@ -1,7 +1,12 @@
 'use client';
 
-import HomeTab from '../home/HomeTab';
+import dynamic from 'next/dynamic';
 import Header from './Header';
+
+const HomeTab = dynamic(
+  () => import('../home/HomeTab'),
+  { ssr: true }
+);
 
 interface PageTemplateProps {
   children?: React.ReactNode;

@@ -24,7 +24,11 @@ export default function AnimalImgCard({
           fill
           className="object-cover"
           sizes="(max-width: 1024px) 100vw, 50vw"
-          unoptimized={!mainImage.includes('res.cloudinary.com')}
+          unoptimized={
+            !mainImage.includes('res.cloudinary.com') &&
+            !mainImage.includes('openapi.animal.go.kr') &&
+            !mainImage.includes('www.animal.go.kr')
+          }
           priority
         />
       </div>
@@ -35,11 +39,10 @@ export default function AnimalImgCard({
             <button
               key={index}
               onClick={() => setSelectedImageIndex(index)}
-              className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                selectedImageIndex === index
+              className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedImageIndex === index
                   ? 'border-primary1 scale-105'
                   : 'border-gray-200 hover:border-gray-300'
-              }`}
+                }`}
             >
               <Image
                 src={img}
@@ -47,7 +50,11 @@ export default function AnimalImgCard({
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 25vw, 12.5vw"
-                unoptimized={!img.includes('res.cloudinary.com')}
+                unoptimized={
+                  !img.includes('res.cloudinary.com') &&
+                  !img.includes('openapi.animal.go.kr') &&
+                  !img.includes('www.animal.go.kr')
+                }
               />
             </button>
           ))}

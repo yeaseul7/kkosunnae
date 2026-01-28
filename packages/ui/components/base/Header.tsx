@@ -5,16 +5,25 @@ import RoundButton from '../common/RoundButton';
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { useClickOutside } from '@/packages/utils/clickEvent';
 import { useRouter } from 'next/navigation';
-import LoginModal from '../auth/LoginModal';
+import dynamic from 'next/dynamic';
 import HeaderUserIcon from './HeaderUserIcon';
 import HeaderUserMenu from './HeaderUserMenu';
 import { useAuth } from '@/lib/firebase/auth';
-import NotificationPop from '../home/notification/NotificationPop';
 import { getUnreadHistoryCount } from '@/lib/api/hisotry';
 import Link from 'next/link';
 import NavLink from '../common/NavLink';
 import { usePathname } from 'next/navigation';
 import { RiPencilFill } from 'react-icons/ri';
+
+const LoginModal = dynamic(
+  () => import('../auth/LoginModal'),
+  { ssr: false }
+);
+
+const NotificationPop = dynamic(
+  () => import('../home/notification/NotificationPop'),
+  { ssr: false }
+);
 
 interface HeaderProps {
   visibleHeaderButtons?: boolean;

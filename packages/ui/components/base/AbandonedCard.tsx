@@ -51,10 +51,6 @@ export default function AbandonedCard({
     return currentImageUrl;
   }, [currentImageUrl]);
 
-  const isExternalImage = useMemo(() => {
-    return currentImageUrl && !currentImageUrl.includes('res.cloudinary.com');
-  }, [currentImageUrl]);
-
   const handleImageError = useCallback(() => {
     if (currentImageIndex < availableImages.length - 1) {
       setCurrentImageIndex((prev) => prev + 1);
@@ -82,6 +78,20 @@ export default function AbandonedCard({
     return thumbnailImage || defaultImage;
   }, [availableImages.length, currentImageIndex, thumbnailImage, defaultImage]);
 
+  const isExternalImage = useMemo(() => {
+    if (!currentImageUrl) return false;
+    // Cloudinary 이미지는 이미 최적화되어 있으므로 Next.js 최적화 불필요
+    if (currentImageUrl.includes('res.cloudinary.com')) return true;
+    // openapi.animal.go.kr 이미지는 Next.js로 최적화 가능
+    if (currentImageUrl.includes('openapi.animal.go.kr') || currentImageUrl.includes('www.animal.go.kr')) {
+      return false;
+    }
+    // 기본 이미지는 최적화 불필요
+    if (displayImage === defaultImage) return true;
+    // 기타 외부 이미지는 최적화 시도
+    return false;
+  }, [currentImageUrl, displayImage, defaultImage]);
+
   const statusBadge = useMemo(() => {
     return {
       text: shelterAnimal?.processState || '상태 미확인',
@@ -95,14 +105,14 @@ export default function AbandonedCard({
 
     const noticeEdtStr = shelterAnimal.noticeEdt;
     const year = parseInt(noticeEdtStr.substring(0, 4));
-    const month = parseInt(noticeEdtStr.substring(4, 6)) - 1; 
+    const month = parseInt(noticeEdtStr.substring(4, 6)) - 1;
     const day = parseInt(noticeEdtStr.substring(6, 8));
     const endDate = new Date(year, month, day);
-    
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     endDate.setHours(0, 0, 0, 0);
-    
+
     const diffTime = endDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
@@ -140,7 +150,7 @@ export default function AbandonedCard({
     }
   }, [shelterAnimal]);
   const openGoogleMap = useCallback((e: React.MouseEvent, address: string) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     const encodedAddress = encodeURIComponent(address);
     const url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
     window.open(url, '_blank');
@@ -242,9 +252,8 @@ export default function AbandonedCard({
 
         {/* 기본 정보 - 높이 유지하며 부드러운 fade out */}
         <div
-          className={`flex flex-col gap-1 transition-opacity duration-300 ease-in-out ${
-            isLongHover ? 'opacity-0 pointer-events-none' : 'opacity-100'
-          }`}
+          className={`flex flex-col gap-1 transition-opacity duration-300 ease-in-out ${isLongHover ? 'opacity-0 pointer-events-none' : 'opacity-100'
+            }`}
         >
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium text-gray-400">
@@ -278,8 +287,8 @@ export default function AbandonedCard({
                     {shelterAnimal.sexCd === 'F'
                       ? '여자'
                       : shelterAnimal.sexCd === 'M'
-                      ? '남자'
-                      : shelterAnimal.sexCd}
+                        ? '남자'
+                        : shelterAnimal.sexCd}
                   </span>
                 </>
               )}
@@ -300,9 +309,8 @@ export default function AbandonedCard({
         </div>
 
         <div
-          className={`absolute inset-0 flex items-center justify-center p-3 sm:p-4 transition-opacity duration-300 ease-in-out ${
-            isLongHover ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
+          className={`absolute inset-0 flex items-center justify-center p-3 sm:p-4 transition-opacity duration-300 ease-in-out ${isLongHover ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
         >
           <button
             onClick={(e) => {
@@ -311,8 +319,8 @@ export default function AbandonedCard({
             }}
             className="w-full flex justify-center items-center p-2 font-bold text-white rounded-lg bg-primary2 hover:bg-primary1 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 active:translate-y-0 gap-2"
           >
-            <FaPaw className="text-sm sm:text-base" /> 
-            <span className='text-xs sm:text-sm font-semibold'>자세히 보러가기</span> 
+            <FaPaw className="text-sm sm:text-base" />
+            <span className='text-xs sm:text-sm font-semibold'>자세히 보러가기</span>
           </button>
         </div>
       </div>

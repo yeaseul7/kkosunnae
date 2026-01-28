@@ -2,10 +2,15 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import localFont from 'next/font/local';
 import Script from 'next/script';
+import dynamic from 'next/dynamic';
 import './globals.css';
 import '@/styles/keyframe.css';
 import { AuthProvider } from '@/lib/firebase/auth';
-import LocationDataProvider from '@/packages/ui/components/base/LocationDataProvider';
+
+const LocationDataProvider = dynamic(
+  () => import('@/packages/ui/components/base/LocationDataProvider'),
+  { ssr: true }
+);
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

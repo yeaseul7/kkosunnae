@@ -1,11 +1,11 @@
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
-import ShelterPosts from '@/packages/ui/components/home/shelter/ShelterPosts';
+import ShelterPostsServer from '@/packages/ui/components/home/shelter/ShelterPostsServer';
 
 export default function Shelter() {
   return (
     <main className="page-container-full">
       <PageTemplate visibleHomeTab={false}>
-        <ShelterPosts />
+        <ShelterPostsServer />
       </PageTemplate>
     </main>
   );
