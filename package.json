@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@floating-ui/react": "^0.27.16",
+    "@next/bundle-analyzer": "^16.1.6",
     "@tiptap/extension-image": "^3.11.0",
     "@tiptap/extension-text-align": "^3.11.0",
     "@tiptap/extensions": "^3.11.0",

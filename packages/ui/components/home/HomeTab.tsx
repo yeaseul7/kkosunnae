@@ -1,9 +1,17 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import JumpDog from '../common/JumpDog';
+import { useEffect, useState, useRef, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { PiHandHeartLight } from 'react-icons/pi';
 import { HiOutlineWifi } from 'react-icons/hi2';
+
+const JumpDog = dynamic(
+  () => import('../common/JumpDog'),
+  {
+    ssr: false,
+    loading: () => <div className="absolute left-0 w-[100px] h-[100px]" />
+  }
+);
 
 interface HomeTabProps {
   mode: 'trending' | 'adoption';
@@ -81,7 +89,9 @@ export default function HomeTab({ mode, setMode }: HomeTabProps) {
           style={{ height: '92px' }}
         >
           {animationData && (
-            <JumpDog dogRef={dogRef as React.RefObject<HTMLDivElement>} animationData={animationData} />
+            <Suspense fallback={<div className="absolute left-0 w-[100px] h-[100px]" />}>
+              <JumpDog dogRef={dogRef as React.RefObject<HTMLDivElement>} animationData={animationData} />
+            </Suspense>
           )}
         </div>
 

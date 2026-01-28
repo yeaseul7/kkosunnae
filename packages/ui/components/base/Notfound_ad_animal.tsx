@@ -1,6 +1,14 @@
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import PageTemplate from './PageTemplate';
-import Lottie from 'lottie-react';
+import dynamic from 'next/dynamic';
+
+const Lottie = dynamic(
+  () => import('lottie-react'),
+  {
+    ssr: false,
+    loading: () => <div className="w-full h-full" />
+  }
+);
 
 interface Notfound_ad_animalProps {
   emptyAnimationData: object | null;
