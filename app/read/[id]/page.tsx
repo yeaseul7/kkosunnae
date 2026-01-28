@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import ReadPostContent from '@/packages/ui/components/home/read/ReadPostContent';
+import dynamic from 'next/dynamic';
 import { getPostById } from '@/lib/api/post';
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
 import PageFooter from '@/packages/ui/components/base/PageFooter';
@@ -10,6 +10,17 @@ import {
   generateMetadata as generateMetadataUtil,
   generateDefaultMetadata,
 } from '@/packages/utils/metadata';
+
+import ReadPostContentSkeleton from '@/packages/ui/components/base/ReadPostContentSkeleton';
+
+// Tiptap을 사용하는 ReadPostContent를 동적 import로 지연 로드
+const ReadPostContent = dynamic(
+  () => import('@/packages/ui/components/home/read/ReadPostContent'),
+  {
+    ssr: true,
+    loading: () => <ReadPostContentSkeleton />
+  }
+);
 
 export async function generateMetadata({
   params,

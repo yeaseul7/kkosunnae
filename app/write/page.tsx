@@ -1,5 +1,15 @@
+'use client';
 import PageTemplate from '@/packages/ui/components/base/PageTemplate';
-import WriteContainer from '@/packages/ui/components/home/write/WriteContainer';
+import dynamic from 'next/dynamic';
+import WriteContainerSkeleton from '@/packages/ui/components/base/WriteContainerSkeleton';
+
+const WriteContainer = dynamic(
+  () => import('@/packages/ui/components/home/write/WriteContainer'),
+  {
+    ssr: false,
+    loading: () => <WriteContainerSkeleton />
+  }
+);
 
 export default function WritePage() {
   return (

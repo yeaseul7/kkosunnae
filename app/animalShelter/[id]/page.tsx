@@ -2,7 +2,17 @@ import { Metadata } from 'next';
 import PageTemplate from "@/packages/ui/components/base/PageTemplate";
 import { ShelterInfoItem } from '@/packages/type/shelterTyps';
 import { ShelterAnimalItem } from '@/packages/type/postType';
-import ShelterInfoComponent from "@/packages/ui/components/home/shelterList/ShelterInfoComponent";
+import dynamic from 'next/dynamic';
+import ShelterInfoComponentSkeleton from '@/packages/ui/components/base/ShelterInfoComponentSkeleton';
+
+// Tiptap을 사용할 수 있는 ShelterInfoComponent를 동적 import로 지연 로드
+const ShelterInfoComponent = dynamic(
+  () => import("@/packages/ui/components/home/shelterList/ShelterInfoComponent"),
+  { 
+    ssr: true,
+    loading: () => <ShelterInfoComponentSkeleton />
+  }
+);
 import {
     getBaseUrl,
     generateMetadata as generateMetadataUtil,
