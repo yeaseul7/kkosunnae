@@ -126,6 +126,7 @@ export default function LocationDataProvider() {
                   };
                   localStorage.setItem('matched_address', JSON.stringify(defaultAddress));
                   localStorage.setItem('matched_address_timestamp', Date.now().toString());
+                  document.cookie = `matched_address=${encodeURIComponent(JSON.stringify(defaultAddress))}; path=/; max-age=${60 * 60 * 24 * 7}`;
                   console.log('기본값(서울) 주소 정보 저장:', defaultAddress);
                 }
                 return;
@@ -143,6 +144,7 @@ export default function LocationDataProvider() {
                   };
                   localStorage.setItem('matched_address', JSON.stringify(defaultAddress));
                   localStorage.setItem('matched_address_timestamp', Date.now().toString());
+                  document.cookie = `matched_address=${encodeURIComponent(JSON.stringify(defaultAddress))}; path=/; max-age=${60 * 60 * 24 * 7}`;
                   console.log('기본값(서울) 주소 정보 저장:', defaultAddress);
                 }
                 return;
@@ -170,6 +172,8 @@ export default function LocationDataProvider() {
                   };
                   localStorage.setItem('matched_address', JSON.stringify(matchedAddress));
                   localStorage.setItem('matched_address_timestamp', Date.now().toString());
+                  // 쿠키에도 저장 (Server Component에서 접근 가능하도록)
+                  document.cookie = `matched_address=${encodeURIComponent(JSON.stringify(matchedAddress))}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7일
                   console.log('주소 매칭 성공 및 localStorage 저장:', matchedAddress);
                 } else {
                   console.log('시도 코드 매칭 실패. level1:', level1, '기본값(서울)을 사용합니다.');
@@ -182,6 +186,7 @@ export default function LocationDataProvider() {
                     };
                     localStorage.setItem('matched_address', JSON.stringify(defaultAddress));
                     localStorage.setItem('matched_address_timestamp', Date.now().toString());
+                    document.cookie = `matched_address=${encodeURIComponent(JSON.stringify(defaultAddress))}; path=/; max-age=${60 * 60 * 24 * 7}`;
                     console.log('기본값(서울) 주소 정보 저장:', defaultAddress);
                   }
                 }
@@ -201,6 +206,7 @@ export default function LocationDataProvider() {
               };
               localStorage.setItem('matched_address', JSON.stringify(defaultAddress));
               localStorage.setItem('matched_address_timestamp', Date.now().toString());
+              document.cookie = `matched_address=${encodeURIComponent(JSON.stringify(defaultAddress))}; path=/; max-age=${60 * 60 * 24 * 7}`;
               console.log('기본값(서울) 주소 정보 저장:', defaultAddress);
             }
           },
@@ -221,6 +227,7 @@ export default function LocationDataProvider() {
           };
           localStorage.setItem('matched_address', JSON.stringify(defaultAddress));
           localStorage.setItem('matched_address_timestamp', Date.now().toString());
+          document.cookie = `matched_address=${encodeURIComponent(JSON.stringify(defaultAddress))}; path=/; max-age=${60 * 60 * 24 * 7}`;
           console.log('기본값(서울) 주소 정보 저장:', defaultAddress);
         }
       }

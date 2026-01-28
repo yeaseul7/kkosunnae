@@ -72,20 +72,16 @@ export async function GET(request: NextRequest) {
     if (searchParams.has('searchQuery'))
       params.searchQuery = searchParams.get('searchQuery')!;
 
-    // 기본값 설정
     const pageNo = params.pageNo || '1';
     const numOfRows = params.numOfRows || '1000';
     const _type = params._type || 'json';
 
-    // URL 파라미터 구성
-    // serviceKey는 URL 인코딩이 필요합니다
     const urlParams = new URLSearchParams();
     urlParams.append('serviceKey', serviceKey);
     urlParams.append('pageNo', pageNo);
     urlParams.append('numOfRows', numOfRows);
     urlParams.append('_type', _type);
 
-    // 선택적 파라미터 추가
     if (params.bgnde) urlParams.append('bgnde', params.bgnde);
     if (params.endde) urlParams.append('endde', params.endde);
     if (params.upkind) urlParams.append('upkind', params.upkind);
@@ -103,8 +99,6 @@ export async function GET(request: NextRequest) {
       urlParams.append('desertion_no', params.desertion_no);
     if (params.notice_no) urlParams.append('notice_no', params.notice_no);
 
-    // 공공데이터포털 API 호출
-    // 엔드포인트 경로: /abandonmentPublic_v2
     const apiUrl = `${API_BASE_URL}/abandonmentPublic_v2?${urlParams.toString()}`;
     console.log('API URL:', apiUrl);
     const response = await fetch(apiUrl, {
@@ -132,7 +126,7 @@ export async function GET(request: NextRequest) {
       const searchLower = params.searchQuery.toLowerCase();
       const items = data.response.body.items.item;
       const itemsArray = Array.isArray(items) ? items : [items];
-      
+
       const filteredItems = itemsArray.filter((item: ShelterAnimalItem) => {
         const rfidCd = item.rfidCd?.toLowerCase() || '';
         const happenPlace = item.happenPlace?.toLowerCase() || '';
@@ -152,7 +146,7 @@ export async function GET(request: NextRequest) {
       } else {
         data.response.body.items.item = filteredItems.length > 0 ? filteredItems[0] : null;
       }
-      
+
       // totalCount도 업데이트
       if (data.response.body.totalCount) {
         data.response.body.totalCount = filteredItems.length;
