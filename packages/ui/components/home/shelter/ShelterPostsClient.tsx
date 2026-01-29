@@ -94,8 +94,8 @@ export default function ShelterPostsClient({ initialData }: ShelterPostsClientPr
       prevFilters.state !== newFilters.state ||
       prevFilters.upKindCd !== newFilters.upKindCd ||
       prevFilters.bgnde !== newFilters.bgnde ||
-      prevFilters.endde !== newFilters.endde;
-
+      prevFilters.endde !== newFilters.endde ||
+      prevFilters.upr_cd !== newFilters.upr_cd;
     if (!isSearchQueryChanged && !isOtherFilterChanged) {
       return;
     }

@@ -113,6 +113,15 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
               className={`!border-b-0 !p-0 text-sm lg:text-base transition-colors ${pathname === '/' ? '!text-primary1 font-semibold' : '!text-gray-700 hover:!text-primary1'
                 }`}
             >
+              홈
+            </NavLink>
+            <NavLink
+              to="/community"
+              activeClassName="active"
+              isActive={() => pathname === '/community'}
+              className={`!border-b-0 !p-0 text-sm lg:text-base transition-colors ${pathname === '/community' ? '!text-primary1 font-semibold' : '!text-gray-700 hover:!text-primary1'
+                }`}
+            >
               이야기 창구
             </NavLink>
             <NavLink
@@ -243,6 +252,16 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
             activeClassName="active"
             isActive={() => pathname === '/'}
             className={`block px-4 py-3 !border-b-0 text-sm transition-colors hover:bg-gray-50 rounded-lg ${pathname === '/' ? '!text-primary1 bg-blue-50 font-semibold' : '!text-gray-700'
+              }`}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            홈
+          </NavLink>
+          <NavLink
+            to="/community"
+            activeClassName="active"
+            isActive={() => pathname === '/community'}
+            className={`block px-4 py-3 !border-b-0 text-sm transition-colors hover:bg-gray-50 rounded-lg ${pathname === '/community' ? '!text-primary1 bg-blue-50 font-semibold' : '!text-gray-700'
               }`}
             onClick={() => setIsMobileMenuOpen(false)}
           >

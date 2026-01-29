@@ -38,6 +38,10 @@ const YoutubeList = dynamic(
   { ssr: true }
 );
 
+const Banner = dynamic(
+  () => import('@/packages/ui/components/home/Banner'),
+  { ssr: true }
+);
 
 export default function Home() {
   const [mode, setMode] = useState<'trending' | 'adoption'>('trending');
@@ -45,6 +49,7 @@ export default function Home() {
     <main className="page-container-full">
       <PageTemplate visibleHomeTab={false}>
         <div className="w-full">
+          <Banner />
           <Suspense fallback={<HomeTabSkeleton />}>
             <HomeTab mode={mode} setMode={setMode} />
           </Suspense>
@@ -57,7 +62,7 @@ export default function Home() {
               </div>
             </div>
           }>
-            {mode === 'trending' ? <TrendingPosts /> : <RecentPosts />}
+            {mode === 'trending' ? <TrendingPosts pageSize={4} fromMain /> : <RecentPosts pageSize={4} fromMain />}
           </Suspense>
         </div>
         <Suspense fallback={

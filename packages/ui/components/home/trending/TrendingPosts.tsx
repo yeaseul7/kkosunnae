@@ -1,23 +1,30 @@
 'use client';
 import { getTrendingBoardsData } from '@/lib/api/post';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import PostCard from '../../base/PostCard';
 import PostCardSkeleton from '../../base/PostCardSkeleton';
 import { PostData } from '@/packages/type/postType';
 
-export default function TrendingPosts() {
+interface TrendingPostsProps {
+  pageSize?: number;
+  fromMain?: boolean;
+}
+
+export default function TrendingPosts({ pageSize = 12, fromMain = false }: TrendingPostsProps) {
   const [allPosts, setAllPosts] = useState<PostData[]>([]);
   const [displayedPosts, setDisplayedPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [displayCount, setDisplayCount] = useState(12);
+  const [displayCount, setDisplayCount] = useState(pageSize);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         const postsData = await getTrendingBoardsData();
         setAllPosts(postsData);
-        setDisplayedPosts(postsData.slice(0, 12));
+        setDisplayedPosts(postsData.slice(0, pageSize));
+        setDisplayCount(pageSize);
       } catch (e) {
         console.error('게시물 조회 중 오류 발생:', e);
       } finally {
@@ -25,13 +32,18 @@ export default function TrendingPosts() {
       }
     };
     fetchPosts();
-  }, []);
+  }, [pageSize]);
+
+  useEffect(() => {
+    setDisplayCount(pageSize);
+    setDisplayedPosts(allPosts.slice(0, pageSize));
+  }, [pageSize, allPosts]);
 
   const handleLoadMore = () => {
     setLoadingMore(true);
 
     setTimeout(() => {
-      const nextCount = displayCount + 12;
+      const nextCount = displayCount + pageSize;
       setDisplayedPosts(allPosts.slice(0, nextCount));
       setDisplayCount(nextCount);
       setLoadingMore(false);
@@ -50,7 +62,7 @@ export default function TrendingPosts() {
     <div className="w-full">
       <div className="grid grid-cols-1 gap-4 px-4 pt-8 w-full sm:px-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {loading ? (
-          Array.from({ length: 12 }).map((_, index) => (
+          Array.from({ length: pageSize }).map((_, index) => (
             <PostCardSkeleton key={`skeleton-${index}`} />
           ))
         ) : (
@@ -59,12 +71,12 @@ export default function TrendingPosts() {
               <PostCard
                 key={post.id}
                 post={post}
-                highPriority={index < 12}
-                highQuality={index < 12}
+                highPriority={index < pageSize}
+                highQuality={index < pageSize}
               />
             ))}
             {loadingMore && (
-              Array.from({ length: 12 }).map((_, index) => (
+              Array.from({ length: pageSize }).map((_, index) => (
                 <PostCardSkeleton key={`skeleton-more-${index}`} />
               ))
             )}
@@ -72,7 +84,7 @@ export default function TrendingPosts() {
         )}
       </div>
 
-      {hasMore && (
+      {hasMore && !fromMain && (
         <div className="flex justify-center mt-8 mb-4 px-4 sm:px-0">
           <button
             onClick={handleLoadMore}
@@ -90,6 +102,16 @@ export default function TrendingPosts() {
               `더보기`
             )}
           </button>
+        </div>
+      )}
+      {fromMain && (
+        <div className="flex justify-end mt-4 mb-4 px-4 sm:px-0">
+          <Link
+            href="/community"
+            className="text-primary1 hover:text-primary2 font-semibold transition-colors duration-200"
+          >
+            전체 보기
+          </Link>
         </div>
       )}
     </div>

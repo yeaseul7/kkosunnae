@@ -283,7 +283,6 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
           )}
         </div>
 
-        {/* 시도 필터 버튼들 */}
         {sidoList.length > 0 && (
           <div className="flex flex-wrap justify-start gap-2 mt-2">
             <button

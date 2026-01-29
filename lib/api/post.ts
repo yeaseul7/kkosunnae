@@ -174,8 +174,6 @@ export async function getTrendingBoardsData(
       limit(limitCount * 2),
     );
 
-    // category 필드가 없는 게시물을 가져오기 위해 모든 게시물을 가져온 후 필터링
-    // (Firestore에서는 필드가 없는 문서를 직접 쿼리할 수 없음)
     const qAll = query(
       boardsCol,
       orderBy('createdAt', 'desc'),
@@ -187,13 +185,11 @@ export async function getTrendingBoardsData(
       getDocs(qAll),
     ]);
 
-    // pet-life 카테고리 게시물
     const petLifePosts = petLifeSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     })) as PostData[];
 
-    // category가 없거나 undefined인 게시물 필터링
     const allPosts = allSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -203,7 +199,6 @@ export async function getTrendingBoardsData(
       (post) => !post.category || post.category === undefined
     );
 
-    // 두 배열을 합치고 중복 제거 (id 기준)
     const allFilteredPosts = [...petLifePosts, ...noCategoryPosts];
     const uniquePostsMap = new Map<string, PostData>();
     allFilteredPosts.forEach((post) => {
@@ -212,7 +207,6 @@ export async function getTrendingBoardsData(
       }
     });
 
-    // 최신순으로 정렬 (createdAt 기준)
     const sortedPosts = Array.from(uniquePostsMap.values())
       .sort((a, b) => {
         const aTime = a.createdAt?.toMillis() || 0;
