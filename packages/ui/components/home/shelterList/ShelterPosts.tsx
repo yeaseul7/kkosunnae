@@ -22,6 +22,24 @@ export default function ShelterPosts() {
     const [selectedSido, setSelectedSido] = useState<string>('서울');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
+    const [shelterIdTokens, setShelterIdTokens] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        if (shelters.length === 0) {
+            setShelterIdTokens({});
+            return;
+        }
+        const careRegNos = shelters.map((s) => s.careRegNo).filter((v): v is string => Boolean(v));
+        if (careRegNos.length === 0) return;
+        fetch('/api/shelter-id/encode', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ care_reg_nos: careRegNos }),
+        })
+            .then((res) => res.json())
+            .then((data) => setShelterIdTokens(data?.tokens ?? {}))
+            .catch(() => setShelterIdTokens({}));
+    }, [shelters]);
 
     const fetchShelterInfo = useCallback(async (sidoCd?: string) => {
         setSheltersLoading(true);
@@ -347,7 +365,14 @@ export default function ShelterPosts() {
                                             )}
                                         </div>
                                         <div className="flex items-center gap-2 shrink-0">
-                                            <button onClick={() => router.push(`/animalShelter/${shelter.careRegNo}`)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200 transition-colors text-xs font-medium">
+                                            <button
+                                                onClick={() => {
+                                                    const token = shelter.careRegNo ? shelterIdTokens[shelter.careRegNo] : undefined;
+                                                    if (token) router.push(`/animalShelter/${token}`);
+                                                }}
+                                                disabled={shelter.careRegNo ? !shelterIdTokens[shelter.careRegNo] : true}
+                                                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200 transition-colors text-xs font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                                            >
                                                 상세보기
                                             </button>
                                             <button

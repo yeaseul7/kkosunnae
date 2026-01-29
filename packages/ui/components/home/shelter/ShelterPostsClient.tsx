@@ -230,9 +230,9 @@ export default function ShelterPostsClient({ initialData }: ShelterPostsClientPr
             ))
           ) : (
             <>
-              {shelterAnimalData.map((shelterAnimal: ShelterAnimalItem) => (
+              {shelterAnimalData.map((shelterAnimal: ShelterAnimalItem, index) => (
                 <AbandonedCard
-                  key={shelterAnimal.desertionNo}
+                  key={shelterAnimal.desertionNo ? `${shelterAnimal.desertionNo}-${index}` : `shelter-${index}`}
                   shelterAnimal={shelterAnimal}
                 />
               ))}

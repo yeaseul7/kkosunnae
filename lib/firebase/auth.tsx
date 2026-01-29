@@ -11,6 +11,7 @@ import { auth } from './firebase';
 import { firestore } from './firebase';
 import {
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
   GoogleAuthProvider,
@@ -35,11 +36,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  login: async () => {},
-  register: async () => {},
-  logout: async () => {},
-  loginWithGoogle: async () => {},
-  loginWithGithub: async () => {},
+  login: async () => { },
+  register: async () => { },
+  logout: async () => { },
+  loginWithGoogle: async () => { },
+  loginWithGithub: async () => { },
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -154,14 +155,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  // 로그인 함수
-  const login = async (email: string) => {
-    await signInWithEmailLink(auth, email, window.location.href);
+  // 이메일·비밀번호 로그인
+  const login = async (email: string, password: string) => {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    if (result.user) {
+      const userDoc = await getDoc(doc(firestore, 'users', result.user.uid));
+      if (!userDoc.exists() && typeof window !== 'undefined') {
+        window.location.href = '/register';
+      }
+    }
   };
 
-  // 회원가입 함수
+  // 회원가입 함수 (이메일·비밀번호)
   const register = async (email: string, password: string) => {
-    await createUserWithEmailAndPassword(auth, email, password);
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    if (result.user) {
+      const userDoc = await getDoc(doc(firestore, 'users', result.user.uid));
+      if (!userDoc.exists() && typeof window !== 'undefined') {
+        window.location.href = '/register';
+      }
+    }
   };
 
   // 로그아웃 함수

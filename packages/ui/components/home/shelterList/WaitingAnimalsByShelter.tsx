@@ -8,10 +8,10 @@ import { useRouter } from 'next/navigation';
 interface WaitingAnimalsByShelterProps {
     animals: ShelterAnimalItem[];
     shelterName: string;
+    setShowAllList: (showAllList: boolean) => void;
 }
 
-export default function WaitingAnimalsByShelter({ animals, shelterName }: WaitingAnimalsByShelterProps) {
-    const router = useRouter();
+export default function WaitingAnimalsByShelter({ animals, shelterName, setShowAllList }: WaitingAnimalsByShelterProps) {
     const displayAnimals = animals.slice(0, 4);
     if (displayAnimals.length === 0) {
         return null;
@@ -32,7 +32,7 @@ export default function WaitingAnimalsByShelter({ animals, shelterName }: Waitin
                 {animals.length > 4 && (
                     <button
                         onClick={() => {
-                            router.push(`/animalShelter?care_reg_no=${displayAnimals[0]?.careRegNo || ''}`);
+                            setShowAllList(true);
                         }}
                         className="text-xs sm:text-sm text-primary1 font-bold hover:text-primary2 transition-colors flex items-center gap-1 cursor-pointer self-start sm:self-auto"
                     >

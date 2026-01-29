@@ -201,9 +201,7 @@ export default function AbandonedCard({
         />
       </div>
       <div className="flex flex-col flex-1 p-3 sm:p-4 gap-1 relative">
-        {/* 뱃지 및 지도 버튼 - 상단 일렬 배치 */}
         <div className="flex items-center gap-2 mb-2">
-          {/* 상태 뱃지 */}
           {shelterAnimal?.processState && (
             <div
               className="px-2 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
@@ -215,7 +213,6 @@ export default function AbandonedCard({
               {statusBadge.text}
             </div>
           )}
-          {/* 공고종료일 뱃지 */}
           {noticeEndBadge && (
             <div
               className="px-2 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
@@ -227,7 +224,6 @@ export default function AbandonedCard({
               {noticeEndBadge.text}
             </div>
           )}
-          {/* 지도 버튼 */}
           <button
             onClick={(e) =>
               openGoogleMap(e, shelterAnimal?.happenPlace || '')

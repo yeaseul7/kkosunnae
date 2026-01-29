@@ -31,7 +31,7 @@ export default function AnimalInfoCard({
   const { user } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  
+
   useEffect(() => {
     const checkAbandonment = async () => {
       if (!desertionNo || !user) {
@@ -121,7 +121,7 @@ export default function AnimalInfoCard({
         textarea.style.opacity = '0';
         document.body.appendChild(textarea);
         textarea.select();
-        textarea.setSelectionRange(0, 99999); 
+        textarea.setSelectionRange(0, 99999);
 
         try {
           const successful = document.execCommand('copy');
@@ -160,11 +160,10 @@ export default function AnimalInfoCard({
           <button
             onClick={handleLike}
             disabled={isUpdating}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-              isLiked
-                ? 'bg-red-100 hover:bg-red-200'
-                : 'bg-gray-100 hover:bg-gray-200'
-            } ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${isLiked
+              ? 'bg-red-100 hover:bg-red-200'
+              : 'bg-gray-100 hover:bg-gray-200'
+              } ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {isLiked ? (
               <HiHeart className="w-5 h-5 text-red-600" />
@@ -178,26 +177,26 @@ export default function AnimalInfoCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <div className="bg-pink-50 rounded-xl p-3 flex flex-col gap-1 items-center justify-center min-h-[70px] lg:col-span-2">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
+        <div className="bg-pink-50 rounded-xl p-3 flex flex-col gap-0.5 items-center justify-center min-h-[70px] lg:col-span-2">
           <span className="text-xs font-semibold text-gray-500">나이</span>
-          <span className="text-sm font-bold text-gray-900 text-center break-words whitespace-normal">
+          <span className="text-[10px] font-bold text-gray-900 text-center break-words whitespace-normal">
             {animalData?.age || '미상'}
           </span>
         </div>
-        <div className="bg-green-50 rounded-xl p-3 flex flex-col gap-1 items-center justify-center min-h-[70px]">
+        <div className="bg-green-50 rounded-xl p-3 flex flex-col gap-0.5 items-center justify-center min-h-[70px]">
           <span className="text-xs font-semibold text-gray-500">성별</span>
-          <span className="text-sm font-bold text-gray-900 text-center">{genderText}</span>
+          <span className="text-[10px] font-bold text-gray-900 text-center">{genderText}</span>
         </div>
-        <div className="bg-blue-50 rounded-xl p-3 flex flex-col gap-1 items-center justify-center min-h-[70px]">
+        <div className="bg-blue-50 rounded-xl p-3 flex flex-col gap-0.5 items-center justify-center min-h-[70px]">
           <span className="text-xs font-semibold text-gray-500">체중</span>
-          <span className="text-sm font-bold text-gray-900 text-center">
+          <span className="text-[10px] font-bold text-gray-900 text-center">
             {animalData?.weight || '미상'}
           </span>
         </div>
-        <div className="bg-purple-50 rounded-xl p-3 flex flex-col gap-1 items-center justify-center min-h-[70px]">
+        <div className="bg-purple-50 rounded-xl p-3 flex flex-col gap-0.5 items-center justify-center min-h-[70px] lg:col-span-2">
           <span className="text-xs font-semibold text-gray-500">품종</span>
-          <span className="text-sm font-bold text-gray-900 text-center line-clamp-1">
+          <span className="text-[10px] font-bold text-gray-900 text-center break-words whitespace-normal w-full min-w-0">
             {breedText}
           </span>
         </div>
@@ -256,8 +255,8 @@ export default function AnimalInfoCard({
                   {animalData.neuterYn === 'Y'
                     ? '완료'
                     : animalData.neuterYn === 'N'
-                    ? '미완료'
-                    : '미상'}
+                      ? '미완료'
+                      : '미상'}
                 </span>
               </div>
             )}
@@ -302,7 +301,7 @@ export default function AnimalInfoCard({
               </span>
             </div>
           )}
-      
+
           {animalData?.careAddr && (
             <div className="flex items-start gap-3 py-2 border-b border-gray-100">
               <span className="text-xs font-semibold text-gray-500 min-w-[80px]">주소:</span>

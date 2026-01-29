@@ -113,6 +113,7 @@ npm start
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Cloudinary 클라우드 이름 |
 | `CLOUDINARY_API_KEY` | Cloudinary API Key |
 | `CLOUDINARY_API_SECRET` | Cloudinary API Secret |
+| `SHELTER_ID_SECRET` | 보호소 상세 URL 토큰 암호화용 비밀 키 (미설정 시 기본값 사용) |
 | `ANALYZE` | `true` 시 빌드 시 번들 분석 결과 생성 |
 
 ## 배포

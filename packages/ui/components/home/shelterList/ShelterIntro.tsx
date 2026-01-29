@@ -13,6 +13,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { Placeholder } from '@tiptap/extensions';
 
 interface ShelterIntroProps {
+    /** 현재 보호소의 관리번호(careRegNo). URL 인코딩된 id가 아님. */
     shelterId: string;
 }
 
@@ -29,6 +30,17 @@ export default function ShelterIntro({ shelterId }: ShelterIntroProps) {
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    /** 로그인한 사용자의 보호소 관리번호(shelterInfo.careRegNo) */
+    const [userShelterCareRegNo, setUserShelterCareRegNo] = useState<string | null>(null);
+    /** 전체 관리자 여부(users.fulladmin) */
+    const [userFullAdmin, setUserFullAdmin] = useState(false);
+    const [userProfileLoading, setUserProfileLoading] = useState(true);
+
+    const isManagerOfThisShelter = Boolean(
+        user && userShelterCareRegNo && shelterId && userShelterCareRegNo === shelterId
+    );
+    /** 이 보호소 관리자이거나 전체 관리자(fulladmin)일 때 수정 가능 */
+    const canEditIntro = Boolean(user && (isManagerOfThisShelter || userFullAdmin));
 
     const editor = useEditor({
         extensions: [
@@ -40,6 +52,32 @@ export default function ShelterIntro({ shelterId }: ShelterIntroProps) {
         content: introData?.content || '',
         immediatelyRender: false,
     });
+
+    // 로그인한 사용자의 보호소 정보(shelterInfo), 전체 관리자(fulladmin) 로드
+    useEffect(() => {
+        const loadUserProfile = async () => {
+            if (!user?.uid) {
+                setUserShelterCareRegNo(null);
+                setUserFullAdmin(false);
+                setUserProfileLoading(false);
+                return;
+            }
+            try {
+                const userDoc = await getDoc(doc(firestore, 'users', user.uid));
+                const data = userDoc.data();
+                const careRegNo = data?.shelterInfo?.careRegNo;
+                setUserShelterCareRegNo(typeof careRegNo === 'string' ? careRegNo : null);
+                setUserFullAdmin(data?.fulladmin === true);
+            } catch (error) {
+                console.error('사용자 프로필 로드 오류:', error);
+                setUserShelterCareRegNo(null);
+                setUserFullAdmin(false);
+            } finally {
+                setUserProfileLoading(false);
+            }
+        };
+        loadUserProfile();
+    }, [user?.uid]);
 
     // 데이터 로드
     useEffect(() => {
@@ -83,6 +121,10 @@ export default function ShelterIntro({ shelterId }: ShelterIntroProps) {
             alert('로그인이 필요합니다.');
             return;
         }
+        if (!canEditIntro) {
+            alert('해당 보호소 관리자만 수정 가능합니다.');
+            return;
+        }
 
         if (!editor) return;
 
@@ -124,6 +166,10 @@ export default function ShelterIntro({ shelterId }: ShelterIntroProps) {
             alert('로그인이 필요합니다.');
             return;
         }
+        if (!canEditIntro) {
+            alert('해당 보호소 관리자만 수정 가능합니다.');
+            return;
+        }
         setIsEditing(true);
     };
 
@@ -153,7 +199,7 @@ export default function ShelterIntro({ shelterId }: ShelterIntroProps) {
                     <IoInformationCircle className="w-5 h-5 text-primary1" />
                     <h2 className="text-lg font-bold text-gray-900">보호소 소개</h2>
                 </div>
-                {hasContent && user && (
+                {hasContent && canEditIntro && (
                     <button
                         onClick={handleEdit}
                         className="flex items-center gap-1 text-gray-700 hover:text-gray-900 transition-colors"
@@ -168,7 +214,7 @@ export default function ShelterIntro({ shelterId }: ShelterIntroProps) {
                 <div className="flex flex-col gap-4">
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                         <p className="text-xs text-blue-700">
-                            💡 로그인한 상태에서만 등록 및 수정이 가능합니다.
+                            💡 이 보호소로 등록된 관리자만 등록 및 수정이 가능합니다.
                         </p>
                     </div>
                     <div className="border border-gray-200 rounded-lg p-4 min-h-[200px]">
@@ -196,11 +242,20 @@ export default function ShelterIntro({ shelterId }: ShelterIntroProps) {
                 </div>
             ) : (
                 <>
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                        <p className="text-xs text-blue-700">
-                            💡 로그인한 상태에서만 등록 및 수정이 가능합니다.
-                        </p>
-                    </div>
+                    {user && !userProfileLoading && !canEditIntro && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                            <p className="text-xs text-amber-800">
+                                ⚠️ 해당 보호소 관리자만 수정 가능합니다. 회원가입 시 이 보호소를 선택한 계정으로 로그인해주세요.
+                            </p>
+                        </div>
+                    )}
+                    {!user && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <p className="text-xs text-blue-700">
+                                💡 로그인한 상태에서만 등록 및 수정이 가능합니다.
+                            </p>
+                        </div>
+                    )}
                     <div className="flex flex-col items-center justify-center gap-4 py-8">
                         <HiDocumentText className="w-10 h-10 text-gray-300" />
                         <div className="flex flex-col items-center gap-2">
@@ -211,7 +266,7 @@ export default function ShelterIntro({ shelterId }: ShelterIntroProps) {
                         </div>
                     </div>
 
-                    {user && (
+                    {canEditIntro && (
                         <div className="flex justify-center">
                             <button
                                 onClick={() => setIsEditing(true)}

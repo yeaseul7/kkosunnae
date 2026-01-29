@@ -1,17 +1,18 @@
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import PageTemplate from "@/packages/ui/components/base/PageTemplate";
 import { ShelterInfoItem } from '@/packages/type/shelterTyps';
 import { ShelterAnimalItem } from '@/packages/type/postType';
 import dynamic from 'next/dynamic';
 import ShelterInfoComponentSkeleton from '@/packages/ui/components/base/ShelterInfoComponentSkeleton';
+import { decodeShelterId } from '@/lib/shelterId';
 
-// Tiptap을 사용할 수 있는 ShelterInfoComponent를 동적 import로 지연 로드
 const ShelterInfoComponent = dynamic(
-  () => import("@/packages/ui/components/home/shelterList/ShelterInfoComponent"),
-  { 
-    ssr: true,
-    loading: () => <ShelterInfoComponentSkeleton />
-  }
+    () => import("@/packages/ui/components/home/shelterList/ShelterInfoComponent"),
+    {
+        ssr: true,
+        loading: () => <ShelterInfoComponentSkeleton />
+    }
 );
 import {
     getBaseUrl,
@@ -142,8 +143,18 @@ export async function generateMetadata({
     const baseUrl = getBaseUrl();
     const pageUrl = `${baseUrl}/animalShelter/${id}`;
 
+    const careRegNo = decodeShelterId(id);
+    if (!careRegNo) {
+        return generateDefaultMetadata(
+            '보호소 정보 | 꼬순내',
+            '보호소 정보 및 입양 대기 중인 친구들을 확인해보세요.',
+            pageUrl,
+            { type: 'website' },
+        );
+    }
+
     try {
-        const shelter = await fetchShelterInfo(id);
+        const shelter = await fetchShelterInfo(careRegNo);
 
         if (shelter) {
             const shelterName = shelter.careNm || '보호소';
@@ -183,9 +194,14 @@ export async function generateMetadata({
 export default async function AnimalShelterPage({ params }: AnimalShelterPageProps) {
     const { id } = await params;
 
+    const careRegNo = decodeShelterId(id);
+    if (!careRegNo) {
+        notFound();
+    }
+
     const [shelter, animals] = await Promise.all([
-        fetchShelterInfo(id),
-        fetchShelterAnimals(id),
+        fetchShelterInfo(careRegNo),
+        fetchShelterAnimals(careRegNo),
     ]);
 
     return (

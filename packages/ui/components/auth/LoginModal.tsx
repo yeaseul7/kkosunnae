@@ -5,19 +5,26 @@ import { FcGoogle } from 'react-icons/fc';
 import { FaGithub } from 'react-icons/fa';
 import { useClickOutsideModal } from '@/packages/utils/clickEvent';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function isValidEmail(value: string): boolean {
+  return EMAIL_REGEX.test(value.trim());
+}
+
 interface LoginModalProps {
   onClose?: () => void;
 }
 
 export default function LoginModal({ onClose }: LoginModalProps) {
-  const { loginWithGoogle, loginWithGithub, user } = useAuth();
+  const { login, register, loginWithGoogle, loginWithGithub, user } = useAuth();
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const modalRef = useRef<HTMLDivElement>(null);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isGithubLoading, setIsGithubLoading] = useState(false);
+  const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [emailSent, setEmailSent] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -27,38 +34,75 @@ export default function LoginModal({ onClose }: LoginModalProps) {
 
   useClickOutsideModal(modalRef, () => onClose?.(), !!onClose);
 
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+    if (!trimmedEmail || !trimmedPassword) {
+      setMessage('이메일과 비밀번호를 입력해주세요.');
+      return;
+    }
+    if (!isValidEmail(trimmedEmail)) {
+      setMessage('올바른 이메일 형식을 입력해주세요.');
+      return;
+    }
+    if (authMode === 'register' && trimmedPassword.length < 6) {
+      setMessage('비밀번호는 6자 이상이어야 합니다.');
+      return;
+    }
+    setIsEmailLoading(true);
+    setMessage('');
+    try {
+      if (authMode === 'login') {
+        await login(trimmedEmail, trimmedPassword);
+      } else {
+        await register(trimmedEmail, trimmedPassword);
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : '알 수 없는 오류';
+      if (msg.includes('auth/invalid-credential') || msg.includes('auth/wrong-password')) {
+        setMessage('이메일 또는 비밀번호가 올바르지 않습니다.');
+      } else if (msg.includes('auth/email-already-in-use')) {
+        setMessage('이미 사용 중인 이메일입니다. 로그인해주세요.');
+      } else if (msg.includes('auth/invalid-email')) {
+        setMessage('올바른 이메일 형식을 입력해주세요.');
+      } else {
+        setMessage(authMode === 'login' ? `로그인 실패: ${msg}` : `회원가입 실패: ${msg}`);
+      }
+    } finally {
+      setIsEmailLoading(false);
+    }
+  };
+
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
     setMessage('Google 로그인 중...');
-
     try {
       await loginWithGoogle();
     } catch (error) {
       setMessage(
-        `Google 로그인 실패: ${
-          error instanceof Error ? error.message : '알 수 없는 오류'
-        }`,
+        `Google 로그인 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`,
       );
     } finally {
       setIsGoogleLoading(false);
     }
   };
-  const handleGithubLogin = async () => {
-      setIsGithubLoading(true);
-      setMessage('Github 로그인 중...');
 
+  const handleGithubLogin = async () => {
+    setIsGithubLoading(true);
+    setMessage('Github 로그인 중...');
     try {
       await loginWithGithub();
     } catch (error) {
       setMessage(
-        `Github 로그인 실패: ${
-          error instanceof Error ? error.message : '알 수 없는 오류'
-        }`,
+        `Github 로그인 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`,
       );
     } finally {
       setIsGithubLoading(false);
     }
   };
+
+  const isLoading = isGoogleLoading || isGithubLoading || isEmailLoading;
 
   return (
     <div className="flex fixed inset-0 justify-center items-center z-[9999]">
@@ -70,88 +114,125 @@ export default function LoginModal({ onClose }: LoginModalProps) {
         <h3 className="mb-4 text-xl font-bold">
           {authMode === 'login' ? '로그인' : '회원가입'}
         </h3>
-        {emailSent ? (
-          <div className="space-y-4">
-            <p className="text-text2">
-              {email}로 회원가입 링크를 전송했습니다. 이메일을 확인하고 링크를
-              클릭해주세요.
+
+        <form onSubmit={handleEmailSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="login-email" className="block mb-1 text-sm font-medium text-text2">
+              이메일
+            </label>
+            <input
+              id="login-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@email.com"
+              autoComplete="email"
+              className="w-full px-3 py-2 border border-border3 rounded-md bg-element1 text-text1 placeholder:text-text3 focus:outline-none focus:ring-2 focus:ring-primary1/30 focus:border-primary1"
+              disabled={isLoading}
+            />
+          </div>
+          <div>
+            <label htmlFor="login-password" className="block mb-1 text-sm font-medium text-text2">
+              비밀번호
+            </label>
+            <input
+              id="login-password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={authMode === 'register' ? '6자 이상' : '비밀번호'}
+              autoComplete={authMode === 'login' ? 'current-password' : 'new-password'}
+              className="w-full px-3 py-2 border border-border3 rounded-md bg-element1 text-text1 placeholder:text-text3 focus:outline-none focus:ring-2 focus:ring-primary1/30 focus:border-primary1"
+              disabled={isLoading}
+            />
+          </div>
+          {message && (
+            <p className="text-sm text-red-600" role="alert">
+              {message}
             </p>
+          )}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full px-4 py-2.5 rounded-md bg-primary1 text-button-text font-medium hover:bg-primary2 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+          >
+            {isEmailLoading
+              ? authMode === 'login'
+                ? '로그인 중...'
+                : '회원가입 중...'
+              : authMode === 'login'
+                ? '로그인'
+                : '회원가입'}
+          </button>
+        </form>
+
+        <div className="flex items-center gap-3 my-6">
+          <span className="flex-1 h-px bg-border3" />
+          <span className="text-sm text-text3">또는</span>
+          <span className="flex-1 h-px bg-border3" />
+        </div>
+
+        <div className="flex gap-4 justify-center">
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={isLoading}
+            className="flex justify-center items-center disabled:opacity-60 disabled:cursor-not-allowed"
+            aria-label="Google로 로그인"
+          >
+            <div className="p-2 rounded-full border border-border3 hover:bg-gray-50 transition-colors">
+              <FcGoogle className="text-2xl" />
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={handleGithubLogin}
+            disabled={isLoading}
+            className="flex justify-center items-center disabled:opacity-60 disabled:cursor-not-allowed"
+            aria-label="Github로 로그인"
+          >
+            <div className="p-2 rounded-full border border-border3 hover:bg-gray-50 transition-colors">
+              <FaGithub className="text-2xl" />
+            </div>
+          </button>
+        </div>
+
+        {authMode === 'login' ? (
+          <div className="flex justify-end mt-6 text-text3 text-sm">
+            아직 회원이 아니신가요?{' '}
             <button
+              type="button"
+              className="pl-1 text-primary1 hover:text-primary2 font-medium"
               onClick={() => {
-                setEmailSent(false);
-                setEmail('');
+                setAuthMode('register');
                 setMessage('');
               }}
-              className="px-4 py-2 w-full rounded-md bg-primary1 text-button-text hover:bg-primary2"
             >
-              {authMode === 'login'
-                ? '다른 이메일로 로그인'
-                : '다른 이메일로 회원가입'}
+              회원가입하기
             </button>
           </div>
         ) : (
-          <div className="space-y-4">
-            <div className="flex gap-4 justify-center my-8">
-              <button
-                onClick={handleGoogleLogin}
-                disabled={isGoogleLoading}
-                className="flex justify-center items-center"
-              >
-                {isGoogleLoading ? (
-                  message
-                ) : (
-                  <div className="p-2 rounded-full border border-border3 hover:bg-gray-50">
-                    <FcGoogle className="text-2xl" />
-                  </div>
-                )}
-              </button>
-              <button
-                onClick={handleGithubLogin}
-                disabled={isGithubLoading}
-                className="flex justify-center items-center"
-              >
-                {isGithubLoading ? (
-                  message
-                ) : (
-                  <div className="p-2 rounded-full border border-border3 hover:bg-gray-50">
-                    <FaGithub className="text-2xl" />
-                  </div>
-                )}
-              </button>
-            </div>
-            {authMode === 'login' ? (
-              <div className="flex justify-end mt-16 text-text3">
-                아직 회원이 아니신가요?
-                <button
-                  className="pl-2 text-primary1 hover:text-primary2"
-                  onClick={() => {
-                    setAuthMode('register');
-                    setMessage('');
-                  }}
-                >
-                  회원가입하기
-                </button>
-              </div>
-            ) : (
-              <div className="flex justify-end mt-16 text-text3">
-                이미 회원이신가요?
-                <button
-                  className="pl-2 text-primary1 hover:text-primary2"
-                  onClick={() => {
-                    setAuthMode('login');
-                    setMessage('');
-                  }}
-                >
-                  로그인하기
-                </button>
-              </div>
-            )}
+          <div className="flex justify-end mt-6 text-text3 text-sm">
+            이미 회원이신가요?{' '}
+            <button
+              type="button"
+              className="pl-1 text-primary1 hover:text-primary2 font-medium"
+              onClick={() => {
+                setAuthMode('login');
+                setMessage('');
+              }}
+            >
+              로그인하기
+            </button>
           </div>
         )}
+
         {onClose && (
           <button
+            type="button"
             onClick={onClose}
             className="absolute top-4 right-4 text-text3 hover:text-text1"
+            aria-label="닫기"
           >
             ✕
           </button>
