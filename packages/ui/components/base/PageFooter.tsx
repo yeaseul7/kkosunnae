@@ -22,7 +22,7 @@ export default function PageFooter() {
           <div className="flex flex-col items-center sm:items-start gap-3">
             <Link href="/" className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary1/30 rounded">
               <Image
-                src="/static/images/logo1.png"
+                src="/static/images/textLogo.png"
                 alt="꼬순내 로고"
                 width={120}
                 height={120}

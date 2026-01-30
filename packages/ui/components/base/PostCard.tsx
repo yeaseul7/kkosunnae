@@ -55,13 +55,13 @@ export default function PostCard({ post, highPriority = false, highQuality = fal
 
   const defaultImage = useMemo(() => {
     if (!post.tags || post.tags.length === 0) {
-      return '/static/images/defaultDogImg.png';
+      return '/static/images/defaultDog.png';
     }
     const catTags = ['고양이', '냥냥이', '냥이', '냥', '냐옹', '츄르', '야옹'];
     if (catTags.some((tag) => post.tags.includes(tag))) {
-      return '/static/images/defaultCatImg.png';
+      return '/static/images/defaultCat.png';
     }
-    return '/static/images/defaultDogImg.png';
+    return '/static/images/defaultDog.png';
   }, [post.tags]);
 
   useEffect(() => {

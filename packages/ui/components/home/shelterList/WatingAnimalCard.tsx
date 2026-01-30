@@ -59,7 +59,7 @@ export default function WatingAnimalCard({ animal }: { animal: ShelterAnimalItem
         return happenDt;
     };
 
-    const imageUrl = animal.popfile1 || '/static/images/defaultDogImg.png';
+    const imageUrl = animal.popfile1 || '/static/images/defaultDog.png';
     const animalName = animal.kindNm || animal.kindFullNm || '이름 없음';
     const age = getAgeText(animal.age);
     const breed = animal.kindNm || '품종 미상';

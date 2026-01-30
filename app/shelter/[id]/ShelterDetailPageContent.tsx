@@ -138,7 +138,7 @@ export default function ShelterDetailPageContent({
     if (animalImgList.length > 0) {
       return animalImgList[selectedImageIndex];
     }
-    return '/static/images/defaultDogImg.png';
+    return '/static/images/defaultDog.png';
   }, [animalImgList, selectedImageIndex]);
 
   const statusText = useMemo(() => {

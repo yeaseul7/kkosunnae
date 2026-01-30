@@ -86,7 +86,7 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
             className="flex items-center transition-opacity hover:opacity-80"
           >
             <Image
-              src="/static/images/logoicon.png"
+              src="/static/images/IconLogo.png"
               alt="Logo"
               width={30}
               height={30}
@@ -94,7 +94,7 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
               loading="eager"
             />
             <Image
-              src="/static/images/logo1.png"
+              src="/static/images/textLogo.png"
               alt="Logo"
               width={120}
               height={120}

@@ -56,7 +56,7 @@ function isUnsupportedImageUrl(imageUrl: string): boolean {
 export function normalizeImageUrl(
   imageUrl: string | null | undefined,
   baseUrl: string,
-  defaultImagePath: string = '/static/images/defaultDogImg.png',
+  defaultImagePath: string = '/static/images/defaultDog.png',
 ): string {
   if (!imageUrl) {
     return `${baseUrl}${defaultImagePath}`;
@@ -107,24 +107,30 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
     type = 'website',
     siteName = '꼬순내',
     locale = 'ko_KR',
-    defaultImagePath = '/static/images/defaultDogImg.png',
-    includeCanonical = false,
+    defaultImagePath = '/static/images/defaultDog.png',
+    includeCanonical = true, // 기본값을 true로 추천 (SEO 중복 방지)
     includeTwitterCreator = false,
-    includeOtherOgTags = false,
     imageAlt,
   } = options;
 
   const baseUrl = getBaseUrl();
   const normalizedImageUrl = normalizeImageUrl(imageUrl, baseUrl, defaultImagePath);
-  const imageAltText = imageAlt || title;
+  const imageAltText = imageAlt || `${title} - 꼬순내`;
 
-  const metadata: Metadata = {
-    title,
-    description,
+  // 160자 제한으로 설명문 최적화
+  const truncatedDescription = extractText(description)?.substring(0, 160) || '';
+
+  return {
+    title: {
+      default: title,
+      template: `%s | ${siteName}`,
+    },
+    description: truncatedDescription,
     metadataBase: new URL(baseUrl),
+    alternates: includeCanonical ? { canonical: url } : undefined,
     openGraph: {
       title,
-      description,
+      description: truncatedDescription,
       url,
       siteName,
       images: [
@@ -133,7 +139,6 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
           width: 1200,
           height: 630,
           alt: imageAltText,
-          type: 'image/jpeg',
         },
       ],
       locale,
@@ -142,35 +147,16 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
     twitter: {
       card: 'summary_large_image',
       title,
-      description,
+      description: truncatedDescription,
       images: [normalizedImageUrl],
+      creator: includeTwitterCreator ? '@kkosunnae' : undefined,
+    },
+    // 로봇 제어 (필요 시 추가)
+    robots: {
+      index: true,
+      follow: true,
     },
   };
-
-  if (includeCanonical) {
-    metadata.alternates = {
-      canonical: url,
-    };
-  }
-
-  if (includeTwitterCreator) {
-    metadata.twitter = {
-      ...metadata.twitter,
-      creator: '@kkosunnae',
-      site: '@kkosunnae',
-    };
-  }
-
-  if (includeOtherOgTags) {
-    metadata.other = {
-      'og:image': normalizedImageUrl,
-      'og:image:width': '1200',
-      'og:image:height': '630',
-      'og:image:alt': imageAltText,
-    };
-  }
-
-  return metadata;
 }
 
 
@@ -187,7 +173,7 @@ export function generateDefaultMetadata(
 ): Metadata {
   const {
     type = 'website',
-    defaultImagePath = '/static/images/defaultDogImg.png',
+    defaultImagePath = '/static/images/defaultDog.png',
     includeCanonical = false,
     includeTwitterCreator = false,
   } = options || {};

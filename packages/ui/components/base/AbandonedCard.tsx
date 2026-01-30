@@ -59,12 +59,12 @@ export default function AbandonedCard({
 
   const defaultImage = useMemo(() => {
     if (shelterAnimal.upKindNm === '417000') {
-      return '/static/images/defaultDogImg.png';
+      return '/static/images/defaultDog.png';
     }
     if (shelterAnimal.kindCd === '422400') {
-      return '/static/images/defaultCatImg.png';
+      return '/static/images/defaultCat.png';
     }
-    return '/static/images/defaultDogImg.png';
+    return '/static/images/defaultDog.png';
   }, [shelterAnimal.upKindNm, shelterAnimal.kindCd]);
 
   // 이미지가 없거나 모든 이미지가 실패한 경우 기본 이미지 사용
