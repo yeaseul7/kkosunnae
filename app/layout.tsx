@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/static/images/bannerImg.png',
+        url: '/static/images/bannerImg.jpeg',
         width: 1200,
         height: 630,
         alt: '꼬순내 - 유기동물 입양 및 반려인 커뮤니티',
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: '꼬순내 - 사지 말고 입양하세요',
     description: '전국의 유기동물 정보와 반려인 커뮤니티를 한곳에서! 당신의 가족을 찾아보세요.',
-    images: ['/static/images/bannerImg.png'],
+    images: ['/static/images/bannerImg.jpeg'],
   },
   themeColor: '#FFD700',
 };
