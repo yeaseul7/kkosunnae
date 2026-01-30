@@ -1,13 +1,20 @@
+'use client';
+
+import { useEffect, RefObject } from 'react';
 import Lottie from 'lottie-react';
-import { RefObject } from 'react';
 
 export default function JumpDog({
   dogRef,
   animationData,
+  onMount,
 }: {
   dogRef: RefObject<HTMLDivElement>;
   animationData: object;
+  onMount?: () => void;
 }) {
+  useEffect(() => {
+    onMount?.();
+  }, [onMount]);
 
   return (
     <>

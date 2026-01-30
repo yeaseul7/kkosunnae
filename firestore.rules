@@ -98,6 +98,19 @@ service cloud.firestore {
       allow delete: if false; // 삭제 불가
     }
 
+    // 'notice' 컬렉션: 공지사항 (읽기는 모두, 작성/수정/삭제는 fulladmin만. 조회수는 view 서브컬렉션 개수로 판단)
+    match /notice/{noticeId} {
+      allow read: if true; // 모든 사람이 공지사항을 읽을 수 있음
+      allow create, update, delete: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.fulladmin == true;
+
+      // view 서브컬렉션: IP별 조회 기록 (중복 조회 방지). 누구나 읽기/생성만 가능
+      match /view/{viewId} {
+        allow read, create: if true;
+        allow update, delete: if false;
+      }
+    }
+
     // 모든 문서에 대한 기본 접근은 여전히 막고
     match /{document=**} {
       allow read, write: if false;

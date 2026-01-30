@@ -318,9 +318,9 @@ export default function MapComponent({
                         )}
                     </div>
 
-                    {/* 시도 선택 버튼 - 지도 아래 */}
+                    {/* 시도 선택 버튼 - 지도 아래 (모바일에서는 숨김) */}
                     {sidoList.length > 0 && (
-                        <div className="mt-4 flex flex-wrap justify-center gap-2">
+                        <div className="mt-4 hidden flex-wrap justify-center gap-2 sm:flex">
                             <button
                                 onClick={() => {
                                     if (onSidoSelect) {

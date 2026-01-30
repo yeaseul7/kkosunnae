@@ -19,6 +19,7 @@ import {
     generateMetadata as generateMetadataUtil,
     generateDefaultMetadata,
 } from '@/packages/utils/metadata';
+import PageFooter from '@/packages/ui/components/base/PageFooter';
 
 interface AnimalShelterPageProps {
     params: Promise<{ id: string }>;
@@ -210,6 +211,7 @@ export default async function AnimalShelterPage({ params }: AnimalShelterPagePro
                 <PageTemplate visibleHomeTab={false}>
                     <ShelterInfoComponent shelter={shelter} animals={animals} />
                 </PageTemplate>
+                <PageFooter />
             </main>
         </div>
     );

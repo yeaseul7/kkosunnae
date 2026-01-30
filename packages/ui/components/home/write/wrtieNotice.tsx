@@ -1,5 +1,4 @@
 import { HiLightBulb } from "react-icons/hi2";
-import { HiArrowRight } from "react-icons/hi2";
 
 export default function WriteNotice() {
     return (
@@ -29,14 +28,7 @@ export default function WriteNotice() {
                     </p>
                 </div>
             </div>
-
-            {/* <div className="bg-white rounded-lg p-4 mt-2">
-                <p className="text-sm text-gray-500 mb-1">도움이 필요하신가요?</p>
-                <div className="flex items-center gap-1">
-                    <span className="text-sm font-bold text-gray-900">커뮤니티 이용 규칙 보기</span>
-                    <HiArrowRight className="w-4 h-4 text-gray-900" />
-                </div>
-            </div> */}
+            ㅊ
         </div>
     );
 }

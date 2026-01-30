@@ -64,3 +64,15 @@ export const formatDateSimple = (
   if (!date) return '';
   return date.toLocaleDateString('ko-KR');
 };
+
+// 메타데이터용 날짜 포맷 (예: 2023.10.24)
+export const formatDateMeta = (
+  timestamp: Timestamp | { seconds: number; nanoseconds: number } | null,
+): string => {
+  const date = toDate(timestamp);
+  if (!date) return '';
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}.${m}.${d}`;
+};

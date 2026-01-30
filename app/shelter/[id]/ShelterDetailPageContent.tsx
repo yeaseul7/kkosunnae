@@ -12,6 +12,7 @@ import Notfound_ad_animal from '@/packages/ui/components/base/Notfound_ad_animal
 import AnimalImgCard from '@/packages/ui/components/home/shelter/AnimalImgCard';
 import AnimalInfoCard from '@/packages/ui/components/home/shelter/AnimalInfoCard';
 import AnimalNotice from '@/packages/ui/components/common/AnimalNotice';
+import PageFooter from '@/packages/ui/components/base/PageFooter';
 
 interface ShelterDetailPageContentProps {
   desertionNo: string;
@@ -216,6 +217,7 @@ export default function ShelterDetailPageContent({
 
           </div>
         </PageTemplate>
+        <PageFooter />
       </main>
     </div>
   );

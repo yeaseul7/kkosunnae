@@ -19,9 +19,10 @@ interface HomeTabProps {
 }
 export default function HomeTab({ mode, setMode }: HomeTabProps) {
   const [animationData, setAnimationData] = useState<object | null>(null);
+  const [dogReady, setDogReady] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const dogRef = useRef<HTMLDivElement>(null);
-  const directionRef = useRef<1 | -1>(1);
+  const cancelledRef = useRef(false);
 
   const isTrendingActive = mode === 'trending';
   const isRecentActive = mode === 'adoption';
@@ -34,43 +35,42 @@ export default function HomeTab({ mode, setMode }: HomeTabProps) {
   }, []);
 
   useEffect(() => {
-    if (!dogRef.current || !containerRef.current || !animationData) return;
-
+    if (!containerRef.current || !animationData || !dogReady) return;
     const dog = dogRef.current;
     const container = containerRef.current;
+    if (!dog) return;
+
+    cancelledRef.current = false;
     let position = 0;
     let currentDirection: 1 | -1 = 1;
-    const speed = 1;
+    const speed = 2;
     const dogWidth = 100;
 
-    directionRef.current = -1;
-    dog.style.transform = `scaleX(-1)`;
-
     const animate = () => {
-      const containerWidth = container.offsetWidth;
+      if (cancelledRef.current) return;
 
+      const containerWidth = container.offsetWidth;
       position += speed * currentDirection;
 
       if (position >= containerWidth - dogWidth) {
         currentDirection = -1;
-        directionRef.current = 1;
         position = Math.min(position, containerWidth - dogWidth);
-      }
-      else if (position <= 0) {
+      } else if (position <= 0) {
         currentDirection = 1;
-        directionRef.current = -1;
         position = Math.max(position, 0);
       }
 
       dog.style.left = `${position}px`;
-      dog.style.transform = `scaleX(${directionRef.current})`;
+      // Lottie 강아지가 기본으로 왼쪽 향해 걸으므로, 이동 방향과 보는 방향을 맞추기 위해 -currentDirection
+      dog.style.transform = `scaleX(${-currentDirection})`;
       requestAnimationFrame(animate);
     };
 
-    const animationId = requestAnimationFrame(animate);
-
-    return () => cancelAnimationFrame(animationId);
-  }, [animationData]);
+    requestAnimationFrame(animate);
+    return () => {
+      cancelledRef.current = true;
+    };
+  }, [animationData, dogReady]);
 
   const handleTrendingClick = () => {
     setMode('trending');
@@ -85,12 +85,16 @@ export default function HomeTab({ mode, setMode }: HomeTabProps) {
       <div className="relative flex justify-center items-center w-full">
         <div
           ref={containerRef}
-          className="absolute inset-0 flex justify-center items-center w-full overflow-hidden"
+          className="absolute inset-0 flex min-w-full justify-center items-center w-full overflow-hidden"
           style={{ height: '92px' }}
         >
           {animationData && (
             <Suspense fallback={<div className="absolute left-0 w-[100px] h-[100px]" />}>
-              <JumpDog dogRef={dogRef as React.RefObject<HTMLDivElement>} animationData={animationData} />
+              <JumpDog
+                dogRef={dogRef as React.RefObject<HTMLDivElement>}
+                animationData={animationData}
+                onMount={() => setDogReady(true)}
+              />
             </Suspense>
           )}
         </div>
