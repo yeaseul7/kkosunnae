@@ -19,17 +19,16 @@ export default function NoticeReadPage() {
   const noticeId = typeof params?.id === 'string' ? params.id : undefined;
 
   return (
-    <div className="w-full min-h-screen font-sans bg-white">
-      <main className="flex flex-col justify-between items-center w-full min-h-screen bg-whitesm:items-start">
-        <div className="flex h-full min-h-0 w-full flex-col overflow-hidden">
-          <PageTemplate visibleHomeTab={false} visibleHeaderButtons={false}>
-            <div className="flex h-full min-h-0 w-full flex-col overflow-auto">
-              <NoticeReadContent noticeId={noticeId ?? ''} />
-            </div>
-          </PageTemplate>
+    <main className="page-container-full">
+      <PageTemplate
+        visibleHomeTab={false}
+        visibleHeaderButtons={false}
+      >
+        <div className="flex h-full min-h-0 w-full flex-col overflow-auto">
+          <NoticeReadContent noticeId={noticeId ?? ''} />
         </div>
-        <PageFooter />
-      </main>
-    </div>
+      </PageTemplate>
+      <PageFooter />
+    </main>
   );
 }

@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
 import { ReplyData } from '@/packages/type/commentType';
+import type { CommentCollectionName } from './CommentList';
 import ReplyContainer from './ReplyContainer';
 import ReplyWrite from './ReplyWrite';
 import DecorateHr from '../../base/DecorateHr';
@@ -11,10 +12,12 @@ import { useClickOutside } from '@/packages/utils/clickEvent';
 export default function ReplyList({
   postId,
   commentId,
+  collectionName = 'boards',
   onReplyListClosed,
 }: {
   postId: string;
   commentId: string;
+  collectionName?: CommentCollectionName;
   onReplyListClosed: () => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -30,7 +33,7 @@ export default function ReplyList({
       try {
         const repliesCollection = collection(
           firestore,
-          'boards',
+          collectionName,
           postId,
           'comments',
           commentId,
@@ -54,7 +57,7 @@ export default function ReplyList({
     };
 
     fetchReplies();
-  }, [postId, commentId]);
+  }, [postId, commentId, collectionName]);
 
   useClickOutside(containerRef, () => onReplyListClosed());
 
@@ -77,11 +80,12 @@ export default function ReplyList({
             replyData={reply}
             postId={postId}
             commentId={commentId}
+            collectionName={collectionName}
           />
           {index !== replies.length - 1 && <DecorateHr />}
         </div>
       ))}
-      <ReplyWrite postId={postId} commentId={commentId} />
+      <ReplyWrite postId={postId} commentId={commentId} collectionName={collectionName} />
     </div>
   );
 }

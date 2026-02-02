@@ -14,6 +14,7 @@ import {
 import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
 import { CommentData } from '@/packages/type/commentType';
+import type { CommentCollectionName } from './CommentList';
 import { BsHeart, BsHeartFill, BsPlusSquare } from 'react-icons/bs';
 import ReplyWrite from './ReplyWrite';
 import ReplyList from './ReplyList';
@@ -22,9 +23,11 @@ import { createHistory, deleteHistoryByCommentLike } from '@/lib/api/hisotry';
 export default function CommentFooter({
   commentData,
   postId,
+  collectionName = 'boards',
 }: {
   commentData: CommentData;
   postId: string;
+  collectionName?: CommentCollectionName;
 }) {
   const { user } = useAuth();
   const [likes, setLikes] = useState<number>(commentData.likes || 0);
@@ -44,7 +47,7 @@ export default function CommentFooter({
       try {
         const commentRef = doc(
           firestore,
-          'boards',
+          collectionName,
           postId,
           'comments',
           commentData.id,
@@ -56,11 +59,10 @@ export default function CommentFooter({
           setLikes(likesCount);
         }
 
-        // 사용자가 좋아요를 눌렀는지 확인
         if (user) {
           const likeListCollection = collection(
             firestore,
-            'boards',
+            collectionName,
             postId,
             'comments',
             commentData.id,
@@ -80,15 +82,14 @@ export default function CommentFooter({
     };
 
     fetchLikeStatus();
-  }, [postId, commentData.id, user]);
+  }, [postId, commentData.id, user, collectionName]);
 
-  // 대댓글 개수 실시간 업데이트
   useEffect(() => {
     if (!postId || !commentData.id) return;
 
     const repliesCollection = collection(
       firestore,
-      'boards',
+      collectionName,
       postId,
       'comments',
       commentData.id,
@@ -100,7 +101,7 @@ export default function CommentFooter({
     });
 
     return () => unsubscribe();
-  }, [postId, commentData.id]);
+  }, [postId, commentData.id, collectionName]);
 
   const handleReply = () => {
     setIsReplyWriting((prev) => !prev);
@@ -118,7 +119,7 @@ export default function CommentFooter({
     try {
       const commentRef = doc(
         firestore,
-        'boards',
+        collectionName,
         postId,
         'comments',
         commentData.id,
@@ -132,7 +133,7 @@ export default function CommentFooter({
 
       const likeListCollection = collection(
         firestore,
-        'boards',
+        collectionName,
         postId,
         'comments',
         commentData.id,
@@ -142,7 +143,7 @@ export default function CommentFooter({
 
       if (isLiked) {
         const commentDocData = commentDoc.data();
-        if (commentDocData?.authorId) {
+        if (collectionName === 'boards' && commentDocData?.authorId) {
           await deleteHistoryByCommentLike(commentData.id, postId, user.uid);
         }
         await deleteDoc(userLikeDoc);
@@ -164,7 +165,7 @@ export default function CommentFooter({
         setIsLiked(true);
 
         const commentDocData = commentDoc.data();
-        if (commentDocData?.authorId) {
+        if (collectionName === 'boards' && commentDocData?.authorId) {
           await createHistory(
             commentDocData.authorId,
             user.uid,
@@ -222,9 +223,8 @@ export default function CommentFooter({
         <button
           onClick={handleLike}
           disabled={isUpdating}
-          className={`flex gap-1 items-center transition-opacity disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-75 ${
-            isLiked ? 'text-red-500' : 'text-primary1'
-          }`}
+          className={`flex gap-1 items-center transition-opacity disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-75 ${isLiked ? 'text-red-500' : 'text-primary1'
+            }`}
         >
           {isLiked ? <BsHeartFill /> : <BsHeart />}
           {likes > 0 && <span className="text-sm">{likes}</span>}
@@ -235,6 +235,7 @@ export default function CommentFooter({
         <ReplyWrite
           postId={postId}
           commentId={commentData.id}
+          collectionName={collectionName}
           onReplySubmitted={() => setIsReplyWriting(false)}
         />
       )}
@@ -242,6 +243,7 @@ export default function CommentFooter({
         <ReplyList
           postId={postId}
           commentId={commentData.id}
+          collectionName={collectionName}
           onReplyListClosed={() => setIsReplyListOpen(false)}
         />
       )}

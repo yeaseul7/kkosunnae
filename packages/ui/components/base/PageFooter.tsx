@@ -1,5 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { FaInstagram } from 'react-icons/fa';
+import { HiEnvelope } from 'react-icons/hi2';
 
 const FOOTER_LINKS = {
   바로가기: [
@@ -29,6 +31,24 @@ export default function PageFooter() {
                 className="shrink-0"
               />
             </Link>
+            <a
+              href="https://www.instagram.com/kkosunnae_official/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-gray-600 hover:text-primary1 focus:outline-none focus:ring-2 focus:ring-primary1/30 rounded transition-colors"
+              aria-label="꼬순내 인스타그램"
+            >
+              <FaInstagram className="w-5 h-5" />
+              <span className="text-xs">Instagram</span>
+            </a>
+            <a
+              href="mailto:kkosunnaekr1@gmail.com"
+              className="flex items-center gap-2 text-gray-600 hover:text-primary1 focus:outline-none focus:ring-2 focus:ring-primary1/30 rounded transition-colors"
+              aria-label="꼬순내 이메일"
+            >
+              <HiEnvelope className="w-5 h-5" />
+              <span className="text-xs">kkosunnaekr1@gmail.com</span>
+            </a>
           </div>
           <div className="flex flex-wrap gap-x-10 gap-y-6 sm:gap-x-12">
             {Object.entries(FOOTER_LINKS).map(([title, links]) => (

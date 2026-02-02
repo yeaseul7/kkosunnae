@@ -9,12 +9,16 @@ import UserProfile from '../../common/UserProfile';
 import { useUserProfiles } from '@/hooks/useUserProfile';
 import { HiChatBubbleLeft } from 'react-icons/hi2';
 
-export default function CommentList({ 
-  postId, 
-  postAuthorId 
-}: { 
+export type CommentCollectionName = 'boards' | 'notice';
+
+export default function CommentList({
+  postId,
+  postAuthorId,
+  collectionName = 'boards',
+}: {
   postId: string;
   postAuthorId?: string;
+  collectionName?: CommentCollectionName;
 }) {
   const router = useRouter();
   const [comments, setComments] = useState<CommentData[]>([]);
@@ -33,7 +37,7 @@ export default function CommentList({
 
     const commentCollection = collection(
       firestore,
-      'boards',
+      collectionName,
       postId,
       'comments',
     );
@@ -56,7 +60,7 @@ export default function CommentList({
     );
 
     return () => unsubscribe();
-  }, [postId]);
+  }, [postId, collectionName]);
 
   if (loading) {
     return (
@@ -95,7 +99,7 @@ export default function CommentList({
   return (
     <div className="flex flex-col gap-4 p-4 px-4 w-full sm:px-6 md:px-10">
       <div className="flex gap-2 items-center text-primary1">
-      <HiChatBubbleLeft className="w-5 h-5" /><div className="text-sm text-gray-500">댓글 {comments.length}</div>
+        <HiChatBubbleLeft className="w-5 h-5" /><div className="text-sm text-gray-500">댓글 {comments.length}</div>
       </div>
       {enrichedComments.map((comment, index) => {
         const authorInfo = comment.authorId
@@ -109,11 +113,10 @@ export default function CommentList({
         return (
           <div
             key={comment.id}
-            className={`flex gap-3 p-2 sm:p-4 w-full items-start ${
-              index !== enrichedComments.length - 1
+            className={`flex gap-3 p-2 sm:p-4 w-full items-start ${index !== enrichedComments.length - 1
                 ? 'border-b border-gray-200'
                 : ''
-            }`}
+              }`}
           >
             <button onClick={() => handleClickAuthor(comment.authorId)}>
               <div className="shrink-0">
@@ -142,6 +145,7 @@ export default function CommentList({
                 }
                 postId={postId}
                 postAuthorId={postAuthorId}
+                collectionName={collectionName}
                 isLoadingAuthorInfo={
                   comment.authorId
                     ? !authorInfoMap.has(comment.authorId)

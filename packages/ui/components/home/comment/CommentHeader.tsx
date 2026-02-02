@@ -1,5 +1,6 @@
 import { useAuth } from '@/lib/firebase/auth';
 import { CommentData } from '@/packages/type/commentType';
+import type { CommentCollectionName } from './CommentList';
 import { useMemo, useState } from 'react';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
@@ -9,10 +10,12 @@ import { deleteHistoryByCommentId } from '@/lib/api/hisotry';
 export default function CommentHeader({
   commentData,
   postId,
+  collectionName = 'boards',
   isLoadingAuthorInfo,
 }: {
   commentData: CommentData;
   postId: string;
+  collectionName?: CommentCollectionName;
   isLoadingAuthorInfo?: boolean;
 }) {
   const { authorName, createdAt } = commentData;
@@ -40,17 +43,19 @@ export default function CommentHeader({
     try {
       const commentRef = doc(
         firestore,
-        'boards',
+        collectionName,
         postId,
         'comments',
         commentData.id,
       );
 
-      await deleteHistoryByCommentId(
-        commentData.id,
-        postId,
-        commentData.authorId,
-      );
+      if (collectionName === 'boards') {
+        await deleteHistoryByCommentId(
+          commentData.id,
+          postId,
+          commentData.authorId,
+        );
+      }
 
       await deleteDoc(commentRef);
     } catch (error) {

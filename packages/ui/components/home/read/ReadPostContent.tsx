@@ -12,7 +12,7 @@ import Loading from '@/packages/ui/components/base/Loading';
 import NotFound from '@/packages/ui/components/base/NotFound';
 import { PostData } from '@/packages/type/postType';
 import ReadHeader from '@/packages/ui/components/home/read/ReadHeader';
-import ReadFooter from '@/packages/ui/components/home/read/ReadFooter';
+import ReadFooter from '@/packages/ui/components/common/ReadFooter';
 import Liked from '@/packages/ui/components/home/comment/Liked';
 import PageFooter from '@/packages/ui/components/base/PageFooter';
 import { optimizeImageUrlsInHtml } from '@/packages/utils/optimization';
@@ -123,7 +123,7 @@ export default function ReadPostContent({
               <Liked />
             </article>
           </div>
-          <ReadFooter post={post} postId={postId} />
+          <ReadFooter type="post" post={post} postId={postId} />
         </div>
       )}
     </div>

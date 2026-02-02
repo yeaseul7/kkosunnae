@@ -31,6 +31,7 @@ import {
 import { RiPencilFill } from 'react-icons/ri';
 import { MdOutlineDeleteOutline } from 'react-icons/md';
 import NoticeReadContentSkeleton from './NoticeReadContentSkeleton';
+import ReadFooter from '../common/ReadFooter';
 
 const NOTICE_COLLECTION = 'notice';
 const VIEW_SUBCOLLECTION = 'view';
@@ -332,7 +333,10 @@ export default function NoticeReadContent({ noticeId }: NoticeReadContentProps) 
             </button>
           </>
         )}
+
       </div>
+
+      <ReadFooter type="notice" noticeId={noticeId} />
     </div>
   );
 }

@@ -16,13 +16,9 @@ export default function Banner1() {
                     backgroundSize: 'cover',
                 }}
             />
-            <div
-                className="absolute inset-0 bg-gradient-to-r from-white/90 via-amber-50/70 to-transparent sm:via-amber-50/50"
-                aria-hidden
-            />
             <div className="relative flex w-full items-center px-4 py-6 pl-14 sm:pl-20 sm:px-6 sm:py-8 md:px-8 md:pl-24 md:py-10 lg:min-h-[340px]">
-                <div className="max-w-xl min-w-0">
-                    <h2 className="text-base font-semibold leading-snug text-gray-800 sm:text-xl sm:leading-relaxed md:text-2xl lg:text-3xl lg:leading-relaxed">
+                <div className="max-w-xl min-w-0 rounded-2xl bg-white/10 backdrop-blur-sm px-4 py-4 sm:px-5 sm:py-5 md:px-6 md:py-6">
+                    <h2 className="text-sm font-semibold leading-snug text-gray-800 sm:text-base sm:leading-relaxed md:text-lg lg:text-xl lg:leading-relaxed">
                         오늘 하루를 꼬순내로
                         <br />
                         채워주시겠어요?

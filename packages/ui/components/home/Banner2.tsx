@@ -16,13 +16,9 @@ export default function Banner2() {
                     backgroundSize: 'cover',
                 }}
             />
-            <div
-                className="absolute inset-0 bg-gradient-to-l from-white/95 via-sky-50/70 to-transparent sm:via-sky-50/50"
-                aria-hidden
-            />
             <div className="relative flex w-full items-center justify-end px-4 py-6 pr-14 sm:pr-20 sm:px-6 sm:py-8 md:px-8 md:pr-24 md:py-10 lg:min-h-[340px]">
-                <div className="max-w-xl min-w-0 text-right">
-                    <h2 className="text-base font-semibold leading-snug text-gray-800 sm:text-xl sm:leading-relaxed md:text-2xl lg:text-3xl lg:leading-relaxed">
+                <div className="max-w-xl min-w-0 rounded-2xl bg-white/10 backdrop-blur-sm px-4 py-4 text-right sm:px-5 sm:py-5 md:px-6 md:py-6">
+                    <h2 className="text-sm font-semibold leading-snug text-gray-800 sm:text-base sm:leading-relaxed md:text-lg lg:text-xl lg:leading-relaxed">
                         꼬순내에서 공지사항을 전해드립니다🐾
                     </h2>
                     <p className="mt-2 text-xs leading-relaxed text-gray-600 sm:mt-3 sm:text-sm md:mt-4 md:text-base lg:text-lg lg:leading-relaxed">

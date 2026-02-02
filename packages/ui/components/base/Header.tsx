@@ -116,13 +116,15 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
               홈
             </NavLink>
             <NavLink
-              to="/community"
+              to="/animalShelter"
               activeClassName="active"
-              isActive={() => pathname === '/community'}
-              className={`!border-b-0 !p-0 text-sm lg:text-base transition-colors ${pathname === '/community' ? '!text-primary1 font-semibold' : '!text-gray-700 hover:!text-primary1'
+              isActive={() => pathname === '/animalShelter' || pathname.startsWith('/animalShelter')}
+              className={`!border-b-0 !p-0 text-sm lg:text-base transition-colors ${pathname === '/animalShelter' || pathname.startsWith('/animalShelter')
+                ? '!text-primary1 font-semibold'
+                : '!text-gray-700 hover:!text-primary1'
                 }`}
             >
-              이야기 창구
+              보호소
             </NavLink>
             <NavLink
               to="/shelter"
@@ -136,15 +138,13 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
               입양 공고
             </NavLink>
             <NavLink
-              to="/animalShelter"
+              to="/community"
               activeClassName="active"
-              isActive={() => pathname === '/animalShelter' || pathname.startsWith('/animalShelter')}
-              className={`!border-b-0 !p-0 text-sm lg:text-base transition-colors ${pathname === '/animalShelter' || pathname.startsWith('/animalShelter')
-                ? '!text-primary1 font-semibold'
-                : '!text-gray-700 hover:!text-primary1'
+              isActive={() => pathname === '/community'}
+              className={`!border-b-0 !p-0 text-sm lg:text-base transition-colors ${pathname === '/community' ? '!text-primary1 font-semibold' : '!text-gray-700 hover:!text-primary1'
                 }`}
             >
-              보호소
+              커뮤니티
             </NavLink>
           </div>
 
@@ -258,14 +258,16 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
             홈
           </NavLink>
           <NavLink
-            to="/community"
+            to="/animalShelter"
             activeClassName="active"
-            isActive={() => pathname === '/community'}
-            className={`block px-4 py-3 !border-b-0 text-sm transition-colors hover:bg-gray-50 rounded-lg ${pathname === '/community' ? '!text-primary1 bg-blue-50 font-semibold' : '!text-gray-700'
+            isActive={() => pathname === '/animalShelter' || pathname.startsWith('/animalShelter')}
+            className={`block px-4 py-3 !border-b-0 text-sm transition-colors hover:bg-gray-50 rounded-lg ${pathname === '/animalShelter' || pathname.startsWith('/animalShelter')
+              ? '!text-primary1 bg-blue-50 font-semibold'
+              : '!text-gray-700'
               }`}
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            이야기 창구
+            보호소
           </NavLink>
           <NavLink
             to="/shelter"
@@ -280,16 +282,14 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
             입양 공고
           </NavLink>
           <NavLink
-            to="/animalShelter"
+            to="/community"
             activeClassName="active"
-            isActive={() => pathname === '/animalShelter' || pathname.startsWith('/animalShelter')}
-            className={`block px-4 py-3 !border-b-0 text-sm transition-colors hover:bg-gray-50 rounded-lg ${pathname === '/animalShelter' || pathname.startsWith('/animalShelter')
-              ? '!text-primary1 bg-blue-50 font-semibold'
-              : '!text-gray-700'
+            isActive={() => pathname === '/community'}
+            className={`block px-4 py-3 !border-b-0 text-sm transition-colors hover:bg-gray-50 rounded-lg ${pathname === '/community' ? '!text-primary1 bg-blue-50 font-semibold' : '!text-gray-700'
               }`}
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            보호소
+            커뮤니티
           </NavLink>
         </div>
       </div>

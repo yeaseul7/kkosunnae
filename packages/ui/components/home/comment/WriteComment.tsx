@@ -11,8 +11,15 @@ import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
 import { VscSend } from 'react-icons/vsc';
 import { createHistory } from '@/lib/api/hisotry';
+import type { CommentCollectionName } from './CommentList';
 
-export default function WriteComment({ postId }: { postId: string }) {
+export default function WriteComment({
+  postId,
+  collectionName = 'boards',
+}: {
+  postId: string;
+  collectionName?: CommentCollectionName;
+}) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,18 +45,17 @@ export default function WriteComment({ postId }: { postId: string }) {
 
     setIsSubmitting(true);
     try {
-      // 게시물 정보 가져오기
-      const postRef = doc(firestore, 'boards', postId);
-      const postDoc = await getDoc(postRef);
+      const docRef = doc(firestore, collectionName, postId);
+      const docSnap = await getDoc(docRef);
 
-      if (!postDoc.exists()) {
-        alert('게시물을 찾을 수 없습니다.');
+      if (!docSnap.exists()) {
+        alert(collectionName === 'boards' ? '게시물을 찾을 수 없습니다.' : '공지를 찾을 수 없습니다.');
         return;
       }
 
       const commentsCollection = collection(
         firestore,
-        'boards',
+        collectionName,
         postId,
         'comments',
       );
@@ -60,18 +66,19 @@ export default function WriteComment({ postId }: { postId: string }) {
         likes: 0,
       });
 
-      // 게시물 작성자에게 댓글 알림 생성
-      const postData = postDoc.data();
-      if (postData?.authorId) {
-        await createHistory(
-          postData.authorId,
-          user.uid,
-          'comment',
-          'comment',
-          commentDocRef.id,
-          postId,
-          commentDocRef.id,
-        );
+      if (collectionName === 'boards') {
+        const postData = docSnap.data();
+        if (postData?.authorId) {
+          await createHistory(
+            postData.authorId,
+            user.uid,
+            'comment',
+            'comment',
+            commentDocRef.id,
+            postId,
+            commentDocRef.id,
+          );
+        }
       }
 
       setComment('');
@@ -116,13 +123,12 @@ export default function WriteComment({ postId }: { postId: string }) {
         />
         <div className="flex justify-between items-center pt-2 border-t border-gray-100">
           <span
-            className={`text-xs font-medium ${
-              commentLength >= maxLength
+            className={`text-xs font-medium ${commentLength >= maxLength
                 ? 'text-red-500'
                 : commentLength >= maxLength * 0.9
-                ? 'text-orange-500'
-                : 'text-gray-400'
-            }`}
+                  ? 'text-orange-500'
+                  : 'text-gray-400'
+              }`}
           >
             {commentLength}/{maxLength}
           </span>

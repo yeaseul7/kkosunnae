@@ -13,14 +13,17 @@ import { firestore } from '@/lib/firebase/firebase';
 import { useAuth } from '@/lib/firebase/auth';
 import { VscSend } from 'react-icons/vsc';
 import { createHistory } from '@/lib/api/hisotry';
+import type { CommentCollectionName } from './CommentList';
 
 export default function ReplyWrite({
   postId,
   commentId,
+  collectionName = 'boards',
   onReplySubmitted,
 }: {
   postId: string;
   commentId: string;
+  collectionName?: CommentCollectionName;
   onReplySubmitted?: () => void;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -83,7 +86,7 @@ export default function ReplyWrite({
     try {
       const commentRef = doc(
         firestore,
-        'boards',
+        collectionName,
         postId,
         'comments',
         commentId,
@@ -97,7 +100,7 @@ export default function ReplyWrite({
 
       const repliesCollection = collection(
         firestore,
-        'boards',
+        collectionName,
         postId,
         'comments',
         commentId,
@@ -114,18 +117,20 @@ export default function ReplyWrite({
         repliesCount: increment(1),
       });
 
-      const commentData = commentDoc.data();
-      if (commentData?.authorId) {
-        await createHistory(
-          commentData.authorId,
-          user.uid,
-          'reply',
-          'reply',
-          replyDocRef.id,
-          postId,
-          commentId,
-          replyDocRef.id,
-        );
+      if (collectionName === 'boards') {
+        const commentData = commentDoc.data();
+        if (commentData?.authorId) {
+          await createHistory(
+            commentData.authorId,
+            user.uid,
+            'reply',
+            'reply',
+            replyDocRef.id,
+            postId,
+            commentId,
+            replyDocRef.id,
+          );
+        }
       }
 
       setReply('');
@@ -173,13 +178,12 @@ export default function ReplyWrite({
         />
         <div className="flex justify-between items-center">
           <span
-            className={`text-xs ${
-              replyLength >= maxLength
+            className={`text-xs ${replyLength >= maxLength
                 ? 'text-red-500'
                 : replyLength >= maxLength * 0.9
-                ? 'text-orange-500'
-                : 'text-gray-500'
-            }`}
+                  ? 'text-orange-500'
+                  : 'text-gray-500'
+              }`}
           >
             {replyLength}/{maxLength}
           </span>

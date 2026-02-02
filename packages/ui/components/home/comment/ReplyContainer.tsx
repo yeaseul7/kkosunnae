@@ -1,4 +1,5 @@
 import { ReplyData } from '@/packages/type/commentType';
+import type { CommentCollectionName } from './CommentList';
 import { useMemo, useState } from 'react';
 import { doc, deleteDoc, updateDoc, increment } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
@@ -12,10 +13,12 @@ export default function ReplyContainer({
   replyData,
   postId,
   commentId,
+  collectionName = 'boards',
 }: {
   replyData: ReplyData;
   postId: string;
   commentId: string;
+  collectionName?: CommentCollectionName;
 }) {
   const { user } = useAuth();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -46,25 +49,27 @@ export default function ReplyContainer({
     try {
       const replyRef = doc(
         firestore,
-        'boards',
+        collectionName,
         postId,
         'comments',
         commentId,
         'replies',
         replyData.id,
       );
-      await deleteHistoryByReplyId(
-        replyData.id,
-        postId,
-        commentId,
-        replyData.authorId,
-      );
+      if (collectionName === 'boards') {
+        await deleteHistoryByReplyId(
+          replyData.id,
+          postId,
+          commentId,
+          replyData.authorId,
+        );
+      }
 
       await deleteDoc(replyRef);
 
       const commentRef = doc(
         firestore,
-        'boards',
+        collectionName,
         postId,
         'comments',
         commentId,

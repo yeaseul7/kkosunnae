@@ -17,14 +17,12 @@ const PageFooter = dynamic(
 
 export default function NoticePage() {
     return (
-        <main className="grid h-screen min-h-screen w-full grid-rows-[1fr_auto]">
-            <div className="flex h-full min-h-0 w-full flex-col overflow-hidden">
-                <PageTemplate visibleHomeTab={false}>
-                    <div className="flex h-full min-h-0 w-full flex-col">
-                        <NoticeList />
-                    </div>
-                </PageTemplate>
-            </div>
+        <main className="page-container-full">
+            <PageTemplate visibleHomeTab={false}>
+                <div className="flex h-full min-h-0 w-full flex-col">
+                    <NoticeList />
+                </div>
+            </PageTemplate>
             <PageFooter />
         </main>
     );

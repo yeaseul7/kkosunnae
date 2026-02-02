@@ -73,10 +73,18 @@ export default function WriteBody({
   }, [editor, postData?.content]);
 
   return (
-    <div className="flex flex-col w-full h-full min-h-0">
-      {editor && <div className="shrink-0 mb-4"><WriteTag editor={editor as Editor} /></div>}
-      <div className="overflow-auto flex-1 w-full min-h-0">
-        {editor && <EditorContent editor={editor} className="tiptap" />}
+    <div className="flex min-h-0 w-full flex-1 flex-col">
+      {editor && (
+        <div className="shrink-0 mb-4">
+          <WriteTag editor={editor as Editor} />
+        </div>
+      )}
+      <div className="min-h-0 flex-1 overflow-y-auto w-full">
+        {editor && (
+          <div className="min-h-full">
+            <EditorContent editor={editor} className="tiptap" />
+          </div>
+        )}
       </div>
     </div>
   );
