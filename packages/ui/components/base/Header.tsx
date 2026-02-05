@@ -146,7 +146,7 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
             >
               커뮤니티
             </NavLink>
-            <NavLink
+            {/* <NavLink
               to="/card_news"
               activeClassName="active"
               isActive={() => pathname === '/card_news' || pathname.startsWith('/card_news')}
@@ -156,7 +156,7 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
                 }`}
             >
               카드뉴스
-            </NavLink>
+            </NavLink> */}
           </div>
 
           {/* 모바일 햄버거 버튼 */}
