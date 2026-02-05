@@ -73,7 +73,7 @@ export default function EditContainer({ className }: { className?: string }) {
       await updateDoc(doc(firestore, 'boards', postId), {
         title: post.title,
         content: post.content,
-        tags: post.tags,
+        tags: post.tags ?? [],
         category: writeCategory,
         updatedAt: serverTimestamp(),
       });

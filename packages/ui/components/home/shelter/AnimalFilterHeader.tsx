@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { MdArrowDropDown } from 'react-icons/md';
 import Image from 'next/image';
 import { getShortSidoName } from '@/packages/utils/locationUtils';
+import { RiResetLeftFill } from 'react-icons/ri';
 
 interface SidoItem {
   SIDO_CD: string;
@@ -48,6 +49,10 @@ interface AnimalFilterHeaderProps {
 export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFilterHeaderProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [sidoList, setSidoList] = useState<SidoItem[]>([]);
+
+  useEffect(() => {
+    console.log('filters', filters);
+  }, [filters]);
 
   useEffect(() => {
     const loadSidoList = () => {
@@ -138,176 +143,162 @@ export default function AnimalFilterHeader({ filters, onFilterChange }: AnimalFi
   };
 
   return (
-    <div className="w-full pb-3 pt-6 px-3 sm:pb-4 sm:pt-10 sm:px-4 ">
-      <div className="flex flex-col gap-3 sm:gap-4 w-full max-w-7xl mx-auto">
-        {/* 검색창 */}
-        <div className="relative w-full">
-          <div className="flex items-center px-3 sm:px-4 w-full h-10 sm:h-12 bg-white border border-gray-300 rounded-full shadow-sm focus-within:border-primary1 focus-within:ring-2 focus-within:ring-primary1/20 transition-all">
+    <div className="w-full pb-3 pt-6 px-0 sm:pb-4 sm:pt-10 sm:px-4">
+      <div className="w-full max-w-7xl mx-auto">
+        {/* 카드 컨테이너: 흰 배경, 둥근 모서리, 그림자 */}
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-gray-100/80 shadow-sm p-4 sm:p-5 flex flex-col gap-4">
+          {/* 검색창 */}
+          <div className="flex items-center w-full h-11 sm:h-12 bg-gray-50 border border-gray-100 rounded-xl px-4 focus-within:border-primary1 focus-within:ring-2 focus-within:ring-primary1/20 transition-all">
             <Image
               src="/static/svg/icon-search-3.svg"
-              alt="Search"
-              width={18}
-              height={18}
-              className="mr-2 sm:mr-3 text-gray-400 shrink-0 sm:w-5 sm:h-5"
+              alt="검색"
+              width={20}
+              height={20}
+              className="mr-3 text-gray-400 shrink-0"
             />
             <input
               type="text"
               value={filters.searchQuery}
               onChange={handleSearchChange}
-              placeholder="동물등록번호, 구조위치, 보호소명"
-              className="flex-1 w-full text-xs sm:text-sm placeholder-gray-400 text-gray-900 bg-transparent border-none outline-none"
+              placeholder="동물등록번호, 구조위치, 보호소명으로 검색해보세요"
+              className="flex-1 min-w-0 text-sm placeholder-gray-400 text-gray-900 bg-transparent border-none outline-none"
             />
           </div>
-        </div>
 
-        {/* 필터 옵션 */}
-        <div className="flex flex-wrap gap-2 sm:gap-3 items-start">
-          {/* 성별 필터 */}
-          <div className="relative z-50">
-            <button
-              onClick={() => setOpenDropdown(openDropdown === 'sexCd' ? null : 'sexCd')}
-              className="flex justify-between items-center px-3 sm:px-4 py-1.5 sm:py-2 min-w-[80px] sm:min-w-[100px] text-xs sm:text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
-            >
-              <span>성별: {getFilterLabel('sexCd')}</span>
-              <MdArrowDropDown className={`w-4 h-4 sm:w-5 sm:h-5 ml-1 transition-transform ${openDropdown === 'sexCd' ? 'rotate-180' : ''}`} />
-            </button>
-            {openDropdown === 'sexCd' && (
-              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[80px] sm:min-w-[100px] bg-white rounded-2xl shadow-lg border border-gray-200">
-                {sexOptions.map((option) => (
-                  <li
-                    key={option.value || 'all'}
-                    className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${filters.sexCd === option.value
-                      ? 'bg-primary1 text-white'
-                      : 'hover:bg-gray-100 hover:text-primary1'
-                      }`}
-                    onClick={() => handleFilterChange('sexCd', option.value)}
-                  >
-                    {option.label}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {/* 상태 필터 */}
-          <div className="relative z-50">
-            <button
-              onClick={() => setOpenDropdown(openDropdown === 'state' ? null : 'state')}
-              className="flex justify-between items-center px-3 sm:px-4 py-1.5 sm:py-2 min-w-[80px] sm:min-w-[100px] text-xs sm:text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
-            >
-              <span>상태: {getFilterLabel('state')}</span>
-              <MdArrowDropDown className={`w-4 h-4 sm:w-5 sm:h-5 ml-1 transition-transform ${openDropdown === 'state' ? 'rotate-180' : ''}`} />
-            </button>
-            {openDropdown === 'state' && (
-              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[80px] sm:min-w-[100px] bg-white rounded-2xl shadow-lg border border-gray-200">
-                {stateOptions.map((option) => (
-                  <li
-                    key={option.value || 'all'}
-                    className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${filters.state === option.value
-                      ? 'bg-primary1 text-white'
-                      : 'hover:bg-gray-100 hover:text-primary1'
-                      }`}
-                    onClick={() => handleFilterChange('state', option.value)}
-                  >
-                    {option.label}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {/* 축종 필터 */}
-          <div className="relative z-50">
-            <button
-              onClick={() => setOpenDropdown(openDropdown === 'upKindCd' ? null : 'upKindCd')}
-              className="flex justify-between items-center px-3 sm:px-4 py-1.5 sm:py-2 min-w-[80px] sm:min-w-[100px] text-xs sm:text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm cursor-pointer hover:border-primary1 hover:text-primary1 transition-colors"
-            >
-              <span>축종: {getFilterLabel('upKindCd')}</span>
-              <MdArrowDropDown className={`w-4 h-4 sm:w-5 sm:h-5 ml-1 transition-transform ${openDropdown === 'upKindCd' ? 'rotate-180' : ''}`} />
-            </button>
-            {openDropdown === 'upKindCd' && (
-              <ul className="absolute left-0 top-full z-10 p-2 mt-1 min-w-[80px] sm:min-w-[100px] bg-white rounded-2xl shadow-lg border border-gray-200">
-                {upKindOptions.map((option) => (
-                  <li
-                    key={option.value || 'all'}
-                    className={`p-2 text-xs sm:text-sm cursor-pointer rounded-md transition-colors ${filters.upKindCd === option.value
-                      ? 'bg-primary1 text-white'
-                      : 'hover:bg-gray-100 hover:text-primary1'
-                      }`}
-                    onClick={() => handleFilterChange('upKindCd', option.value)}
-                  >
-                    {option.label}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {/* 접수일 필터 */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1 text-xs sm:text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-2xl sm:rounded-full shadow-sm">
-            <label className="text-xs text-gray-500 whitespace-nowrap shrink-0">접수일:</label>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
-              <input
-                type="date"
-                value={startDate}
-                onChange={handleStartDateChange}
-                onBlur={handleStartDateBlur}
-                className="w-full sm:w-[110px] md:w-[140px] px-2 py-1 text-xs sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary1/20 focus:border-primary1 transition-all"
-                placeholder="시작일"
-              />
-              <span className="hidden sm:inline text-gray-400 shrink-0">~</span>
-              <input
-                type="date"
-                value={endDate}
-                onChange={handleEndDateChange}
-                onBlur={handleEndDateBlur}
-                className="w-full sm:w-[110px] md:w-[140px] px-2 py-1 text-xs sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary1/20 focus:border-primary1 transition-all"
-                placeholder="종료일"
-              />
+          {/* 필터: 모바일 세로 배치 / 데스크톱 가로 배치 */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+            {/* 성별 필터 */}
+            <div className="relative z-50 w-full sm:w-auto">
+              <button
+                onClick={() => setOpenDropdown(openDropdown === 'sexCd' ? null : 'sexCd')}
+                className="flex w-full justify-between items-center px-4 py-2 min-w-0 sm:min-w-[88px] text-sm font-medium text-gray-700 bg-gray-50 border border-gray-100 rounded-full hover:border-gray-300 transition-colors"
+              >
+                <span>성별: {getFilterLabel('sexCd')}</span>
+                <MdArrowDropDown className={`w-5 h-5 ml-1 shrink-0 transition-transform ${openDropdown === 'sexCd' ? 'rotate-180' : ''}`} />
+              </button>
+              {openDropdown === 'sexCd' && (
+                <ul className="absolute left-0 right-0 sm:right-auto top-full z-10 p-2 mt-1 min-w-[88px] sm:min-w-[88px] w-full sm:w-auto bg-white rounded-2xl shadow-lg border border-gray-100">
+                  {sexOptions.map((option) => (
+                    <li
+                      key={option.value || 'all'}
+                      className={`px-3 py-2 text-sm cursor-pointer rounded-lg transition-colors ${filters.sexCd === option.value ? 'bg-primary1 text-white' : 'hover:bg-gray-50'}`}
+                      onClick={() => handleFilterChange('sexCd', option.value)}
+                    >
+                      {option.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
+
+            {/* 상태 필터 */}
+            <div className="relative z-50 w-full sm:w-auto">
+              <button
+                onClick={() => setOpenDropdown(openDropdown === 'state' ? null : 'state')}
+                className="flex w-full justify-between items-center px-4 py-2 min-w-0 sm:min-w-[88px] text-sm font-medium text-gray-700 bg-gray-50 border border-gray-100 rounded-full hover:border-gray-300 transition-colors"
+              >
+                <span>상태: {getFilterLabel('state')}</span>
+                <MdArrowDropDown className={`w-5 h-5 ml-1 shrink-0 transition-transform ${openDropdown === 'state' ? 'rotate-180' : ''}`} />
+              </button>
+              {openDropdown === 'state' && (
+                <ul className="absolute left-0 right-0 sm:right-auto top-full z-10 p-2 mt-1 min-w-[88px] w-full sm:w-auto bg-white rounded-2xl shadow-lg border border-gray-100">
+                  {stateOptions.map((option) => (
+                    <li
+                      key={option.value || 'all'}
+                      className={`px-3 py-2 text-sm cursor-pointer rounded-lg transition-colors ${filters.state === option.value ? 'bg-primary1 text-white' : 'hover:bg-gray-50'}`}
+                      onClick={() => handleFilterChange('state', option.value)}
+                    >
+                      {option.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* 축종 필터 */}
+            <div className="relative z-50 w-full sm:w-auto">
+              <button
+                onClick={() => setOpenDropdown(openDropdown === 'upKindCd' ? null : 'upKindCd')}
+                className="flex w-full justify-between items-center px-4 py-2 min-w-0 sm:min-w-[88px] text-sm font-medium text-gray-700 bg-gray-50 border border-gray-100 rounded-full hover:border-gray-300 transition-colors"
+              >
+                <span>축종: {getFilterLabel('upKindCd')}</span>
+                <MdArrowDropDown className={`w-5 h-5 ml-1 shrink-0 transition-transform ${openDropdown === 'upKindCd' ? 'rotate-180' : ''}`} />
+              </button>
+              {openDropdown === 'upKindCd' && (
+                <ul className="absolute left-0 right-0 sm:right-auto top-full z-10 p-2 mt-1 min-w-[88px] w-full sm:w-auto bg-white rounded-2xl shadow-lg border border-gray-100">
+                  {upKindOptions.map((option) => (
+                    <li
+                      key={option.value || 'all'}
+                      className={`px-3 py-2 text-sm cursor-pointer rounded-lg transition-colors ${filters.upKindCd === option.value ? 'bg-primary1 text-white' : 'hover:bg-gray-50'}`}
+                      onClick={() => handleFilterChange('upKindCd', option.value)}
+                    >
+                      {option.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* 접수일: 한 블록 (모바일에서 날짜 영역 넘침 방지) */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 px-4 py-2 w-full sm:w-auto bg-gray-50 border border-gray-100 rounded-2xl sm:rounded-full text-sm text-gray-700">
+              <span className="text-gray-500 shrink-0 font-medium">접수일:</span>
+              <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={handleStartDateChange}
+                  onBlur={handleStartDateBlur}
+                  className="min-w-0 flex-1 w-full max-w-[160px] text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-primary1/20 focus:border-primary1 [color-scheme:light]"
+                />
+                <span className="text-gray-400 shrink-0">~</span>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={handleEndDateChange}
+                  onBlur={handleEndDateBlur}
+                  className="min-w-0 flex-1 w-full max-w-[160px] text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-primary1/20 focus:border-primary1 [color-scheme:light]"
+                />
+              </div>
+            </div>
+
+            {/* 필터 초기화 */}
+            {(filters.sexCd !== null || filters.state !== null || filters.upKindCd !== null || filters.searchQuery || filters.bgnde || filters.endde || filters.upr_cd) && (
+              <button
+                onClick={() => {
+                  const resetFilters = { sexCd: null, state: null, upKindCd: null, searchQuery: '', bgnde: null, endde: null, upr_cd: null };
+                  onFilterChange(resetFilters);
+                  setStartDate('');
+                  setEndDate('');
+                }}
+                className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-600 flex items-center justify-center gap-1.5 hover:bg-gray-300/80 rounded-full transition-colors"
+              >
+                <RiResetLeftFill className="w-4 h-4 shrink-0" />
+                필터 초기화
+              </button>
+            )}
           </div>
 
-          {/* 필터 초기화 버튼 */}
-          {(filters.sexCd !== null || filters.state !== null || filters.upKindCd !== null || filters.searchQuery || filters.bgnde || filters.endde || filters.upr_cd) && (
-            <button
-              onClick={() => {
-                const resetFilters = { sexCd: null, state: null, upKindCd: null, searchQuery: '', bgnde: null, endde: null, upr_cd: null };
-                onFilterChange(resetFilters);
-                setStartDate('');
-                setEndDate('');
-              }}
-              className="w-full sm:w-auto px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
-            >
-              필터 초기화
-            </button>
+          {/* 지역 버튼: 모바일에서만 표시, 4열 그리드 (데스크톱은 RegionMap에서 선택) */}
+          {sidoList.length > 0 && (
+            <div className="grid grid-cols-4 gap-2 pt-1 lg:hidden">
+              <button
+                onClick={() => handleFilterChange('upr_cd', null)}
+                className={`px-3 py-1.5 rounded-full border text-sm transition-colors ${!filters.upr_cd ? 'bg-primary1 text-white border-primary1' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-200'}`}
+              >
+                전체
+              </button>
+              {sidoList.map((sido) => (
+                <button
+                  key={sido.SIDO_CD}
+                  onClick={() => handleFilterChange('upr_cd', sido.SIDO_CD)}
+                  className={`px-3 py-1.5 rounded-full border text-sm transition-colors ${filters.upr_cd === sido.SIDO_CD ? 'bg-primary1 text-white border-primary1' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-200'}`}
+                >
+                  {getShortSidoName(sido.SIDO_NAME)}
+                </button>
+              ))}
+            </div>
           )}
         </div>
-
-        {sidoList.length > 0 && (
-          <div className="flex flex-wrap justify-start gap-2 mt-2">
-            <button
-              onClick={() => handleFilterChange('upr_cd', null)}
-              className={`px-3 py-1.5 rounded-full border transition-colors duration-200 text-xs sm:text-sm ${!filters.upr_cd
-                ? 'bg-primary1 text-white border-primary1'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
-                }`}
-            >
-              전체
-            </button>
-            {sidoList.map((sido) => (
-              <button
-                key={sido.SIDO_CD}
-                onClick={() => handleFilterChange('upr_cd', sido.SIDO_CD)}
-                className={`px-3 py-1.5 rounded-full border transition-colors duration-200 text-xs sm:text-sm ${filters.upr_cd === sido.SIDO_CD
-                  ? 'bg-primary1 text-white border-primary1'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
-                  }`}
-              >
-                {getShortSidoName(sido.SIDO_NAME)}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

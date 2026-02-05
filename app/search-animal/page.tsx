@@ -1,0 +1,52 @@
+'use client';
+
+import dynamic from 'next/dynamic';
+import { useSearchAnimal } from '@/hooks/useSearchAnimal';
+import AiHeader from '@/packages/ui/components/search-animals/AiHeader';
+import LikeAnimals from '@/packages/ui/components/search-animals/LikeAnimals';
+
+const PageTemplate = dynamic(
+    () => import('@/packages/ui/components/base/PageTemplate'),
+    { ssr: true }
+);
+
+const PageFooter = dynamic(
+    () => import('@/packages/ui/components/base/PageFooter'),
+    { ssr: true }
+);
+
+export default function SearchAnimalPage() {
+    const {
+        previewUrl,
+        modelReady,
+        searchLoading,
+        searchMatches,
+        searchError,
+        loadModel,
+        onFileChange,
+        runSearch,
+    } = useSearchAnimal();
+
+    return (
+        <main className="page-container-full">
+            <PageTemplate visibleHomeTab={false}>
+                <div className="w-full">
+                    <AiHeader
+                        previewUrl={previewUrl}
+                        searchLoading={searchLoading}
+                        modelReady={modelReady}
+                        onFileChange={onFileChange}
+                        onSearch={runSearch}
+                        onLoadModel={loadModel}
+                    />
+                    <LikeAnimals
+                        key={searchMatches ? `search-${searchMatches.length}-${searchMatches[0]?.id ?? ''}` : 'no-results'}
+                        searchError={searchError}
+                        searchMatches={searchMatches}
+                    />
+                </div>
+            </PageTemplate>
+            <PageFooter />
+        </main>
+    );
+}

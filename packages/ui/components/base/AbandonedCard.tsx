@@ -80,15 +80,11 @@ export default function AbandonedCard({
 
   const isExternalImage = useMemo(() => {
     if (!currentImageUrl) return false;
-    // Cloudinary 이미지는 이미 최적화되어 있으므로 Next.js 최적화 불필요
     if (currentImageUrl.includes('res.cloudinary.com')) return true;
-    // openapi.animal.go.kr 이미지는 Next.js로 최적화 가능
     if (currentImageUrl.includes('openapi.animal.go.kr') || currentImageUrl.includes('www.animal.go.kr')) {
       return false;
     }
-    // 기본 이미지는 최적화 불필요
     if (displayImage === defaultImage) return true;
-    // 기타 외부 이미지는 최적화 시도
     return false;
   }, [currentImageUrl, displayImage, defaultImage]);
 

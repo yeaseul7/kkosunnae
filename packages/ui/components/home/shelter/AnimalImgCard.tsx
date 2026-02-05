@@ -40,8 +40,8 @@ export default function AnimalImgCard({
               key={index}
               onClick={() => setSelectedImageIndex(index)}
               className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedImageIndex === index
-                  ? 'border-primary1 scale-105'
-                  : 'border-gray-200 hover:border-gray-300'
+                ? 'border-primary1 scale-105'
+                : 'border-gray-200 hover:border-gray-300'
                 }`}
             >
               <Image

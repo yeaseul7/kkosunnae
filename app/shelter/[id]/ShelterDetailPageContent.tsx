@@ -199,6 +199,9 @@ export default function ShelterDetailPageContent({
                 animalImgList={animalImgList}
                 selectedImageIndex={selectedImageIndex}
                 setSelectedImageIndex={setSelectedImageIndex}
+                onSidoSelect={(sidoCd) => {
+                  router.push(sidoCd ? `/shelter?upr_cd=${sidoCd}` : '/shelter');
+                }}
               />
 
               <div className="flex flex-col gap-6">

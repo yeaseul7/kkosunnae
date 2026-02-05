@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Banner1 from './Banner1';
-import Banner2 from './Banner2';
+import BannerImage from './BannerImage';
 
 const AUTO_SCROLL_INTERVAL_MS = 5000;
 
@@ -67,10 +66,10 @@ export default function Banner() {
                     style={{ scrollSnapType: 'x mandatory' }}
                 >
                     <div className="min-w-full w-full shrink-0 snap-center snap-always flex-[0_0_100%]">
-                        <Banner1 />
+                        <BannerImage imageUrl={'/static/images/banner1.jpg'} link={'/animalShelter'} title={'보호소 정보 확인하기'} />
                     </div>
                     <div className="min-w-full w-full shrink-0 snap-center snap-always flex-[0_0_100%]">
-                        <Banner2 />
+                        <BannerImage imageUrl={'/static/images/banner2.jpeg'} link={'/notice'} title={'공지사항 보기'} />
                     </div>
                 </div>
 

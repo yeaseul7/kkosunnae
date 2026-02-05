@@ -5,6 +5,8 @@ import AbandonedCard from '../../base/AbandonedCard';
 import AbandonedCardSkeleton from '../../base/AbandonedCardSkeleton';
 import AnimalFilterHeader, { AnimalFilterState } from './AnimalFilterHeader';
 import { fetchShelterAnimalData, FetchShelterAnimalDataResult } from '@/lib/api/shelter';
+import SearchAi from './SearchAi';
+import RegionMap from './RegionMap';
 
 interface ShelterPostsClientProps {
   initialData: FetchShelterAnimalDataResult;
@@ -18,6 +20,7 @@ export default function ShelterPostsClient({ initialData }: ShelterPostsClientPr
   const [pageNo, setPageNo] = useState(1);
   const [hasMore, setHasMore] = useState(initialData.hasMore);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  /** 지역 기본값: 서울 (서버 초기 조회와 동일) */
   const [filters, setFilters] = useState<AnimalFilterState>({
     sexCd: null,
     state: null,
@@ -25,7 +28,7 @@ export default function ShelterPostsClient({ initialData }: ShelterPostsClientPr
     searchQuery: '',
     bgnde: null,
     endde: null,
-    upr_cd: null,
+    upr_cd: '6110000', // 서울특별시
   });
   const filtersRef = useRef<AnimalFilterState>(filters);
   const isLoadingMoreRef = useRef(false);
@@ -212,51 +215,120 @@ export default function ShelterPostsClient({ initialData }: ShelterPostsClientPr
     };
   }, [loading, hasMore, isLoadingMore, pageNo, handleFetchShelterAnimalData]);
 
+  const postCount =
+    loading && shelterAnimalData.length === 0
+      ? null
+      : shelterAnimalData.length > 0
+        ? shelterAnimalData.length.toLocaleString()
+        : '0';
+
   return (
-    <>
-      <AnimalFilterHeader
-        filters={filters}
-        onFilterChange={handleFilterChange}
-      />
-      {shelterAnimalData.length === 0 && !loading ? (
-        <div className="py-12 text-center text-gray-500">
-          유기동물 데이터가 없습니다.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-2 pt-8 w-full px-4 sm:px-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center">
-          {loading ? (
-            Array.from({ length: 12 }).map((_, index) => (
-              <AbandonedCardSkeleton key={`skeleton-${index}`} />
-            ))
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 pb-6">
+      <div className="flex flex-col lg:flex-row lg:items-start gap-6 pt-4">
+        {/* 왼쪽 사이드바: 데스크톱에서만 — 지역별 보기 + 나의 관심 지역 */}
+        <aside className="hidden lg:block lg:w-[280px] xl:w-[320px] shrink-0 pt-6 sm:pt-10">
+          <div className="lg:sticky lg:top-4 flex flex-col gap-4">
+            <RegionMap
+              height="280px"
+              selectedSidoCd={filters.upr_cd}
+              onSidoSelect={(sidoCd) =>
+                handleFilterChange({ ...filters, upr_cd: sidoCd })
+              }
+              initialSidoCd="6110000"
+            />
+            {/* <div className="bg-gray-50/80 rounded-2xl border border-gray-100 p-4">
+              <h3 className="text-sm font-bold text-gray-900 mb-1">
+                나의 관심 지역
+              </h3>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                자주 찾는 지역을 설정하면 새로운 공고 발생 시 알림을 보내드려요.
+              </p>
+            </div> */}
+          </div>
+        </aside>
+
+        {/* 오른쪽 메인: 필터 + AI 검색 + 입양 공고 목록 */}
+        <div className="flex-1 min-w-0 flex flex-col">
+          <AnimalFilterHeader
+            filters={filters}
+            onFilterChange={handleFilterChange}
+          />
+          <SearchAi />
+
+          {/* 입양 공고 섹션 헤더 */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-6 pb-3 px-0 sm:px-4">
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+                입양 공고
+                {postCount !== null && (
+                  <span className="text-primary1 ml-1.5">{postCount}</span>
+                )}
+              </h2>
+              <p className="text-sm text-gray-500 mt-0.5">
+                현재 전국 보호소 친구들을 보여드리고 있어요.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <select
+                className="text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary1/20 focus:border-primary1"
+                defaultValue="recent"
+                aria-label="정렬"
+              >
+                <option value="recent">최근 공고순</option>
+              </select>
+              <button
+                type="button"
+                className="p-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors"
+                aria-label="그리드 보기"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {shelterAnimalData.length === 0 && !loading ? (
+            <div className="py-12 text-center text-gray-500">
+              유기동물 데이터가 없습니다.
+            </div>
           ) : (
-            <>
-              {shelterAnimalData.map((shelterAnimal: ShelterAnimalItem, index) => (
-                <AbandonedCard
-                  key={shelterAnimal.desertionNo ? `${shelterAnimal.desertionNo}-${index}` : `shelter-${index}`}
-                  shelterAnimal={shelterAnimal}
-                />
-              ))}
-              {isLoadingMore && (
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 justify-items-center">
+              {loading ? (
                 Array.from({ length: 12 }).map((_, index) => (
-                  <AbandonedCardSkeleton key={`skeleton-more-${index}`} />
+                  <AbandonedCardSkeleton key={`skeleton-${index}`} />
                 ))
+              ) : (
+                <>
+                  {shelterAnimalData.map((shelterAnimal: ShelterAnimalItem, index) => (
+                    <AbandonedCard
+                      key={shelterAnimal.desertionNo ? `${shelterAnimal.desertionNo}-${index}` : `shelter-${index}`}
+                      shelterAnimal={shelterAnimal}
+                    />
+                  ))}
+                  {isLoadingMore && (
+                    Array.from({ length: 12 }).map((_, index) => (
+                      <AbandonedCardSkeleton key={`skeleton-more-${index}`} />
+                    ))
+                  )}
+                </>
               )}
-            </>
+            </div>
+          )}
+          {hasMore && !loading && (
+            <div
+              ref={observerTarget}
+              className="h-32 flex justify-center items-center py-12"
+              data-testid="infinite-scroll-trigger"
+            />
+          )}
+          {!hasMore && shelterAnimalData.length > 0 && (
+            <div className="text-center text-gray-500 py-8">
+              모든 데이터를 불러왔습니다.
+            </div>
           )}
         </div>
-      )}
-      {hasMore && !loading && (
-        <div
-          ref={observerTarget}
-          className="h-32 flex justify-center items-center py-12"
-          data-testid="infinite-scroll-trigger"
-        />
-      )}
-      {!hasMore && shelterAnimalData.length > 0 && (
-        <div className="text-center text-gray-500 py-8">
-          모든 데이터를 불러왔습니다.
-        </div>
-      )}
-    </>
+      </div>
+    </div>
   );
 }
