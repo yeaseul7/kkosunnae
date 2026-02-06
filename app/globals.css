@@ -110,6 +110,18 @@ body {
   font-family: var(--font-cafe24), sans-serif;
 }
 
+/* 링크·버튼에 포인터 커서 */
+a,
+button,
+[role="button"] {
+  cursor: pointer;
+}
+
+button:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* TipTap Placeholder styles */
 .tiptap p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);

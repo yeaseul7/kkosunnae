@@ -81,7 +81,7 @@ export default function Banner() {
                     type="button"
                     onClick={goPrev}
                     aria-label="이전 배너"
-                    className="absolute left-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-gray-700 shadow-md transition-colors hover:bg-white hover:text-primary1 focus:outline-none focus:ring-2 focus:ring-primary1/50 sm:left-4 sm:h-10 sm:w-10 md:left-5 md:h-11 md:w-11"
+                    className="absolute left-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-gray-700 shadow-md transition-all duration-200 hover:scale-110 hover:bg-primary1 hover:text-white hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary1/50 sm:left-4 sm:h-10 sm:w-10 md:left-5 md:h-11 md:w-11"
                 >
                     <svg className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -91,7 +91,7 @@ export default function Banner() {
                     type="button"
                     onClick={goNext}
                     aria-label="다음 배너"
-                    className="absolute right-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-gray-700 shadow-md transition-colors hover:bg-white hover:text-primary1 focus:outline-none focus:ring-2 focus:ring-primary1/50 sm:right-4 sm:h-10 sm:w-10 md:right-5 md:h-11 md:w-11"
+                    className="absolute right-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-gray-700 shadow-md transition-all duration-200 hover:scale-110 hover:bg-primary1 hover:text-white hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary1/50 sm:right-4 sm:h-10 sm:w-10 md:right-5 md:h-11 md:w-11"
                 >
                     <svg className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
