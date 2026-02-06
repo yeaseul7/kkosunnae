@@ -22,6 +22,8 @@ export default function SearchAnimalPage() {
         searchLoading,
         searchMatches,
         searchError,
+        dailyAiUsed,
+        dailyLimit,
         loadModel,
         onFileChange,
         runSearch,
@@ -35,6 +37,8 @@ export default function SearchAnimalPage() {
                         previewUrl={previewUrl}
                         searchLoading={searchLoading}
                         modelReady={modelReady}
+                        dailyAiUsed={dailyAiUsed}
+                        dailyLimit={dailyLimit}
                         onFileChange={onFileChange}
                         onSearch={runSearch}
                         onLoadModel={loadModel}

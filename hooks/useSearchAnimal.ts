@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import {
   loadEmbedModel,
   isModelLoaded,
@@ -8,14 +9,49 @@ import {
   getImageEmbeddingFromResult,
   type SimilarMatch,
 } from '@/lib/search-animal';
+import { useAuth } from '@/lib/firebase/auth';
+import { firestore } from '@/lib/firebase/firebase';
+
+const DAILY_LIMIT = 5;
+const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+
+/** lastAi 이후 24시간 지났거나 lastAi가 없으면 count 0, 아니면 todayAi 반환. lastAi는 횟수 업데이트 시에만 수정됨. */
+async function getDailyAiUsage(uid: string): Promise<{ count: number }> {
+  const userRef = doc(firestore, 'users', uid);
+  const snap = await getDoc(userRef);
+  const data = snap.data();
+  const lastAi = typeof data?.lastAi === 'string' ? data.lastAi : '';
+  const todayAi = typeof data?.todayAi === 'number' ? data.todayAi : 0;
+  if (!lastAi) return { count: 0 };
+  const lastTime = new Date(lastAi).getTime();
+  if (Number.isNaN(lastTime) || Date.now() - lastTime >= TWENTY_FOUR_HOURS_MS) {
+    return { count: 0 };
+  }
+  return { count: todayAi };
+}
+
+/** 검색 횟수만 증가시킬 때 호출. lastAi를 현재 시간(ISO)으로, todayAi를 newCount로 저장. */
+async function incrementDailyAiUsage(uid: string): Promise<number> {
+  const usage = await getDailyAiUsage(uid);
+  const newCount = usage.count === 0 ? 1 : usage.count + 1;
+  const userRef = doc(firestore, 'users', uid);
+  await setDoc(
+    userRef,
+    { lastAi: new Date().toISOString(), todayAi: newCount },
+    { merge: true }
+  );
+  return newCount;
+}
 
 export function useSearchAnimal() {
+  const { user } = useAuth();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [modelReady, setModelReady] = useState(isModelLoaded());
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchMatches, setSearchMatches] = useState<SimilarMatch[] | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [dailyAiUsed, setDailyAiUsed] = useState<number | null>(null);
 
   const loadModel = useCallback(async () => {
     try {
@@ -42,6 +78,22 @@ export function useSearchAnimal() {
 
   const runSearch = useCallback(async () => {
     if (!selectedFile || !previewUrl) return;
+    if (!user) {
+      setSearchError('AI 검색을 이용하려면 로그인이 필요합니다.');
+      return;
+    }
+    try {
+      const usage = await getDailyAiUsage(user.uid);
+      if (usage.count >= DAILY_LIMIT) {
+        setSearchError(`검색 횟수(${DAILY_LIMIT}회)를 모두 사용했습니다. 24시간이 지나면 다시 이용할 수 있습니다.`);
+        return;
+      }
+      const newCount = await incrementDailyAiUsage(user.uid);
+      setDailyAiUsed(newCount);
+    } catch (e) {
+      setSearchError(e instanceof Error ? e.message : '검색 횟수 확인에 실패했습니다.');
+      return;
+    }
     setSearchLoading(true);
     setSearchError(null);
     setSearchMatches(null);
@@ -75,13 +127,21 @@ export function useSearchAnimal() {
     } finally {
       setSearchLoading(false);
     }
-  }, [selectedFile, previewUrl]);
+  }, [user, selectedFile, previewUrl]);
 
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
+
+  useEffect(() => {
+    if (!user?.uid) {
+      setDailyAiUsed(null);
+      return;
+    }
+    getDailyAiUsage(user.uid).then(({ count }) => setDailyAiUsed(count)).catch(() => setDailyAiUsed(null));
+  }, [user?.uid]);
 
   return {
     selectedFile,
@@ -90,6 +150,8 @@ export function useSearchAnimal() {
     searchLoading,
     searchMatches,
     searchError,
+    dailyAiUsed,
+    dailyLimit: DAILY_LIMIT,
     loadModel,
     onFileChange,
     runSearch,

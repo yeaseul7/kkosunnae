@@ -7,6 +7,8 @@ export interface AiHeaderProps {
     previewUrl: string | null;
     searchLoading: boolean;
     modelReady?: boolean;
+    dailyAiUsed?: number | null;
+    dailyLimit?: number;
     onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onSearch: () => void;
     onLoadModel?: () => void;
@@ -16,6 +18,8 @@ export default function AiHeader({
     previewUrl,
     searchLoading,
     modelReady = false,
+    dailyAiUsed = null,
+    dailyLimit = 3,
     onFileChange,
     onSearch,
     onLoadModel,
@@ -29,6 +33,11 @@ export default function AiHeader({
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
                     AI 스마트 검색
                 </h1>
+                {dailyAiUsed != null && (
+                    <p className="text-xs text-gray-500 mb-2">
+                        오늘 <span className="font-semibold text-primary1">{dailyAiUsed}</span>/{dailyLimit}회 사용
+                    </p>
+                )}
                 <p className="text-xs sm:text-sm text-gray-500 leading-relaxed max-w-xl mx-auto">
                     AI가 보호소 공고를 분석하여 우리 아이와 가장 닮은 친구를 찾아드립니다.
                     <br className="hidden sm:block" />

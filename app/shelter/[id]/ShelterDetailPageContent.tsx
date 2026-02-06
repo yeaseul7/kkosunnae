@@ -6,7 +6,6 @@ import PageTemplate from '@/packages/ui/components/base/PageTemplate';
 import Loading from '@/packages/ui/components/base/Loading';
 import { ShelterAnimalItem, ShelterAnimalData } from '@/packages/type/postType';
 import { ShelterInfoResponse, ShelterInfoItem } from '@/app/api/shelter-info/route';
-import { FaPaw } from 'react-icons/fa';
 import { IoIosArrowBack } from 'react-icons/io';
 import Notfound_ad_animal from '@/packages/ui/components/base/Notfound_ad_animal';
 import AnimalImgCard from '@/packages/ui/components/home/shelter/AnimalImgCard';
@@ -199,9 +198,6 @@ export default function ShelterDetailPageContent({
                 animalImgList={animalImgList}
                 selectedImageIndex={selectedImageIndex}
                 setSelectedImageIndex={setSelectedImageIndex}
-                onSidoSelect={(sidoCd) => {
-                  router.push(sidoCd ? `/shelter?upr_cd=${sidoCd}` : '/shelter');
-                }}
               />
 
               <div className="flex flex-col gap-6">
