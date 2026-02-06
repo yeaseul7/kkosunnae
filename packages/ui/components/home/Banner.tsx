@@ -15,7 +15,7 @@ export default function Banner() {
 
         const intervalId = setInterval(() => {
             setCurrentIndex((prev) => {
-                const next = prev + 1 >= 2 ? 0 : prev + 1;
+                const next = prev + 1 >= 3 ? 0 : prev + 1;
                 const container = scrollRef.current;
                 if (container) {
                     const width = container.clientWidth;
@@ -33,7 +33,7 @@ export default function Banner() {
         if (!el) return;
         const width = el.clientWidth;
         const index = Math.round(el.scrollLeft / width);
-        setCurrentIndex(Math.min(index, 1));
+        setCurrentIndex(Math.min(index, 2));
     };
 
     const goToSlide = (index: number) => {
@@ -45,16 +45,16 @@ export default function Banner() {
     };
 
     const goPrev = () => {
-        const prev = currentIndex <= 0 ? 1 : currentIndex - 1;
+        const prev = currentIndex <= 0 ? 2 : currentIndex - 1;
         goToSlide(prev);
     };
 
     const goNext = () => {
-        const next = currentIndex >= 1 ? 0 : currentIndex + 1;
+        const next = currentIndex >= 2 ? 0 : currentIndex + 1;
         goToSlide(next);
     };
 
-    const TOTAL_SLIDES = 2;
+    const TOTAL_SLIDES = 3;
 
     return (
         <div className="mt-4 w-full max-w-7xl px-4 sm:px-6" aria-label="배너 캐러셀">
@@ -70,6 +70,9 @@ export default function Banner() {
                     </div>
                     <div className="min-w-full w-full shrink-0 snap-center snap-always flex-[0_0_100%]">
                         <BannerImage imageUrl={'/static/images/banner2.jpeg'} link={'/notice'} title={'공지사항 보기'} />
+                    </div>
+                    <div className="min-w-full w-full shrink-0 snap-center snap-always flex-[0_0_100%]">
+                        <BannerImage imageUrl={'/static/images/banner3.jpeg'} link={'/search-animal'} title={'기능 사용해보기'} />
                     </div>
                 </div>
 
