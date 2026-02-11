@@ -154,6 +154,29 @@ export async function getCardNewsByCategory(
 }
 
 /**
+ * 작성자별 카드뉴스 목록 조회 (발행된 것만, 최신순).
+ * Firestore 복합 인덱스: cardNews (authorId, status, createdAt desc)
+ */
+export async function getCardNewsByAuthorId(
+    authorId: string,
+    options?: { limitCount?: number }
+): Promise<CardNewsData[]> {
+    const limitCount = options?.limitCount ?? 20;
+    const col = collection(firestore, CARD_NEWS_COLLECTION);
+    const q = query(
+        col,
+        where('authorId', '==', authorId),
+        where('status', '==', 'published'),
+        orderBy('createdAt', 'desc'),
+        limit(limitCount)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((d) =>
+        toCardNewsData(d.id, d.data() as Record<string, unknown>)
+    );
+}
+
+/**
  * 카드뉴스 댓글 목록 조회 (서브컬렉션 cardNews/{id}/comments)
  */
 export async function getCardNewsComments(cardNewsId: string): Promise<CardNewsCommentData[]> {

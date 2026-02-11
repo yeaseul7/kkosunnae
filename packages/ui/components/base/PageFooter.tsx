@@ -9,7 +9,7 @@ const FOOTER_LINKS = {
     { label: '유기동물 보호소', href: '/animalShelter' },
     { label: '입양 공고', href: '/shelter' },
     { label: '커뮤니티', href: '/community' },
-    { label: '보호단체', href: '/protectionGroup' },
+    { label: '카드뉴스', href: '/card_news' },
   ],
   소식: [
     { label: '공지사항', href: '/notice' },

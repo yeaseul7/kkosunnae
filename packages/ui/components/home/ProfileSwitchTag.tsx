@@ -1,14 +1,25 @@
 'use client';
 
+export type ProfileCategory = 'posts' | 'cardNews' | 'shelter';
+
 interface ProfileSwitchTagProps {
-  category: 'posts' | 'shelter';
-  setCategory: (category: 'posts' | 'shelter') => void;
+  category: ProfileCategory;
+  setCategory: (category: ProfileCategory) => void;
   isOwnProfile?: boolean;
 }
 
 export default function ProfileSwitchTag({ category, setCategory, isOwnProfile = false }: ProfileSwitchTagProps) {
   const isPostsActive = category === 'posts';
+  const isCardNewsActive = category === 'cardNews';
   const isShelterActive = category === 'shelter';
+
+  const pillWidth = 'calc((100% - 8px) / 3)';
+  const pillLeft = {
+    posts: '4px',
+    cardNews: 'calc(4px + (100% - 8px) / 3)',
+    shelter: 'calc(4px + (100% - 8px) / 3 * 2)',
+  };
+  const activeLeft = isPostsActive ? pillLeft.posts : isCardNewsActive ? pillLeft.cardNews : pillLeft.shelter;
 
   if (!isOwnProfile) {
     return (
@@ -30,23 +41,31 @@ export default function ProfileSwitchTag({ category, setCategory, isOwnProfile =
     <div className="flex justify-center items-center mt-4 w-full">
       <div className="relative flex bg-gray-200 rounded-full p-1 w-fit">
         <div
-          className={`absolute top-1 bottom-1 rounded-full bg-white transition-all duration-300 ease-in-out ${
-            isPostsActive ? 'left-1 right-1/2' : 'left-1/2 right-1'
-          }`}
+          className="absolute top-1 bottom-1 rounded-full bg-white transition-all duration-300 ease-in-out"
+          style={{ width: pillWidth, left: activeLeft }}
         />
-        
+
         <button
           onClick={() => setCategory('posts')}
-          className={`relative z-10 px-6 py-2 rounded-full text-sm font-semibold transition-colors duration-300 whitespace-nowrap ${
+          className={`relative z-10 px-4 sm:px-5 py-2 rounded-full text-sm font-semibold transition-colors duration-300 whitespace-nowrap ${
             isPostsActive ? 'text-primary1' : 'text-gray-600'
           }`}
         >
           게시글
         </button>
-        
+
+        <button
+          onClick={() => setCategory('cardNews')}
+          className={`relative z-10 px-4 sm:px-5 py-2 rounded-full text-sm font-semibold transition-colors duration-300 whitespace-nowrap ${
+            isCardNewsActive ? 'text-primary1' : 'text-gray-600'
+          }`}
+        >
+          카드뉴스
+        </button>
+
         <button
           onClick={() => setCategory('shelter')}
-          className={`relative z-10 px-6 py-2 rounded-full text-sm font-semibold transition-colors duration-300 whitespace-nowrap ${
+          className={`relative z-10 px-4 sm:px-5 py-2 rounded-full text-sm font-semibold transition-colors duration-300 whitespace-nowrap ${
             isShelterActive ? 'text-primary1' : 'text-gray-600'
           }`}
         >

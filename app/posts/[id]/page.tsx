@@ -4,8 +4,9 @@ import PageTemplate from '@/packages/ui/components/base/PageTemplate';
 import PostScrollList from '@/packages/ui/components/home/post/PostScrollList';
 import TagList from '@/packages/ui/components/home/post/TagList';
 import UserHeader from '@/packages/ui/components/home/profile/UserHeader';
-import ProfileSwitchTag from '@/packages/ui/components/home/ProfileSwitchTag';
+import ProfileSwitchTag, { type ProfileCategory } from '@/packages/ui/components/home/ProfileSwitchTag';
 import LikedAnimalList from '@/packages/ui/components/home/shelter/LikedAnimalList';
+import UserCardNewsList from '@/packages/ui/components/home/profile/UserCardNewsList';
 import { useAuth } from '@/lib/firebase/auth';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
@@ -14,7 +15,7 @@ export default function PostsListPage() {
   const params = useParams();
   const userId = params.id as string;
   const { user } = useAuth();
-  const [category, setCategory] = useState<'posts' | 'shelter'>('posts');
+  const [category, setCategory] = useState<ProfileCategory>('posts');
 
   const isOwnProfile = user?.uid === userId;
 
@@ -29,6 +30,9 @@ export default function PostsListPage() {
               <TagList userId={userId} />
               <PostScrollList userId={userId} />
             </>
+          )}
+          {category === 'cardNews' && isOwnProfile && (
+            <UserCardNewsList userId={userId} />
           )}
           {category === 'shelter' && isOwnProfile && (
             <LikedAnimalList userId={userId} />
