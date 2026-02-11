@@ -1,7 +1,6 @@
 'use client';
 import { getRecentBoardsData } from '@/lib/api/post';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import PostCard from '../../base/PostCard';
 import PostCardSkeleton from '../../base/PostCardSkeleton';
 import { PostData } from '@/packages/type/postType';
@@ -98,16 +97,6 @@ export default function RecentPosts({ pageSize = 12, fromMain = false }: RecentP
               `더보기`
             )}
           </button>
-        </div>
-      )}
-      {fromMain && (
-        <div className="flex justify-end mt-4 mb-4 px-4 sm:px-0">
-          <Link
-            href="/community"
-            className="text-primary1 hover:text-primary2 font-semibold transition-colors duration-200"
-          >
-            전체 보기
-          </Link>
         </div>
       )}
     </div>

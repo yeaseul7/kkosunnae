@@ -1,12 +1,10 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { HiMapPin } from 'react-icons/hi2';
+import { useState, useMemo, useCallback } from 'react';
 import { ShelterAnimalItem } from '@/packages/type/postType';
-import { formatDateToKorean } from '@/packages/utils/dateFormatting';
 import getOptimizedCloudinaryUrl from '@/packages/utils/optimization';
-import { FaPaw } from 'react-icons/fa';
+import { HiCalendar, HiClock } from 'react-icons/hi2';
 
 export default function AbandonedCard({
   shelterAnimal,
@@ -15,8 +13,6 @@ export default function AbandonedCard({
 }) {
   const router = useRouter();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLongHover, setIsLongHover] = useState(false);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [prevDesertionNo, setPrevDesertionNo] = useState(shelterAnimal.desertionNo);
 
   if (shelterAnimal.desertionNo !== prevDesertionNo) {
@@ -89,10 +85,20 @@ export default function AbandonedCard({
   }, [currentImageUrl, displayImage, defaultImage]);
 
   const statusBadge = useMemo(() => {
+    const state = shelterAnimal?.processState || '상태 미확인';
+    const isProtecting = state === '보호중';
+    const hasEnd = state.includes('종료'); // 종료 포함 상태(예: 공고종료 등)
+    if (!isProtecting && hasEnd) {
+      return {
+        text: state,
+        bgColor: '#E5E5E5', // 연한 회색
+        textColor: '#6B6B6B', // 진한 회색 텍스트
+      };
+    }
     return {
-      text: shelterAnimal?.processState || '상태 미확인',
-      bgColor: '#FFE5D9', // 연한 복숭아/주황색
-      textColor: '#8B4513', // 어두운 갈색 텍스트
+      text: state,
+      bgColor: '#E9EBFD', // 연한 라벤더/퍼플 블루
+      textColor: '#575FE5', // 진한 블루 퍼플 텍스트
     };
   }, [shelterAnimal]);
 
@@ -112,82 +118,48 @@ export default function AbandonedCard({
     const diffTime = endDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    // 기존 색상 규칙을 파스텔톤으로 변환
-    if (diffDays < 0) {
+    // 보호중이고 남은 일수가 0 이상일 때 D-n (빨간 뱃지), 그 외에는 공고 종료 (회색)
+    const isProtecting = shelterAnimal?.processState === '보호중';
+    if (isProtecting && diffDays >= 0) {
       return {
-        text: '공고 종료',
-        bgColor: '#E5E5E5', // 연한 회색
-        textColor: '#6B6B6B', // 어두운 회색 텍스트
-      };
-    } else if (diffDays === 0) {
-      return {
-        text: '오늘 종료',
-        bgColor: '#FFE5E5', // 연한 빨강
-        textColor: '#8B1A1A', // 어두운 빨강 텍스트
-      };
-    } else if (diffDays === 1) {
-      return {
-        text: '1일 전',
-        bgColor: '#FFE5E5', // 연한 빨강
-        textColor: '#8B1A1A', // 어두운 빨강 텍스트
-      };
-    } else if (diffDays <= 7) {
-      return {
-        text: `${diffDays}일 전`,
-        bgColor: '#FFE8D5', // 연한 주황
-        textColor: '#8B4513', // 어두운 주황 텍스트
-      };
-    } else {
-      return {
-        text: `${diffDays}일 전`,
-        bgColor: '#E5F0FF', // 연한 파랑 (primary2 파스텔톤)
-        textColor: '#1E3A5F', // 어두운 파랑 텍스트
+        text: `D-${diffDays}`,
+        bgColor: '#e54c41', // 빨간 배경 (디데이 뱃지)
+        textColor: '#ffffff', // 흰색 텍스트·아이콘
       };
     }
-  }, [shelterAnimal]);
-  const openGoogleMap = useCallback((e: React.MouseEvent, address: string) => {
-    e.stopPropagation();
-    const encodedAddress = encodeURIComponent(address);
-    const url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
-    window.open(url, '_blank');
-  }, []);
-
-  const handleMouseEnter = useCallback(() => {
-    hoverTimeoutRef.current = setTimeout(() => {
-      setIsLongHover(true);
-    }, 1000);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
-    }
-    setIsLongHover(false);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
+    return {
+      text: '공고 종료',
+      bgColor: '#E5E5E5', // 연한 회색
+      textColor: '#6B6B6B', // 어두운 회색 텍스트
     };
-  }, []);
+  }, [shelterAnimal]);
+
+  const basicInfoLine = useMemo(() => {
+    const parts: string[] = [];
+    if (shelterAnimal.kindNm) parts.push(shelterAnimal.kindNm);
+    if (shelterAnimal.age) parts.push(shelterAnimal.age.includes('살') ? shelterAnimal.age : `${shelterAnimal.age}살`);
+    if (shelterAnimal.sexCd) parts.push(shelterAnimal.sexCd === 'M' ? '수컷' : shelterAnimal.sexCd === 'F' ? '암컷' : shelterAnimal.sexCd);
+    return parts.join(' · ');
+  }, [shelterAnimal.kindNm, shelterAnimal.age, shelterAnimal.sexCd]);
+
+  const rescueDateStr = useMemo(() => {
+    const dt = shelterAnimal.happenDt;
+    if (!dt || dt.length < 8) return '';
+    return `${dt.substring(0, 4)}.${dt.substring(4, 6)}.${dt.substring(6, 8)} 구조`;
+  }, [shelterAnimal.happenDt]);
 
   return (
     <article
       key={shelterAnimal.desertionNo}
       onClick={() => router.push(`/shelter/${shelterAnimal.desertionNo}`)}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      className="flex overflow-hidden flex-col bg-white rounded-lg shadow-sm transition-all duration-200 cursor-pointer hover:shadow-md hover:scale-[1.02] active:scale-[0.98] w-full max-w-full sm:max-w-[260px] border border-gray-100"
+      className=" p-2 sm:p-3 flex overflow-hidden flex-col bg-white rounded-2xl shadow-sm transition-all duration-200 cursor-pointer hover:shadow-md hover:scale-[1.02] active:scale-[0.98] w-full max-w-full sm:max-w-[260px] border border-gray-100"
     >
-      <div className="relative w-full bg-gray-100 aspect-[4/5] overflow-hidden">
+      <div className="relative w-full bg-gray-100 aspect-square overflow-hidden rounded-2xl">
         <Image
           src={displayImage}
           alt={shelterAnimal?.desertionNo || '유기동물 이미지'}
           fill
-          className="object-cover transition-transform duration-300 hover:scale-105"
+          className="object-contain "
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
           unoptimized={
             isExternalImage || displayImage === defaultImage || undefined
@@ -195,12 +167,31 @@ export default function AbandonedCard({
           loading="lazy"
           onError={handleImageError}
         />
+        {/* 뱃지: 사진 오른쪽 상단 - D-n(빨강+시계 아이콘) 또는 공고 종료(회색) */}
+        {noticeEndBadge && (
+          <div
+            className="absolute top-2 right-2 z-10 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap shadow-sm"
+            style={{
+              backgroundColor: noticeEndBadge.bgColor,
+              color: noticeEndBadge.textColor,
+            }}
+          >
+            {noticeEndBadge.text.startsWith('D-') && (
+              <HiClock className="w-3.5 h-3.5 flex-shrink-0" aria-hidden />
+            )}
+            <span>{noticeEndBadge.text}</span>
+          </div>
+        )}
       </div>
-      <div className="flex flex-col flex-1 p-3 sm:p-4 gap-1 relative">
-        <div className="flex items-center gap-2 mb-2">
+      <div className="flex flex-col flex-1 py-3 sm:py-4 gap-3 relative">
+        {/* 이름 + 보호중 뱃지 */}
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 truncate flex-1 min-w-0">
+            {shelterAnimal?.kindNm || '이름 없음'}
+          </h3>
           {shelterAnimal?.processState && (
             <div
-              className="px-2 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+              className="flex-shrink-0 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
               style={{
                 backgroundColor: statusBadge.bgColor,
                 color: statusBadge.textColor,
@@ -209,112 +200,31 @@ export default function AbandonedCard({
               {statusBadge.text}
             </div>
           )}
-          {noticeEndBadge && (
-            <div
-              className="px-2 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
-              style={{
-                backgroundColor: noticeEndBadge.bgColor,
-                color: noticeEndBadge.textColor,
-              }}
-            >
-              {noticeEndBadge.text}
-            </div>
-          )}
-          <button
-            onClick={(e) =>
-              openGoogleMap(e, shelterAnimal?.happenPlace || '')
-            }
-            className="flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors duration-200 ml-auto"
-            style={{
-              backgroundColor: '#D4EDDA', // 연한 초록색
-              color: '#155724', // 어두운 초록색 텍스트
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#C3E6CB';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#D4EDDA';
-            }}
-            title="구글 지도에서 지도"
-          >
-            <HiMapPin className="w-3 h-3" />
-            <span>지도</span>
-          </button>
         </div>
-
-        {/* 기본 정보 - 높이 유지하며 부드러운 fade out */}
-        <div
-          className={`flex flex-col gap-1 transition-opacity duration-300 ease-in-out ${isLongHover ? 'opacity-0 pointer-events-none' : 'opacity-100'
-            }`}
+        {/* 품종 · 나이 · 성별 */}
+        {basicInfoLine && (
+          <p className="text-sm text-gray-700">
+            {basicInfoLine}
+          </p>
+        )}
+        {/* 구조일 */}
+        {rescueDateStr && (
+          <div className="flex items-center gap-1.5 text-sm text-gray-600">
+            <HiCalendar className="w-4 h-4 flex-shrink-0 text-gray-400" />
+            <span>{rescueDateStr}</span>
+          </div>
+        )}
+        {/* 자세히 보기 버튼 - 항상 노출, 보라 톤 */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            router.push(`/shelter/${shelterAnimal.desertionNo}`);
+          }}
+          className="w-full flex justify-center items-center py-1.5 rounded-2xl text-sm font-semibold transition-colors mt-auto bg-primary1/10 text-primary1 hover:bg-primary1/20"
         >
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-400">
-              구조 위치
-            </label>
-            <p className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug">
-              {shelterAnimal?.happenPlace || '정보 없음'}
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-400">
-              구조 일시
-            </label>
-            <span className="text-sm font-semibold text-gray-900">
-              {formatDateToKorean(shelterAnimal?.happenDt || undefined) ||
-                '정보 없음'}
-            </span>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-400">
-              동물 정보
-            </label>
-            <div className="flex flex-wrap items-baseline gap-1 text-sm text-gray-900">
-              <span className="text-gray-700">{shelterAnimal.kindNm}</span>
-              {shelterAnimal?.sexCd && (
-                <>
-                  <span className="text-gray-400">·</span>
-                  <span className="text-gray-700">
-                    {shelterAnimal.sexCd === 'F'
-                      ? '여자'
-                      : shelterAnimal.sexCd === 'M'
-                        ? '남자'
-                        : shelterAnimal.sexCd}
-                  </span>
-                </>
-              )}
-              {shelterAnimal?.colorCd && (
-                <>
-                  <span className="text-gray-400">·</span>
-                  <span className="text-gray-700">{shelterAnimal.colorCd}</span>
-                </>
-              )}
-              {shelterAnimal?.weight && (
-                <>
-                  <span className="text-gray-400">·</span>
-                  <span className="text-gray-700">{shelterAnimal.weight}</span>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div
-          className={`absolute inset-0 flex items-center justify-center p-3 sm:p-4 transition-opacity duration-300 ease-in-out ${isLongHover ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}
-        >
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              router.push(`/shelter/${shelterAnimal.desertionNo}`);
-            }}
-            className="w-full flex justify-center items-center p-2 font-bold text-white rounded-lg bg-primary2 hover:bg-primary1 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 active:translate-y-0 gap-2"
-          >
-            <FaPaw className="text-sm sm:text-base" />
-            <span className='text-xs sm:text-sm font-semibold'>자세히 보러가기</span>
-          </button>
-        </div>
+          자세히 보기
+        </button>
       </div>
     </article>
   );

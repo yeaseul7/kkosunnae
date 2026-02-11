@@ -15,8 +15,13 @@ export default function SearchAi() {
     return (
         <div className="w-full px-0 sm:px-4">
             <div className="max-w-4xl mx-auto">
-                <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl shadow-sm border border-indigo-100/50 overflow-hidden">
-                    <div className="flex flex-col sm:flex-row">
+                <div className="relative rounded-2xl shadow-sm border border-indigo-100/50 overflow-hidden">
+                    {/* 무지개 애니메이션 배경 레이어 */}
+                    <div
+                        className="search-ai-rainbow absolute inset-0 rounded-2xl"
+                        aria-hidden
+                    />
+                    <div className="relative z-10 flex flex-col sm:flex-row">
                         {/* 왼쪽: 사진 아이콘 영역 */}
                         <div className="flex-shrink-0 flex items-center justify-center p-4 sm:p-5 sm:pr-0">
                             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl border-2 border-dashed border-indigo-200 bg-white/80 flex items-center justify-center text-indigo-400">
