@@ -66,10 +66,10 @@ export default function Banner() {
                     style={{ scrollSnapType: 'x mandatory' }}
                 >
                     <div className="min-w-full w-full shrink-0 snap-center snap-always flex-[0_0_100%]">
-                        <BannerImage imageUrl={'/static/images/banner1.jpg'} link={'/animalShelter'} title={'보호소 정보 확인하기'} />
+                        <BannerImage imageUrl={'/static/images/banner1.png'} link={'/animalShelter'} title={'보호소 정보 확인하기'} />
                     </div>
                     <div className="min-w-full w-full shrink-0 snap-center snap-always flex-[0_0_100%]">
-                        <BannerImage imageUrl={'/static/images/banner2.jpeg'} link={'/notice'} title={'공지사항 보기'} />
+                        <BannerImage imageUrl={'/static/images/banner2.png'} link={'/notice'} title={'공지사항 보기'} />
                     </div>
                     <div className="min-w-full w-full shrink-0 snap-center snap-always flex-[0_0_100%]">
                         <BannerImage imageUrl={'/static/images/banner3.jpeg'} link={'/search-animal'} title={'기능 사용해보기'} />

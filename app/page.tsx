@@ -3,7 +3,6 @@ import { useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import HomeTabSkeleton from '@/packages/ui/components/base/HomeTabSkeleton';
 import PostCardSkeleton from '@/packages/ui/components/base/PostCardSkeleton';
-import YoutubeCardSkeleton from '@/packages/ui/components/base/YoutubeCardSkeleton';
 
 const PageTemplate = dynamic(
   () => import('@/packages/ui/components/base/PageTemplate'),
@@ -33,8 +32,8 @@ const RecentPosts = dynamic(
   { ssr: true }
 );
 
-const YoutubeList = dynamic(
-  () => import('@/packages/ui/components/common/YoutubeList'),
+const SummaryCardNews = dynamic(
+  () => import('@/packages/ui/components/home/SummaryCardNews'),
   { ssr: true }
 );
 
@@ -66,16 +65,16 @@ export default function Home() {
           </Suspense>
         </div>
         <Suspense fallback={
-          <div className="w-full pt-8">
-            <div className="h-6 bg-gray-200 rounded w-48 mb-6 mx-4 sm:mx-0 animate-pulse" />
-            <div className="grid grid-cols-1 gap-4 px-4 w-full sm:px-0 md:grid-cols-3">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <YoutubeCardSkeleton key={`skeleton-${index}`} />
+          <div className="w-full px-4 pt-8 sm:px-0">
+            <div className="h-6 bg-gray-200 rounded w-32 mb-4 animate-pulse" />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4 mt-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="aspect-[3/4] animate-pulse rounded-xl bg-gray-200" />
               ))}
             </div>
           </div>
         }>
-          <YoutubeList />
+          <SummaryCardNews />
         </Suspense>
       </PageTemplate>
       <PageFooter />

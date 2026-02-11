@@ -7,12 +7,11 @@ import Image from 'next/image';
 import { MdMap } from 'react-icons/md';
 import { sidoLocation } from '@/static/data/sidoLocation';
 import { IoCall, IoLocationSharp } from 'react-icons/io5';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import ShelterCardSkeleton from '../../base/ShelterCardSkeleton';
 
 
 export default function ShelterPosts() {
-    const router = useRouter();
     const [address, setAddress] = useState<Address | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -365,16 +364,21 @@ export default function ShelterPosts() {
                                             )}
                                         </div>
                                         <div className="flex items-center gap-2 shrink-0">
-                                            <button
-                                                onClick={() => {
-                                                    const token = shelter.careRegNo ? shelterIdTokens[shelter.careRegNo] : undefined;
-                                                    if (token) router.push(`/animalShelter/${token}`);
-                                                }}
-                                                disabled={shelter.careRegNo ? !shelterIdTokens[shelter.careRegNo] : true}
-                                                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200 transition-colors text-xs font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-                                            >
-                                                상세보기
-                                            </button>
+                                            {(() => {
+                                                const token = shelter.careRegNo ? shelterIdTokens[shelter.careRegNo] : undefined;
+                                                return token ? (
+                                                    <Link
+                                                        href={`/animalShelter/${token}`}
+                                                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200 transition-colors text-xs font-medium"
+                                                    >
+                                                        상세보기
+                                                    </Link>
+                                                ) : (
+                                                    <span className="px-4 py-2 bg-gray-100 text-gray-700 rounded-2xl text-xs font-medium opacity-60 cursor-not-allowed">
+                                                        상세보기
+                                                    </span>
+                                                );
+                                            })()}
                                             <button
                                                 className="p-2 rounded-full bg-gray-100 text-primary1 hover:bg-gray-200 transition-colors"
                                                 aria-label="지도 보기"

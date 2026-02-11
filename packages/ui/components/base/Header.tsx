@@ -147,6 +147,17 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
               커뮤니티
             </NavLink>
             {/* <NavLink
+              to="/protectionGroup"
+              activeClassName="active"
+              isActive={() => pathname === '/protectionGroup' || pathname.startsWith('/protectionGroup')}
+              className={`!border-b-0 !p-0 text-sm lg:text-base transition-colors ${pathname === '/protectionGroup' || pathname.startsWith('/protectionGroup')
+                ? '!text-primary1 font-semibold'
+                : '!text-gray-700 hover:!text-primary1'
+                }`}
+            >
+              보호단체
+            </NavLink> */}
+            <NavLink
               to="/card_news"
               activeClassName="active"
               isActive={() => pathname === '/card_news' || pathname.startsWith('/card_news')}
@@ -156,7 +167,7 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
                 }`}
             >
               카드뉴스
-            </NavLink> */}
+            </NavLink>
           </div>
 
           {/* 모바일 햄버거 버튼 */}
@@ -302,6 +313,18 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
           >
             커뮤니티
           </NavLink>
+          {/* <NavLink
+            to="/protectionGroup"
+            activeClassName="active"
+            isActive={() => pathname === '/protectionGroup' || pathname.startsWith('/protectionGroup')}
+            className={`block px-4 py-3 !border-b-0 text-sm transition-colors hover:bg-gray-50 rounded-lg ${pathname === '/protectionGroup' || pathname.startsWith('/protectionGroup')
+              ? '!text-primary1 bg-blue-50 font-semibold'
+              : '!text-gray-700'
+              }`}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            보호단체
+          </NavLink> */}
           <NavLink
             to="/card_news"
             activeClassName="active"

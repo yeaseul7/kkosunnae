@@ -5,6 +5,7 @@ import { HiPencil } from 'react-icons/hi';
 import { HiDocumentText } from 'react-icons/hi';
 import { HiPlus } from 'react-icons/hi';
 import { useAuth } from '@/lib/firebase/auth';
+import { useFullAdmin } from '@/hooks/useFullAdmin';
 import { doc, getDoc, setDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase/firebase';
 import { useEffect, useState } from 'react';
@@ -26,14 +27,13 @@ interface ShelterIntroData {
 
 export default function ShelterIntro({ shelterId }: ShelterIntroProps) {
     const { user } = useAuth();
+    const { fullAdmin: userFullAdmin } = useFullAdmin();
     const [introData, setIntroData] = useState<ShelterIntroData | null>(null);
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     /** 로그인한 사용자의 보호소 관리번호(shelterInfo.careRegNo) */
     const [userShelterCareRegNo, setUserShelterCareRegNo] = useState<string | null>(null);
-    /** 전체 관리자 여부(users.fulladmin) */
-    const [userFullAdmin, setUserFullAdmin] = useState(false);
     const [userProfileLoading, setUserProfileLoading] = useState(true);
 
     const isManagerOfThisShelter = Boolean(
@@ -53,12 +53,11 @@ export default function ShelterIntro({ shelterId }: ShelterIntroProps) {
         immediatelyRender: false,
     });
 
-    // 로그인한 사용자의 보호소 정보(shelterInfo), 전체 관리자(fulladmin) 로드
+    // 로그인한 사용자의 보호소 정보(shelterInfo.careRegNo) 로드
     useEffect(() => {
         const loadUserProfile = async () => {
             if (!user?.uid) {
                 setUserShelterCareRegNo(null);
-                setUserFullAdmin(false);
                 setUserProfileLoading(false);
                 return;
             }
@@ -66,12 +65,10 @@ export default function ShelterIntro({ shelterId }: ShelterIntroProps) {
                 const userDoc = await getDoc(doc(firestore, 'users', user.uid));
                 const data = userDoc.data();
                 const careRegNo = data?.shelterInfo?.careRegNo;
-                setUserShelterCareRegNo(typeof careRegNo === 'string' ? careRegNo : null);
-                setUserFullAdmin(data?.fulladmin === true);
+                setUserShelterCareRegNo(careRegNo != null ? String(careRegNo) : null);
             } catch (error) {
                 console.error('사용자 프로필 로드 오류:', error);
                 setUserShelterCareRegNo(null);
-                setUserFullAdmin(false);
             } finally {
                 setUserProfileLoading(false);
             }

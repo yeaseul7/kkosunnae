@@ -1,10 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/lib/firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { firestore } from '@/lib/firebase/firebase';
+import { useFullAdmin } from '@/hooks/useFullAdmin';
 import { useNoticeList } from '@/hooks/useNoticeList';
 import NoticeSearch from './NoticeSearch';
 import NoticeListCard from './NoticeListCard';
@@ -14,9 +12,8 @@ import { RiPencilFill } from 'react-icons/ri';
 const PAGE_SIZE = 10;
 
 export default function NoticeList() {
-    const { user } = useAuth();
+    const { fullAdmin } = useFullAdmin();
     const [searchQuery, setSearchQuery] = useState('');
-    const [fullAdmin, setFullAdmin] = useState(false);
 
     const {
         notices,
@@ -26,22 +23,6 @@ export default function NoticeList() {
         listNumberStart,
         goToPage,
     } = useNoticeList({ searchQuery, pageSize: PAGE_SIZE });
-
-    useEffect(() => {
-        const loadUserProfile = async () => {
-            if (!user?.uid) {
-                setFullAdmin(false);
-                return;
-            }
-            try {
-                const userDoc = await getDoc(doc(firestore, 'users', user.uid));
-                setFullAdmin(userDoc.data()?.fulladmin === true);
-            } catch {
-                setFullAdmin(false);
-            }
-        };
-        loadUserProfile();
-    }, [user?.uid]);
 
     return (
         <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">

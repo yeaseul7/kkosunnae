@@ -4,15 +4,15 @@ import { FaInstagram } from 'react-icons/fa';
 import { HiEnvelope } from 'react-icons/hi2';
 
 const FOOTER_LINKS = {
-  바로가기: [
-    { label: '홈', href: '/' },
-    { label: '공지사항', href: '/notice' },
-    { label: '보호소', href: '/shelter' },
-    { label: '커뮤니티', href: '/community' },
-  ],
   서비스: [
+    { label: '홈', href: '/' },
     { label: '유기동물 보호소', href: '/animalShelter' },
-    { label: '검색', href: '/search' },
+    { label: '입양 공고', href: '/shelter' },
+    { label: '커뮤니티', href: '/community' },
+    { label: '보호단체', href: '/protectionGroup' },
+  ],
+  소식: [
+    { label: '공지사항', href: '/notice' },
   ],
 } as const;
 
@@ -50,16 +50,16 @@ export default function PageFooter() {
               <span className="text-xs">kkosunnaekr1@gmail.com</span>
             </a>
           </div>
-          <div className="flex flex-wrap gap-x-10 gap-y-6 sm:gap-x-12">
+          <div className="grid grid-cols-2 min-[500px]:grid-cols-3 gap-8 sm:gap-10">
             {Object.entries(FOOTER_LINKS).map(([title, links]) => (
-              <div key={title}>
+              <div key={title} className="min-w-0">
                 <h3 className="mb-3 text-sm font-bold text-gray-900">{title}</h3>
                 <ul className="flex flex-col gap-2">
                   {links.map(({ label, href }) => (
                     <li key={href}>
                       <Link
                         href={href}
-                        className="text-xs text-gray-600 hover:text-primary1 hover:underline focus:outline-none focus:ring-2 focus:ring-primary1/30 rounded"
+                        className="text-xs text-gray-600 hover:text-primary1 hover:underline focus:outline-none focus:ring-2 focus:ring-primary1/30 rounded break-words"
                       >
                         {label}
                       </Link>

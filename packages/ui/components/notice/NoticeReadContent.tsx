@@ -1,17 +1,10 @@
 'use client';
 
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getCountFromServer,
-  getDoc,
-  setDoc,
-  serverTimestamp,
-} from 'firebase/firestore';
+import { deleteDoc, doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useAuth } from '@/lib/firebase/auth';
+import { useCallback, useEffect, useState } from 'react';
+import { useFullAdmin } from '@/hooks/useFullAdmin';
+import { useViewCount } from '@/hooks/useViewCount';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Image } from '@tiptap/extension-image';
@@ -34,16 +27,6 @@ import NoticeReadContentSkeleton from './NoticeReadContentSkeleton';
 import ReadFooter from '../common/ReadFooter';
 
 const NOTICE_COLLECTION = 'notice';
-const VIEW_SUBCOLLECTION = 'view';
-
-/** IP를 SHA-256 해시한 뒤 앞 32자리 hex 문자열로 반환 (view 문서 ID용) */
-async function hashIpForViewId(ip: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(ip);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
-}
 
 interface NoticeReadData extends NoticeData {
   category?: string;
@@ -78,18 +61,16 @@ function toNoticeData(id: string, data: Record<string, unknown>): NoticeReadData
   };
 }
 
-const VIEW_COUNT_DELAY_MS = 5000;
-
 export default function NoticeReadContent({ noticeId }: NoticeReadContentProps) {
   const router = useRouter();
-  const { user } = useAuth();
+  const { fullAdmin } = useFullAdmin();
   const [notice, setNotice] = useState<NoticeReadData | null>(null);
-  const [viewCount, setViewCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const [fullAdmin, setFullAdmin] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const recordedViewRef = useRef<string | null>(null);
+  const { viewCount } = useViewCount(NOTICE_COLLECTION, noticeId ?? undefined, {
+    enabled: !!notice,
+  });
 
   const editor = useEditor({
     extensions: [StarterKit, Image],
@@ -107,7 +88,6 @@ export default function NoticeReadContent({ noticeId }: NoticeReadContentProps) 
     let cancelled = false;
     setLoading(true);
     setNotice(null);
-    setViewCount(0);
 
     const load = async () => {
       try {
@@ -121,14 +101,6 @@ export default function NoticeReadContent({ noticeId }: NoticeReadContentProps) 
             const optimized = optimizeImageUrlsInHtml(data.content);
             editor.commands.setContent(optimized);
           }
-          const viewCol = collection(
-            firestore,
-            NOTICE_COLLECTION,
-            noticeId,
-            VIEW_SUBCOLLECTION
-          );
-          const countSnap = await getCountFromServer(viewCol);
-          if (!cancelled) setViewCount(countSnap.data().count);
         } else {
           setNotice(null);
           setNotFound(true);
@@ -148,22 +120,6 @@ export default function NoticeReadContent({ noticeId }: NoticeReadContentProps) 
       cancelled = true;
     };
   }, [noticeId, editor]);
-
-  useEffect(() => {
-    if (!user?.uid) {
-      setFullAdmin(false);
-      return;
-    }
-    const load = async () => {
-      try {
-        const userDoc = await getDoc(doc(firestore, 'users', user.uid));
-        setFullAdmin(userDoc.data()?.fulladmin === true);
-      } catch {
-        setFullAdmin(false);
-      }
-    };
-    load();
-  }, [user?.uid]);
 
   const handleDelete = useCallback(async () => {
     if (!noticeId || !fullAdmin) return;
@@ -186,40 +142,6 @@ export default function NoticeReadContent({ noticeId }: NoticeReadContentProps) 
       editor.commands.setContent(optimized);
     }
   }, [notice?.content, editor]);
-
-  useEffect(() => {
-    if (!noticeId || !notice || recordedViewRef.current === noticeId) return;
-    const timer = setTimeout(async () => {
-      try {
-        const res = await fetch('/api/client-ip');
-        const { ip } = (await res.json()) as { ip: string };
-        const viewerId = await hashIpForViewId(ip || 'unknown');
-
-        const viewRef = doc(
-          firestore,
-          NOTICE_COLLECTION,
-          noticeId,
-          VIEW_SUBCOLLECTION,
-          viewerId
-        );
-        const viewSnap = await getDoc(viewRef);
-        if (viewSnap.exists()) {
-          recordedViewRef.current = noticeId;
-          return;
-        }
-
-        await setDoc(viewRef, {
-          ip,
-          createdAt: serverTimestamp(),
-        });
-        recordedViewRef.current = noticeId;
-        setViewCount((prev) => prev + 1);
-      } catch (e) {
-        console.error('조회 기록 실패:', e);
-      }
-    }, VIEW_COUNT_DELAY_MS);
-    return () => clearTimeout(timer);
-  }, [noticeId, notice]);
 
   if (loading) {
     return <NoticeReadContentSkeleton />;

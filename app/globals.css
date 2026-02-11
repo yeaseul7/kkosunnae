@@ -1,14 +1,16 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
   /* --foreground: #171717; */
+  --font-pretendard: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   /* --color-foreground: var(--foreground); */
-  --font-sans: var(--font-cafe24), sans-serif;
+  --font-sans: var(--font-pretendard);
   --font-mono: var(--font-geist-mono);
 
   /* Theme colors from tailwind.config.js */
@@ -107,7 +109,7 @@ body {
   background: #fafafa;
   /* 항상 밝은 배경색 사용 */
   /* color: var(--foreground); */
-  font-family: var(--font-cafe24), sans-serif;
+  font-family: var(--font-pretendard);
 }
 
 /* 링크·버튼에 포인터 커서 */

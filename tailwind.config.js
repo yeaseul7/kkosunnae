@@ -8,8 +8,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'sans': ['var(--font-cafe24)', 'sans-serif'],
-        'bmjua': ['var(--font-cafe24)', 'sans-serif'],
+        sans: ['var(--font-pretendard)', 'sans-serif'],
+        pretendard: ['var(--font-pretendard)', 'sans-serif'],
+        bmjua: ['var(--font-cafe24)', 'sans-serif'],
       },
       colors: {
         // Theme colors (light theme as default)

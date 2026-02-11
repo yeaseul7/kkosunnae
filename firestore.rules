@@ -37,6 +37,11 @@ service cloud.firestore {
         allow update: if request.auth != null && request.auth.uid == userId;
         allow delete: if request.auth != null && request.auth.uid == userId;
       }
+
+      // cardnews 서브컬렉션: 스크랩한 카드뉴스 id 저장. 본인만 읽기/쓰기
+      match /cardnews/{cardNewsId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // 'boards' 컬렉션에 대해서는 로그인된 사용자만 생성 가능
@@ -92,9 +97,14 @@ service cloud.firestore {
     match /shelter/{shelterId} {
       allow read: if true; // 모든 사람이 보호소 소개 정보를 읽을 수 있음
       allow create: if request.auth != null; // 로그인한 사용자만 생성 가능
-      allow update: if request.auth != null && 
-        resource.exists && 
-        request.auth.uid == resource.data.authorId; // 작성자만 수정 가능
+      // 작성자, 해당 보호소 관리자(shelterInfo.careRegNo == shelterId), 전체 관리자(fulladmin)만 수정 가능
+      // users 문서의 shelterInfo.careRegNo는 문자열이어야 함 (숫자면 규칙 비교 실패)
+      allow update: if request.auth != null && resource.exists && (
+        request.auth.uid == resource.data.get('authorId', '')
+        || (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('shelterInfo', null) != null
+            && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('shelterInfo', {}).get('careRegNo', '') == shelterId)
+        || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('fulladmin', false) == true
+      );
       allow delete: if false; // 삭제 불가
     }
 
@@ -137,6 +147,39 @@ service cloud.firestore {
           );
           allow delete: if request.auth != null && request.auth.uid == resource.data.authorId;
         }
+      }
+    }
+
+    // 'cardNews' 컬렉션: 카드뉴스 (작성자/좋아요/댓글)
+    match /cardNews/{cardNewsId} {
+      allow read: if true; // 모든 사람이 읽기 가능
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (
+        request.auth.uid == resource.data.authorId || // 작성자 수정
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeIds', 'likeCount'])) // 좋아요만 변경
+      );
+      allow delete: if request.auth != null && request.auth.uid == resource.data.authorId;
+
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if request.auth != null;
+        allow update: if request.auth != null && (
+          request.auth.uid == resource.data.authorId ||
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes']))
+        );
+        allow delete: if request.auth != null && request.auth.uid == resource.data.authorId;
+      }
+
+      // liked 서브컬렉션: 좋아요 누른 사용자 id (문서 id = userId)
+      match /liked/{userId} {
+        allow read: if true;
+        allow create, delete: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // view 서브컬렉션: IP별 조회 기록 (중복 조회 방지). 누구나 읽기/생성만 가능
+      match /view/{viewId} {
+        allow read, create: if true;
+        allow update, delete: if false;
       }
     }
 

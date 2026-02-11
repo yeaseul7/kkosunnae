@@ -11,7 +11,7 @@ export default function Banner2() {
             <div
                 className="absolute inset-0 bg-cover bg-no-repeat bg-left"
                 style={{
-                    backgroundImage: 'url(/static/images/banner2.jpeg)',
+                    backgroundImage: 'url(/static/images/banner2.png)',
                     backgroundPosition: 'left center',
                     backgroundSize: 'cover',
                 }}

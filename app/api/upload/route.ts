@@ -5,6 +5,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const folder = (formData.get('folder') as string)?.trim() || 'unleashed';
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
@@ -17,11 +18,11 @@ export async function POST(request: NextRequest) {
     // Convert buffer to base64 string (Cloudinary prefers base64 over stream for server-side)
     const base64 = buffer.toString('base64');
 
-    // Upload to Cloudinary using base64
+    // Upload to Cloudinary using base64 (folder 예: 'unleashed' | 'kkosunnae_cardNews/{firebaseId}')
     const result = await cloudinary.uploader.upload(
       `data:${file.type};base64,${base64}`,
       {
-        folder: 'unleashed',
+        folder,
         resource_type: 'image',
         quality: 'auto',
         fetch_format: 'auto',

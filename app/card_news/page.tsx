@@ -1,8 +1,10 @@
 'use client';
-import { useState, Suspense } from 'react';
+
+import CardNewsHeader from '@/packages/ui/components/cardNews/cardNewsHeader';
+import AdoptionGuide from '@/packages/ui/components/cardNews/AdoptionGuide';
+import Training from '@/packages/ui/components/cardNews/Training';
+import Health from '@/packages/ui/components/cardNews/Health';
 import dynamic from 'next/dynamic';
-import HomeTabSkeleton from '@/packages/ui/components/base/HomeTabSkeleton';
-import PostCardSkeleton from '@/packages/ui/components/base/PostCardSkeleton';
 
 const PageTemplate = dynamic(
     () => import('@/packages/ui/components/base/PageTemplate'),
@@ -14,45 +16,17 @@ const PageFooter = dynamic(
     { ssr: true }
 );
 
-const HomeTab = dynamic(
-    () => import('@/packages/ui/components/home/HomeTab'),
-    {
-        ssr: true,
-        loading: () => <HomeTabSkeleton />
-    }
-);
-
-const TrendingPosts = dynamic(
-    () => import('@/packages/ui/components/home/trending/TrendingPosts'),
-    { ssr: true }
-);
-
-const RecentPosts = dynamic(
-    () => import('@/packages/ui/components/home/recent/RecentPosts'),
-    { ssr: true }
-);
-
-
-export default function Home() {
-    const [mode, setMode] = useState<'trending' | 'adoption'>('trending');
+export default function CardNewsPage() {
     return (
         <main className="page-container-full">
             <PageTemplate visibleHomeTab={false}>
-                <div className="w-full">
-                    <Suspense fallback={<HomeTabSkeleton />}>
-                        <HomeTab mode={mode} setMode={setMode} />
-                    </Suspense>
-                    <Suspense fallback={
-                        <div className="w-full">
-                            <div className="grid grid-cols-1 gap-4 px-4 pt-8 w-full sm:px-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                                {Array.from({ length: 12 }).map((_, index) => (
-                                    <PostCardSkeleton key={`skeleton-${index}`} />
-                                ))}
-                            </div>
-                        </div>
-                    }>
-                        {mode === 'trending' ? <TrendingPosts pageSize={4} fromMain /> : <RecentPosts pageSize={4} fromMain />}
-                    </Suspense>
+                <div className="mx-auto w-full max-w-4xl px-4 py-5 sm:px-6 sm:py-6 md:px-8 md:py-6">
+                    <CardNewsHeader />
+                    <div className="mt-8 flex flex-col gap-10">
+                        <AdoptionGuide />
+                        <Training />
+                        <Health />
+                    </div>
                 </div>
             </PageTemplate>
             <PageFooter />
