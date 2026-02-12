@@ -44,7 +44,6 @@ export default function CardNewsCard({ data, aspectRatio = '3/4' }: CardNewsCard
     const optimizedUrl = imageUrl && imageUrl.includes('res.cloudinary.com')
         ? getOptimizedCloudinaryUrl(imageUrl, 400, 533)
         : imageUrl;
-    const categoryLabel = CARD_NEWS_CATEGORY_LABELS[data.category] ?? data.category;
     const dateStr = formatDate(data.createdAt);
 
     return (

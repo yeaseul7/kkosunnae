@@ -170,7 +170,7 @@ export default function AbandonedCard({
         {/* 뱃지: 사진 오른쪽 상단 - D-n(빨강+시계 아이콘) 또는 공고 종료(회색) */}
         {noticeEndBadge && (
           <div
-            className="absolute top-2 right-2 z-10 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap shadow-sm"
+            className="absolute top-1.5 right-1.5 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold whitespace-nowrap shadow-sm"
             style={{
               backgroundColor: noticeEndBadge.bgColor,
               color: noticeEndBadge.textColor,
@@ -183,15 +183,15 @@ export default function AbandonedCard({
           </div>
         )}
       </div>
-      <div className="flex flex-col flex-1 py-3 sm:py-4 gap-3 relative">
+      <div className="flex flex-col flex-1 pt-3 sm:pt-4 gap-3 relative ">
         {/* 이름 + 보호중 뱃지 */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-base sm:text-lg font-bold text-gray-900 truncate flex-1 min-w-0">
+          <h3 className="text-sm sm:text-base font-bold text-gray-900 truncate flex-1 min-w-0">
             {shelterAnimal?.kindNm || '이름 없음'}
           </h3>
           {shelterAnimal?.processState && (
             <div
-              className="flex-shrink-0 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+              className="flex-shrink-0 px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold whitespace-nowrap"
               style={{
                 backgroundColor: statusBadge.bgColor,
                 color: statusBadge.textColor,
@@ -203,14 +203,14 @@ export default function AbandonedCard({
         </div>
         {/* 품종 · 나이 · 성별 */}
         {basicInfoLine && (
-          <p className="text-sm text-gray-700">
+          <p className="text-xs text-gray-700">
             {basicInfoLine}
           </p>
         )}
         {/* 구조일 */}
         {rescueDateStr && (
-          <div className="flex items-center gap-1.5 text-sm text-gray-600">
-            <HiCalendar className="w-4 h-4 flex-shrink-0 text-gray-400" />
+          <div className="flex items-center gap-1.5 text-xs text-gray-600">
+            <HiCalendar className="w-3.5 h-3.5 flex-shrink-0 text-gray-400" />
             <span>{rescueDateStr}</span>
           </div>
         )}
@@ -221,7 +221,7 @@ export default function AbandonedCard({
             e.stopPropagation();
             router.push(`/shelter/${shelterAnimal.desertionNo}`);
           }}
-          className="w-full flex justify-center items-center py-1.5 rounded-2xl text-sm font-semibold transition-colors mt-auto bg-primary1/10 text-primary1 hover:bg-primary1/20"
+          className="w-full flex justify-center items-center py-1.5 rounded-2xl text-xs font-semibold transition-colors mt-2 bg-primary1/10 text-primary1 hover:bg-primary1/20"
         >
           자세히 보기
         </button>

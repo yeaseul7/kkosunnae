@@ -1,12 +1,12 @@
 'use client';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { ShelterAnimalItem } from '@/packages/type/postType';
-import AbandonedCard from '../../base/AbandonedCard';
 import AbandonedCardSkeleton from '../../base/AbandonedCardSkeleton';
 import AnimalFilterHeader, { AnimalFilterState } from './AnimalFilterHeader';
 import { fetchShelterAnimalData, FetchShelterAnimalDataResult } from '@/lib/api/shelter';
 import SearchAi from './SearchAi';
 import RegionMap from './RegionMap';
+import VirtualizedShelterGrid from './VirtualizedShelterGrid';
 
 interface ShelterPostsClientProps {
   initialData: FetchShelterAnimalDataResult;
@@ -32,12 +32,30 @@ export default function ShelterPostsClient({ initialData }: ShelterPostsClientPr
   });
   const filtersRef = useRef<AnimalFilterState>(filters);
   const isLoadingMoreRef = useRef(false);
-  const observerTarget = useRef<HTMLDivElement>(null);
   const isFilterRequestInProgress = useRef(false);
+  const gridContainerRef = useRef<HTMLDivElement>(null);
+  const [gridSize, setGridSize] = useState({ width: 0, height: 0 });
+  const pageNoRef = useRef(pageNo);
+  const hasMoreRef = useRef(hasMore);
+  pageNoRef.current = pageNo;
+  hasMoreRef.current = hasMore;
 
   useEffect(() => {
     filtersRef.current = filters;
   }, [filters]);
+
+  useEffect(() => {
+    const el = gridContainerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const { width: w, height: h } = entries[0]?.contentRect ?? {};
+      if (w != null && h != null) setGridSize({ width: w, height: h });
+    });
+    ro.observe(el);
+    const { width: w, height: h } = el.getBoundingClientRect();
+    if (w && h) setGridSize({ width: w, height: h });
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     isLoadingMoreRef.current = isLoadingMore;
@@ -140,80 +158,12 @@ export default function ShelterPostsClient({ initialData }: ShelterPostsClientPr
     }
   }, []);
 
-  useEffect(() => {
-    if (loading || !hasMore) {
-      return;
-    }
-
-    if (isLoadingMore) {
-      return;
-    }
-
-    if (isFilterRequestInProgress.current) {
-      return;
-    }
-
-    const currentTarget = observerTarget.current;
-    if (!currentTarget) {
-      const timeoutId = setTimeout(() => {
-        const retryTarget = observerTarget.current;
-        if (
-          retryTarget &&
-          hasMore &&
-          !isLoadingMore &&
-          !isFilterRequestInProgress.current
-        ) {
-          const observer = new IntersectionObserver(
-            (entries) => {
-              if (entries[0].isIntersecting) {
-                if (
-                  hasMore &&
-                  !isLoadingMoreRef.current &&
-                  !isFilterRequestInProgress.current
-                ) {
-                  const nextPage = pageNo + 1;
-                  setPageNo(nextPage);
-                  handleFetchShelterAnimalData(nextPage, false, filtersRef.current);
-                }
-              }
-            },
-            {
-              threshold: 0.1,
-              rootMargin: '200px',
-            },
-          );
-          observer.observe(retryTarget);
-        }
-      }, 100);
-      return () => clearTimeout(timeoutId);
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          if (
-            hasMore &&
-            !isLoadingMoreRef.current &&
-            !isFilterRequestInProgress.current
-          ) {
-            const nextPage = pageNo + 1;
-            setPageNo(nextPage);
-            handleFetchShelterAnimalData(nextPage, false, filtersRef.current);
-          }
-        }
-      },
-      {
-        threshold: 0.1,
-        rootMargin: '200px',
-      },
-    );
-
-    observer.observe(currentTarget);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [loading, hasMore, isLoadingMore, pageNo, handleFetchShelterAnimalData]);
+  const handleScrollNearEnd = useCallback(() => {
+    if (!hasMoreRef.current || isLoadingMoreRef.current || isFilterRequestInProgress.current) return;
+    const next = pageNoRef.current + 1;
+    setPageNo(next);
+    handleFetchShelterAnimalData(next, false, filtersRef.current);
+  }, [handleFetchShelterAnimalData]);
 
   const postCount =
     loading && shelterAnimalData.length === 0
@@ -292,40 +242,39 @@ export default function ShelterPostsClient({ initialData }: ShelterPostsClientPr
             <div className="py-12 text-center text-gray-500">
               유기동물 데이터가 없습니다.
             </div>
-          ) : (
+          ) : loading && shelterAnimalData.length === 0 ? (
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 justify-items-center">
-              {loading ? (
-                Array.from({ length: 12 }).map((_, index) => (
-                  <AbandonedCardSkeleton key={`skeleton-${index}`} />
-                ))
-              ) : (
-                <>
-                  {shelterAnimalData.map((shelterAnimal: ShelterAnimalItem, index) => (
-                    <AbandonedCard
-                      key={shelterAnimal.desertionNo ? `${shelterAnimal.desertionNo}-${index}` : `shelter-${index}`}
-                      shelterAnimal={shelterAnimal}
-                    />
-                  ))}
-                  {isLoadingMore && (
-                    Array.from({ length: 12 }).map((_, index) => (
-                      <AbandonedCardSkeleton key={`skeleton-more-${index}`} />
-                    ))
-                  )}
-                </>
+              {Array.from({ length: 12 }).map((_, index) => (
+                <AbandonedCardSkeleton key={`skeleton-${index}`} />
+              ))}
+            </div>
+          ) : (
+            <>
+              <div
+                ref={gridContainerRef}
+                className="w-full"
+                style={{ minHeight: '60vh', height: '65vh' }}
+              >
+                {gridSize.width > 0 && gridSize.height > 0 && (
+                  <VirtualizedShelterGrid
+                    items={shelterAnimalData}
+                    width={gridSize.width}
+                    height={gridSize.height}
+                    onScrollNearEnd={handleScrollNearEnd}
+                  />
+                )}
+              </div>
+              {isLoadingMore && (
+                <div className="flex justify-center py-4 text-sm text-gray-500">
+                  더 불러오는 중...
+                </div>
               )}
-            </div>
-          )}
-          {hasMore && !loading && (
-            <div
-              ref={observerTarget}
-              className="h-32 flex justify-center items-center py-12"
-              data-testid="infinite-scroll-trigger"
-            />
-          )}
-          {!hasMore && shelterAnimalData.length > 0 && (
-            <div className="text-center text-gray-500 py-8">
-              모든 데이터를 불러왔습니다.
-            </div>
+              {!hasMore && shelterAnimalData.length > 0 && (
+                <div className="text-center text-gray-500 py-8">
+                  모든 데이터를 불러왔습니다.
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
