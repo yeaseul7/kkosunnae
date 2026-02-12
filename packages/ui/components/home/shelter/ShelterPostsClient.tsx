@@ -252,8 +252,7 @@ export default function ShelterPostsClient({ initialData }: ShelterPostsClientPr
             <>
               <div
                 ref={gridContainerRef}
-                className="w-full"
-                style={{ minHeight: '60vh', height: '65vh' }}
+                className="w-full h-[65vh] min-h-[400px] overflow-hidden"
               >
                 {gridSize.width > 0 && gridSize.height > 0 && (
                   <VirtualizedShelterGrid

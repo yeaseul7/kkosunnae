@@ -336,39 +336,48 @@ export default function RegionMap({
       });
     };
 
-    // 4. 실행: Data Layer 우선, 실패 시 Polygon 폴백
-    if (nm.Data) {
+    // 4. 실행: Data Layer 우선, 실패 시 Polygon 폴백 (선택 시 스타일 갱신을 위해 캐시 있으면 레이어 재생성)
+    const applyDataLayer = (geojson: typeof geoJsonCacheRef.current) => {
+      if (!geojson || !nm.Data) return;
       if (dataLayerRef.current) {
-        dataLayerRef.current.setStyle(getStyle);
+        dataLayerRef.current.setMap(null);
+        dataLayerRef.current = null;
+      }
+      const dataLayer = new nm.Data({ map });
+      dataLayerRef.current = dataLayer;
+      try {
+        dataLayer.addGeoJson(geojson);
+        dataLayer.setStyle(getStyle);
+        if (dataLayer.addListener) {
+          dataLayer.addListener('click', (e: { feature: NaverDataFeature }) => {
+            const props = {
+              CTP_KOR_NM: e.feature.getProperty?.('CTP_KOR_NM'),
+              SIDO_NM: e.feature.getProperty?.('SIDO_NM'),
+              NAME_1: e.feature.getProperty?.('NAME_1'),
+              name: e.feature.getProperty?.('name'),
+              name_eng: e.feature.getProperty?.('name_eng'),
+            } as Record<string, unknown>;
+            const clickedName = getFeatureName(props);
+            console.log('클릭한 지역:', clickedName);
+          });
+        }
+      } catch (e) {
+        console.warn('Data.addGeoJson 실패, Polygon 폴백 사용', e);
+        dataLayerRef.current = null;
+        drawPolygonFallback(geojson);
+      }
+    };
+
+    if (nm.Data) {
+      if (geoJsonCacheRef.current) {
+        applyDataLayer(geoJsonCacheRef.current);
       } else {
-        const dataLayer = new nm.Data({ map });
-        dataLayerRef.current = dataLayer;
         fetch(SIDO_GEOJSON_URL)
           .then((res) => res.json())
           .then((geojson: typeof geoJsonCacheRef.current) => {
             if (!geojson) return;
             geoJsonCacheRef.current = geojson;
-            try {
-              dataLayer.addGeoJson(geojson);
-              dataLayer.setStyle(getStyle);
-              if (dataLayer.addListener) {
-                dataLayer.addListener('click', (e: { feature: NaverDataFeature }) => {
-                  const props = {
-                    CTP_KOR_NM: e.feature.getProperty?.('CTP_KOR_NM'),
-                    SIDO_NM: e.feature.getProperty?.('SIDO_NM'),
-                    NAME_1: e.feature.getProperty?.('NAME_1'),
-                    name: e.feature.getProperty?.('name'),
-                    name_eng: e.feature.getProperty?.('name_eng'),
-                  } as Record<string, unknown>;
-                  const clickedName = getFeatureName(props);
-                  console.log('클릭한 지역:', clickedName);
-                });
-              }
-            } catch (e) {
-              console.warn('Data.addGeoJson 실패, Polygon 폴백 사용', e);
-              dataLayerRef.current = null;
-              drawPolygonFallback(geojson);
-            }
+            applyDataLayer(geojson);
           })
           .catch((err) => {
             console.warn('Data Layer 오류, Polygon 폴백 실행', err);
@@ -378,10 +387,10 @@ export default function RegionMap({
             } else {
               fetch(SIDO_GEOJSON_URL)
                 .then((res) => res.json())
-                .then((geojson: typeof geoJsonCacheRef.current) => {
-                  if (geojson) {
-                    geoJsonCacheRef.current = geojson;
-                    drawPolygonFallback(geojson);
+                .then((g: typeof geoJsonCacheRef.current) => {
+                  if (g) {
+                    geoJsonCacheRef.current = g;
+                    drawPolygonFallback(g);
                   }
                 })
                 .catch((e) => console.error('행정구역 GeoJSON 로드 실패', e));

@@ -31,7 +31,7 @@ export default function PageTemplate({
       </div>
       {visibleHomeTab && <div className="shrink-0"><HomeTab mode={mode as 'trending' | 'adoption'} setMode={setMode as (mode: 'trending' | 'adoption') => void} /></div>}
       <div className="flex-1 min-h-0 w-full bg-lightBlue overflow-hidden">
-        <div className="flex flex-col h-full px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl mb-15 pb-15">{children}</div>
+        <div className="flex flex-col h-full px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl ">{children}</div>
       </div>
     </div>
   );

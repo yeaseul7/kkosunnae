@@ -116,17 +116,6 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
               홈
             </NavLink>
             <NavLink
-              to="/animalShelter"
-              activeClassName="active"
-              isActive={() => pathname === '/animalShelter' || pathname.startsWith('/animalShelter')}
-              className={`!border-b-0 !p-0 text-sm lg:text-base transition-colors ${pathname === '/animalShelter' || pathname.startsWith('/animalShelter')
-                ? '!text-primary1 font-semibold'
-                : '!text-gray-700 hover:!text-primary1'
-                }`}
-            >
-              보호소
-            </NavLink>
-            <NavLink
               to="/shelter"
               activeClassName="active"
               isActive={() => pathname === '/shelter' || pathname.startsWith('/shelter')}
@@ -136,6 +125,17 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
                 }`}
             >
               입양 공고
+            </NavLink>
+            <NavLink
+              to="/animalShelter"
+              activeClassName="active"
+              isActive={() => pathname === '/animalShelter' || pathname.startsWith('/animalShelter')}
+              className={`!border-b-0 !p-0 text-sm lg:text-base transition-colors ${pathname === '/animalShelter' || pathname.startsWith('/animalShelter')
+                ? '!text-primary1 font-semibold'
+                : '!text-gray-700 hover:!text-primary1'
+                }`}
+            >
+              보호소
             </NavLink>
             <NavLink
               to="/community"
@@ -280,18 +280,6 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
             홈
           </NavLink>
           <NavLink
-            to="/animalShelter"
-            activeClassName="active"
-            isActive={() => pathname === '/animalShelter' || pathname.startsWith('/animalShelter')}
-            className={`block px-4 py-3 !border-b-0 text-sm transition-colors hover:bg-gray-50 rounded-lg ${pathname === '/animalShelter' || pathname.startsWith('/animalShelter')
-              ? '!text-primary1 bg-blue-50 font-semibold'
-              : '!text-gray-700'
-              }`}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            보호소
-          </NavLink>
-          <NavLink
             to="/shelter"
             activeClassName="active"
             isActive={() => pathname === '/shelter' || pathname.startsWith('/shelter')}
@@ -303,6 +291,19 @@ export default function Header({ visibleHeaderButtons = true }: HeaderProps) {
           >
             입양 공고
           </NavLink>
+          <NavLink
+            to="/animalShelter"
+            activeClassName="active"
+            isActive={() => pathname === '/animalShelter' || pathname.startsWith('/animalShelter')}
+            className={`block px-4 py-3 !border-b-0 text-sm transition-colors hover:bg-gray-50 rounded-lg ${pathname === '/animalShelter' || pathname.startsWith('/animalShelter')
+              ? '!text-primary1 bg-blue-50 font-semibold'
+              : '!text-gray-700'
+              }`}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            보호소
+          </NavLink>
+
           <NavLink
             to="/community"
             activeClassName="active"
