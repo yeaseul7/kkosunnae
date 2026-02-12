@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/lib/firebase/auth';
 import { FcGoogle } from 'react-icons/fc';
 import { FaGithub } from 'react-icons/fa';
+import { SiKakaotalk } from 'react-icons/si';
 import { useClickOutsideModal } from '@/packages/utils/clickEvent';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -16,13 +17,14 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ onClose }: LoginModalProps) {
-  const { login, register, loginWithGoogle, loginWithGithub, user } = useAuth();
+  const { login, register, loginWithGoogle, loginWithGithub, loginWithKakao, user } = useAuth();
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const modalRef = useRef<HTMLDivElement>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isGithubLoading, setIsGithubLoading] = useState(false);
+  const [isKakaoLoading, setIsKakaoLoading] = useState(false);
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -102,7 +104,21 @@ export default function LoginModal({ onClose }: LoginModalProps) {
     }
   };
 
-  const isLoading = isGoogleLoading || isGithubLoading || isEmailLoading;
+  const handleKakaoLogin = async () => {
+    setIsKakaoLoading(true);
+    setMessage('카카오 로그인 중...');
+    try {
+      await loginWithKakao();
+    } catch (error) {
+      setMessage(
+        `카카오 로그인 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`,
+      );
+    } finally {
+      setIsKakaoLoading(false);
+    }
+  };
+
+  const isLoading = isGoogleLoading || isGithubLoading || isKakaoLoading || isEmailLoading;
 
   return (
     <div className="flex fixed inset-0 justify-center items-center z-[9999]">
@@ -193,6 +209,17 @@ export default function LoginModal({ onClose }: LoginModalProps) {
           >
             <div className="p-2 rounded-full border border-border3 hover:bg-gray-50 transition-colors">
               <FaGithub className="text-2xl" />
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={handleKakaoLogin}
+            disabled={isLoading}
+            className="flex justify-center items-center disabled:opacity-60 disabled:cursor-not-allowed"
+            aria-label="카카오로 로그인"
+          >
+            <div className="p-2 rounded-full border border-border3 hover:bg-[#FEE500]/20 transition-colors">
+              <SiKakaotalk className="text-2xl text-[#191919]" />
             </div>
           </button>
         </div>

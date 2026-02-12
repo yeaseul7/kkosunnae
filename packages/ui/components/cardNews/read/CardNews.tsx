@@ -91,7 +91,7 @@ export default function CardNews({ images, title, summary }: CardNewsProps) {
                         </h2>
                     )}
                     {summary && (
-                        <p className="text-sm text-gray-600">{summary}</p>
+                        <p className="text-sm text-gray-600 whitespace-pre-wrap">{summary}</p>
                     )}
                 </div>
             )}

@@ -91,7 +91,7 @@ export default function CarNewsInfo({
 
             {/* 요약 */}
             {data.summary && (
-                <p className="mt-3 text-sm leading-relaxed text-gray-600">
+                <p className="mt-3 text-sm leading-relaxed text-gray-600 whitespace-pre-wrap">
                     {data.summary}
                 </p>
             )}

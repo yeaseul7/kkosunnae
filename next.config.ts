@@ -81,6 +81,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '**.ytimg.com',
       },
+      {
+        protocol: 'http',
+        hostname: 'k.kakaocdn.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'k.kakaocdn.net',
+      },
     ],
     minimumCacheTTL: 60 * 60 * 24,
   },

@@ -16,6 +16,7 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   GithubAuthProvider,
+  OAuthProvider,
   signInWithPopup,
   User,
   signInWithEmailLink,
@@ -31,6 +32,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   loginWithGithub: () => Promise<void>;
+  loginWithKakao: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -41,6 +43,7 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => { },
   loginWithGoogle: async () => { },
   loginWithGithub: async () => { },
+  loginWithKakao: async () => { },
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -250,6 +253,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const loginWithKakao = async () => {
+    const provider = new OAuthProvider('oidc.kako');
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const currentUser = result.user;
+      if (currentUser) {
+        const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
+        if (!userDoc.exists() && typeof window !== 'undefined') {
+          window.location.href = '/register';
+        }
+      }
+    } catch (error) {
+      console.error('카카오 로그인 실패:', error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -260,6 +280,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         logout,
         loginWithGoogle,
         loginWithGithub,
+        loginWithKakao,
       }}
     >
       {children}
