@@ -91,7 +91,6 @@ export default function YoutubeList() {
             <a
               key={video.id}
               href={`https://www.youtube.com/watch?v=${video.id}`}
-              target="_blank"
               rel="noopener noreferrer"
               className="group block"
             >

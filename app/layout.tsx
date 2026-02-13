@@ -76,6 +76,9 @@ export const metadata: Metadata = {
     description: '전국의 유기동물 정보와 반려인 커뮤니티를 한곳에서! 당신의 가족을 찾아보세요.',
     images: ['/static/images/bannerImg.jpeg'],
   },
+};
+
+export const viewport = {
   themeColor: '#FFD700',
 };
 

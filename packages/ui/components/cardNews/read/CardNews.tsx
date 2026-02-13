@@ -81,8 +81,39 @@ export default function CardNews({ images, title, summary }: CardNewsProps) {
             ? getOptimizedCloudinaryUrl(currentUrl, MAIN_WIDTH, MAIN_HEIGHT)
             : currentUrl;
 
+    const nextIndex = total > 1 ? (currentIndex + 1) % total : -1;
+    const prevIndex = total > 1 ? (currentIndex - 1 + total) % total : -1;
+    const nextUrl =
+        nextIndex >= 0 && images[nextIndex]?.includes('res.cloudinary.com')
+            ? getOptimizedCloudinaryUrl(images[nextIndex], MAIN_WIDTH, MAIN_HEIGHT)
+            : nextIndex >= 0 ? images[nextIndex] : null;
+    const prevUrl =
+        prevIndex >= 0 && images[prevIndex]?.includes('res.cloudinary.com')
+            ? getOptimizedCloudinaryUrl(images[prevIndex], MAIN_WIDTH, MAIN_HEIGHT)
+            : prevIndex >= 0 ? images[prevIndex] : null;
+
     return (
-        <div className="space-y-4">
+        <div className="relative space-y-4">
+            {/* 다음/이전 이미지 미리 로드 → 넘길 때 즉시 표시 */}
+            {nextUrl && (
+                <div
+                    className="pointer-events-none absolute overflow-hidden opacity-0"
+                    style={{ left: -9999, width: MAIN_WIDTH, height: MAIN_HEIGHT }}
+                    aria-hidden
+                >
+                    <Image src={nextUrl} alt="" fill sizes="(max-width: 768px) 100vw, 672px" className="object-cover" />
+                </div>
+            )}
+            {prevUrl && prevUrl !== nextUrl && (
+                <div
+                    className="pointer-events-none absolute overflow-hidden opacity-0"
+                    style={{ left: -9999, width: MAIN_WIDTH, height: MAIN_HEIGHT, top: 0 }}
+                    aria-hidden
+                >
+                    <Image src={prevUrl} alt="" fill sizes="(max-width: 768px) 100vw, 672px" className="object-cover" />
+                </div>
+            )}
+
             {(title || summary) && (
                 <div className="space-y-1">
                     {title && (

@@ -33,7 +33,6 @@ export default function PageFooter() {
             </Link>
             <a
               href="https://www.instagram.com/kkosunnae_official/"
-              target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-gray-600 hover:text-primary1 focus:outline-none focus:ring-2 focus:ring-primary1/30 rounded transition-colors"
               aria-label="꼬순내 인스타그램"

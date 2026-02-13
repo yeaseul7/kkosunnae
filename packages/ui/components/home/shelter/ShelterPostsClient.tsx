@@ -175,7 +175,6 @@ export default function ShelterPostsClient({ initialData }: ShelterPostsClientPr
   return (
     <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 pb-6">
       <div className="flex flex-col lg:flex-row lg:items-start gap-6 pt-4">
-        {/* 왼쪽 사이드바: 데스크톱에서만 — 지역별 보기 + 나의 관심 지역 */}
         <aside className="hidden lg:block lg:w-[280px] xl:w-[320px] shrink-0 pt-6 sm:pt-10">
           <div className="lg:sticky lg:top-4 flex flex-col gap-4">
             <RegionMap
@@ -186,14 +185,7 @@ export default function ShelterPostsClient({ initialData }: ShelterPostsClientPr
               }
               initialSidoCd="6110000"
             />
-            {/* <div className="bg-gray-50/80 rounded-2xl border border-gray-100 p-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-1">
-                나의 관심 지역
-              </h3>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                자주 찾는 지역을 설정하면 새로운 공고 발생 시 알림을 보내드려요.
-              </p>
-            </div> */}
+
           </div>
         </aside>
 

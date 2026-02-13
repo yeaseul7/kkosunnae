@@ -1,19 +1,24 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import BannerImage from './BannerImage';
 
 const AUTO_SCROLL_INTERVAL_MS = 5000;
+const SCROLL_SYNC_THROTTLE_MS = 120;
 
 export default function Banner() {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const programmaticScrollRef = useRef(false);
+    const throttleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const rafRef = useRef<number | null>(null);
 
     useEffect(() => {
         const el = scrollRef.current;
         if (!el) return;
 
         const intervalId = setInterval(() => {
+            programmaticScrollRef.current = true;
             setCurrentIndex((prev) => {
                 const next = prev + 1 >= 3 ? 0 : prev + 1;
                 const container = scrollRef.current;
@@ -23,26 +28,49 @@ export default function Banner() {
                 }
                 return next;
             });
+            setTimeout(() => {
+                programmaticScrollRef.current = false;
+            }, 600);
         }, AUTO_SCROLL_INTERVAL_MS);
 
-        return () => clearInterval(intervalId);
+        return () => {
+            clearInterval(intervalId);
+            if (throttleRef.current) clearTimeout(throttleRef.current);
+            if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        };
     }, []);
 
-    const handleScroll = () => {
+    const syncIndexFromScroll = useCallback(() => {
         const el = scrollRef.current;
-        if (!el) return;
+        if (!el || programmaticScrollRef.current) return;
         const width = el.clientWidth;
         const index = Math.round(el.scrollLeft / width);
         setCurrentIndex(Math.min(index, 2));
-    };
+    }, []);
 
-    const goToSlide = (index: number) => {
+    const handleScroll = useCallback(() => {
+        if (programmaticScrollRef.current) return;
+        if (throttleRef.current) return;
+        throttleRef.current = setTimeout(() => {
+            throttleRef.current = null;
+            rafRef.current = requestAnimationFrame(() => {
+                rafRef.current = null;
+                syncIndexFromScroll();
+            });
+        }, SCROLL_SYNC_THROTTLE_MS);
+    }, [syncIndexFromScroll]);
+
+    const goToSlide = useCallback((index: number) => {
         const el = scrollRef.current;
         if (!el) return;
+        programmaticScrollRef.current = true;
         const width = el.clientWidth;
         el.scrollTo({ left: width * index, behavior: 'smooth' });
         setCurrentIndex(index);
-    };
+        setTimeout(() => {
+            programmaticScrollRef.current = false;
+        }, 500);
+    }, []);
 
     const goPrev = () => {
         const prev = currentIndex <= 0 ? 2 : currentIndex - 1;
@@ -66,7 +94,7 @@ export default function Banner() {
                     style={{ scrollSnapType: 'x mandatory' }}
                 >
                     <div className="min-w-full w-full shrink-0 snap-center snap-always flex-[0_0_100%]">
-                        <BannerImage imageUrl={'/static/images/banner1.png'} link={'/animalShelter'} title={'보호소 정보 확인하기'} />
+                        <BannerImage imageUrl={'/static/images/banner1.png'} link={'/animalShelter'} title={'보호소 정보 확인하기'} priority={true} />
                     </div>
                     <div className="min-w-full w-full shrink-0 snap-center snap-always flex-[0_0_100%]">
                         <BannerImage imageUrl={'/static/images/banner2.png'} link={'/notice'} title={'공지사항 보기'} />
